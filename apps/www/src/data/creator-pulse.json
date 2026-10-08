@@ -1,0 +1,641 @@
+{
+  "syncedAt": "2026-10-07T14:58:58.582Z",
+  "profile": {
+    "handle": "coldniko",
+    "name": "Niko Veit",
+    "xUrl": "https://x.com/coldniko",
+    "github": "https://github.com/Niko1221",
+    "strataRepo": "https://github.com/Niko1221/Strata",
+    "telegram": "https://t.me/veit06",
+    "region": "Europe"
+  },
+  "posts": [
+    {
+      "id": "seed-project-maya-deep-dive",
+      "type": "post",
+      "title": "Project Maya deep dive: running GLM-5.3-Flash (321B MoE) on your own NVIDIA GPUs, built on Strata",
+      "body": "Site analysis · Project Maya (mw00/project-maya) is a Strata-derived engine rewrite that targets zai-org/GLM-5.3-Flash, a 321B-parameter MoE (about 18B active per token) with up to 1M-token context.\n\nHow the port works, per the project's own study (docs/GLM5-FLASH.md, written against engine 0.1.27): roughly two thirds of Strata's machinery carries over unchanged because GLM-5.3-Flash is the same kind of model as Qwen3.8-Flash-Next — a 3:1 linear-attention/sparse-attention hybrid MoE with hyper-connections and an MTP layer. The reworked third is the mixer (KDA instead of GDN), the full-attention mixer (MLA instead of plain QKV), the router scoring, and the model packaging.\n\nMemory is the whole game: the engine keeps the most-used experts in VRAM, the next tier in pinned RAM, and the rest on NVMe SSD, moving them as the conversation needs — nothing leaves the machine. On 2x Tesla V100 32GB the Maya-S quant decodes at up to 40 tokens/s with prefill up to 560 tokens/s; a single V100 still reaches ~19 tokens/s.\n\nThe quants are calibrated, not squeezed: Maya-S (96.5 GB) keeps 97.9% of the FP8 model's zero-shot accuracy and matches its next token 83% of the time; Maya-M (116 GB) adds IQ3_XXS down projections and IQ3_S in the most sensitive layers for 23% lower KL divergence and 86% token agreement, calibrated toward tool calls and front-end code.\n\nMulti-GPU is pipeline (layer) parallelism, not tensor parallelism — a token crosses cards once per verify window, no NVLink needed. Recent v1.0.x releases added a comparable --bench mode, Turing long-prompt fixes, and Maya-M. Full analysis: https://github.com/mw00/project-maya",
+      "url": "https://github.com/mw00/project-maya",
+      "publishedAt": "2026-10-08T08:00:00.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en",
+        "zh",
+        "ja"
+      ],
+      "tags": [
+        "models",
+        "hardware",
+        "benchmark",
+        "release"
+      ]
+    },
+    {
+      "id": "x-2107835937468420440",
+      "type": "post",
+      "title": "Small patch coming in approx 1h for this issue",
+      "body": "Small patch coming in approx 1h for this issue",
+      "url": "https://x.com/coldniko/status/2107835937468420440",
+      "publishedAt": "2026-10-07T14:10:23.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "upgrade",
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 270,
+        "like_count": 7,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 1
+      }
+    },
+    {
+      "id": "x-2107810312145588377",
+      "type": "post",
+      "title": "New release is out!\n\n - Intel Arc works fast now!\n - Multi-GPU (+40%) boost\n - Low-RAM setups now fly\n - DGX Spark 10X faster\n - Outputs 4% faster\n - Short prompts are now blazing quick\n\nhttps://github.com/Niko1221/Strata/releases/tag/v0.1.40.2",
+      "body": "New release is out!\n\n - Intel Arc works fast now!\n - Multi-GPU (+40%) boost\n - Low-RAM setups now fly\n - DGX Spark 10X faster\n - Outputs 4% faster\n - Short prompts are now blazing quick\n\nhttps://github.com/Niko1221/Strata/releases/tag/v0.1.40.2",
+      "url": "https://x.com/coldniko/status/2107810312145588377",
+      "publishedAt": "2026-10-07T12:28:34.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "upgrade",
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 168,
+        "impression_count": 25828,
+        "like_count": 509,
+        "quote_count": 35,
+        "reply_count": 46,
+        "retweet_count": 64
+      }
+    },
+    {
+      "id": "x-2107571956258328821",
+      "type": "post",
+      "title": "@rskjr Hey Robert! I have seen your live stream and concerns in Strata and totally agree. Things are progressing a bit fast, just wanted to let you know it will be handled!",
+      "body": "@rskjr Hey Robert! I have seen your live stream and concerns in Strata and totally agree. Things are progressing a bit fast, just wanted to let you know it will be handled!",
+      "url": "https://x.com/coldniko/status/2107571956258328821",
+      "publishedAt": "2026-10-06T20:41:25.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 1,
+        "impression_count": 509,
+        "like_count": 6,
+        "quote_count": 0,
+        "reply_count": 2,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107535003521310805",
+      "type": "post",
+      "title": "@yue_neg_631 I have a surprise for that :))",
+      "body": "@yue_neg_631 I have a surprise for that :))",
+      "url": "https://x.com/coldniko/status/2107535003521310805",
+      "publishedAt": "2026-10-06T18:14:35.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 314,
+        "like_count": 7,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-seed-strix-win",
+      "type": "post",
+      "title": "Strata wins by a tight margin against other Strix Halo inference engines on first try release",
+      "body": "Community benchmark attention on Ryzen AI Max / Strix Halo builds with Strata v0.1.40.",
+      "url": "https://x.com/coldniko",
+      "publishedAt": "2026-10-06T18:00:00.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en",
+        "zh",
+        "ja"
+      ],
+      "tags": [
+        "benchmark",
+        "hardware",
+        "release"
+      ]
+    },
+    {
+      "id": "x-2107529439001411655",
+      "type": "post",
+      "title": "@servasyy_ai Amazing work from you! I love the community and all the help I get with great PR's and benchmarks you are doing. I'll be looking forward to your further work.",
+      "body": "@servasyy_ai Amazing work from you! I love the community and all the help I get with great PR's and benchmarks you are doing. I'll be looking forward to your further work.",
+      "url": "https://x.com/coldniko/status/2107529439001411655",
+      "publishedAt": "2026-10-06T17:52:28.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "benchmark"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 359,
+        "like_count": 7,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107518943237652537",
+      "type": "post",
+      "title": "@toolowgear @__kutluk Soon 👀👀👀",
+      "body": "@toolowgear @__kutluk Soon 👀👀👀",
+      "url": "https://x.com/coldniko/status/2107518943237652537",
+      "publishedAt": "2026-10-06T17:10:46.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 136,
+        "like_count": 2,
+        "quote_count": 1,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107515460841533689",
+      "type": "post",
+      "title": "Only loses to @ciruai engine on Hermes benchmarks. Kudos 🫡",
+      "body": "Only loses to @ciruai engine on Hermes benchmarks. Kudos 🫡",
+      "url": "https://x.com/coldniko/status/2107515460841533689",
+      "publishedAt": "2026-10-06T16:56:56.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "benchmark"
+      ],
+      "metrics": {
+        "bookmark_count": 1,
+        "impression_count": 1576,
+        "like_count": 11,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 1
+      }
+    },
+    {
+      "id": "x-2107515343107399967",
+      "type": "post",
+      "title": "Strata wins by a tight margin against all other Strix Halo inference engines in it’s first try release. Did not expect that! 🥳 https://t.co/7Ie0lXa85c",
+      "body": "Strata wins by a tight margin against all other Strix Halo inference engines in it’s first try release. Did not expect that! 🥳 https://t.co/7Ie0lXa85c",
+      "url": "https://x.com/coldniko/status/2107515343107399967",
+      "publishedAt": "2026-10-06T16:56:28.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "hardware",
+        "release"
+      ],
+      "metrics": {
+        "bookmark_count": 15,
+        "impression_count": 5974,
+        "like_count": 125,
+        "quote_count": 0,
+        "reply_count": 14,
+        "retweet_count": 8
+      }
+    },
+    {
+      "id": "x-2107493977922707936",
+      "type": "post",
+      "title": "@joseed801 Yes",
+      "body": "@joseed801 Yes",
+      "url": "https://x.com/coldniko/status/2107493977922707936",
+      "publishedAt": "2026-10-06T15:31:34.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 614,
+        "like_count": 4,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107487196995625229",
+      "type": "post",
+      "title": "@badguyty @LotusDecoder I have Aura, but it’s catching up on me 😭",
+      "body": "@badguyty @LotusDecoder I have Aura, but it’s catching up on me 😭",
+      "url": "https://x.com/coldniko/status/2107487196995625229",
+      "publishedAt": "2026-10-06T15:04:37.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 654,
+        "like_count": 3,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107486862025654605",
+      "type": "post",
+      "title": "@Biggest I’m waiting @Alibaba_Qwen @QwenDevs 👀",
+      "body": "@Biggest I’m waiting @Alibaba_Qwen @QwenDevs 👀",
+      "url": "https://x.com/coldniko/status/2107486862025654605",
+      "publishedAt": "2026-10-06T15:03:17.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "models"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 1039,
+        "like_count": 16,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107478982967067126",
+      "type": "post",
+      "title": "@shishimaimidori You are correct and it packs better power.",
+      "body": "@shishimaimidori You are correct and it packs better power.",
+      "url": "https://x.com/coldniko/status/2107478982967067126",
+      "publishedAt": "2026-10-06T14:31:59.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 1,
+        "impression_count": 314,
+        "like_count": 3,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107477488196805012",
+      "type": "post",
+      "title": "@gabu3d_pl @pardoxAI I'm just doing tests on 4x cards. Hold up ;)",
+      "body": "@gabu3d_pl @pardoxAI I'm just doing tests on 4x cards. Hold up ;)",
+      "url": "https://x.com/coldniko/status/2107477488196805012",
+      "publishedAt": "2026-10-06T14:26:02.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 50,
+        "like_count": 1,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107477338816495896",
+      "type": "post",
+      "title": "@D3PR3C4T0R @AMD @ColbyCakesss @AzorFrank I'm dealing with Strata, I have finger crossed for you to handle it!",
+      "body": "@D3PR3C4T0R @AMD @ColbyCakesss @AzorFrank I'm dealing with Strata, I have finger crossed for you to handle it!",
+      "url": "https://x.com/coldniko/status/2107477338816495896",
+      "publishedAt": "2026-10-06T14:25:27.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "gpu"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 66,
+        "like_count": 1,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107477101704306795",
+      "type": "post",
+      "title": "@ibrahim_sanata5 Works steadily on 8GB",
+      "body": "@ibrahim_sanata5 Works steadily on 8GB",
+      "url": "https://x.com/coldniko/status/2107477101704306795",
+      "publishedAt": "2026-10-06T14:24:30.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 43,
+        "like_count": 2,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-seed-780m",
+      "type": "post",
+      "title": "Running Strata on Mini PC with iGPU 780M — about 13 tokens/s on first try",
+      "body": "APU / mini PC path for localized inference; pairs with install docs and model sizing.",
+      "url": "https://x.com/coldniko",
+      "publishedAt": "2026-10-06T14:00:00.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en",
+        "zh",
+        "ja"
+      ],
+      "tags": [
+        "hardware",
+        "benchmark"
+      ]
+    },
+    {
+      "id": "x-2107467670711128175",
+      "type": "post",
+      "title": "@RRunner144 Get me SSH!!!",
+      "body": "@RRunner144 Get me SSH!!!",
+      "url": "https://x.com/coldniko/status/2107467670711128175",
+      "publishedAt": "2026-10-06T13:47:02.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 1,
+        "impression_count": 799,
+        "like_count": 12,
+        "quote_count": 0,
+        "reply_count": 2,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107467630705537026",
+      "type": "post",
+      "title": "@arnewc @forgalaforus There is a lot more to go.",
+      "body": "@arnewc @forgalaforus There is a lot more to go.",
+      "url": "https://x.com/coldniko/status/2107467630705537026",
+      "publishedAt": "2026-10-06T13:46:52.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 189,
+        "like_count": 0,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107463493561860266",
+      "type": "post",
+      "title": "@sami3dat Need to get W7800 to optimize -.-",
+      "body": "@sami3dat Need to get W7800 to optimize -.-",
+      "url": "https://x.com/coldniko/status/2107463493561860266",
+      "publishedAt": "2026-10-06T13:30:26.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 232,
+        "like_count": 2,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107461140267913565",
+      "type": "post",
+      "title": "@sami3dat Yes, but very soon optimized ;)",
+      "body": "@sami3dat Yes, but very soon optimized ;)",
+      "url": "https://x.com/coldniko/status/2107461140267913565",
+      "publishedAt": "2026-10-06T13:21:05.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 1013,
+        "like_count": 8,
+        "quote_count": 0,
+        "reply_count": 1,
+        "retweet_count": 1
+      }
+    },
+    {
+      "id": "x-2107461024764883208",
+      "type": "post",
+      "title": "@zharoboy Check my latest post :))",
+      "body": "@zharoboy Check my latest post :))",
+      "url": "https://x.com/coldniko/status/2107461024764883208",
+      "publishedAt": "2026-10-06T13:20:37.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 206,
+        "like_count": 1,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107460895282462981",
+      "type": "post",
+      "title": "@cryptodreki @LotusDecoder I will in 2-3 days tops",
+      "body": "@cryptodreki @LotusDecoder I will in 2-3 days tops",
+      "url": "https://x.com/coldniko/status/2107460895282462981",
+      "publishedAt": "2026-10-06T13:20:06.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "update"
+      ],
+      "metrics": {
+        "bookmark_count": 0,
+        "impression_count": 240,
+        "like_count": 2,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0
+      }
+    },
+    {
+      "id": "x-2107456702459359404",
+      "type": "post",
+      "title": "Running Strata on Mini PC with iGPU 780M \n\n- 13 tokens/second on first try 😅",
+      "body": "Running Strata on Mini PC with iGPU 780M \n\n- 13 tokens/second on first try 😅",
+      "url": "https://x.com/coldniko/status/2107456702459359404",
+      "publishedAt": "2026-10-06T13:03:27.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "hardware"
+      ],
+      "metrics": {
+        "bookmark_count": 31,
+        "impression_count": 13584,
+        "like_count": 215,
+        "quote_count": 6,
+        "reply_count": 40,
+        "retweet_count": 9
+      }
+    },
+    {
+      "id": "x-seed-qwen-compare",
+      "type": "post",
+      "title": "For those who slept on Qwen3.8-Flash-Next — community ts-bench comparisons vs 27B stacks",
+      "body": "Highlights MoE local speed vs dense llama.cpp routes; links to models and install pages.",
+      "url": "https://x.com/coldniko",
+      "publishedAt": "2026-10-06T13:00:00.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en",
+        "ja"
+      ],
+      "tags": [
+        "models",
+        "benchmark"
+      ]
+    },
+    {
+      "id": "x-seed-strix-shipped",
+      "type": "post",
+      "title": "Strix Halo officially supported in Strata v0.1.40",
+      "body": "AMD GPU improvements, multi-GPU batching, decode and Turing/Arc fixes — see release notes on site.",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.40",
+      "publishedAt": "2026-10-06T05:00:00.000Z",
+      "author": "coldniko",
+      "locales": [
+        "en",
+        "zh",
+        "ja",
+        "de",
+        "fr"
+      ],
+      "tags": [
+        "release",
+        "hardware"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "id": "int-zed-strix",
+      "type": "mention",
+      "title": "Community call to support Strix Halo / Strata hardware outreach",
+      "body": "Ecosystem voices (e.g. Zed) amplifying AMD community hardware for Strata development.",
+      "url": "https://x.com/coldniko",
+      "relatedUrl": "https://x.com/ZedLLM",
+      "publishedAt": "2026-10-06T12:00:00.000Z",
+      "tags": [
+        "community",
+        "hardware"
+      ]
+    }
+  ],
+  "linkExchange": {
+    "siteUrl": "https://stratat.com",
+    "siteName": "Strata Platform",
+    "suggestedAnchor": {
+      "en": "Strata — local Qwen3.8-Flash-Next on your PC",
+      "zh": "Strata — 本地运行 Qwen3.8-Flash-Next",
+      "ja": "Strata — ゲーミング PC で Qwen3.8-Flash-Next"
+    }
+  }
+}

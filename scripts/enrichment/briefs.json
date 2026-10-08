@@ -1,0 +1,571 @@
+{
+  "version": 1,
+  "defaults": {
+    "imageModel": "qwen-image-21",
+    "imageSize": "1024x576",
+    "ttsModel": "qwen3-tts-acted",
+    "ttsVoice": "alloy"
+  },
+  "items": [
+    {
+      "id": "hero-home",
+      "page": "/",
+      "slot": "hero",
+      "type": "image",
+      "prompt": "Cinematic wide hero: gaming PC desk at night, GPU glow, holographic neural network, teal and cyan palette, Strata local AI mood, ultra clean, no text, no logos",
+      "alt": {
+        "en": "Local AI on a gaming PC",
+        "zh": "游戏电脑上的本地 AI"
+      }
+    },
+    {
+      "id": "card-local",
+      "page": "/",
+      "slot": "feature-local",
+      "type": "image",
+      "prompt": "Minimal isometric illustration: laptop and home server locked vault icon, data stays local, dark background teal accents, no text",
+      "alt": {
+        "en": "Data stays on your machine",
+        "zh": "数据留在本机"
+      }
+    },
+    {
+      "id": "card-speed",
+      "page": "/",
+      "slot": "feature-speed",
+      "type": "image",
+      "prompt": "Abstract speed visualization: GPU chip with token stream lines, benchmark chart glow, RTX class hardware, dark tech, no text",
+      "alt": {
+        "en": "High tokens per second",
+        "zh": "高 tok/s 性能"
+      }
+    },
+    {
+      "id": "card-agents",
+      "page": "/",
+      "slot": "feature-agents",
+      "type": "image",
+      "prompt": "Developer IDE with AI agent plugins connected to localhost API, cables of light to 127.0.0.1, cozy dark theme, no readable text",
+      "alt": {
+        "en": "Agents via OpenAI-compatible API",
+        "zh": "OpenAI 兼容 API 对接 Agent"
+      }
+    },
+    {
+      "id": "install-guide",
+      "page": "/install",
+      "slot": "hero",
+      "type": "image",
+      "prompt": "One-click install wizard on monitor, terminal and progress bar, Windows and Linux subtle icons, friendly tech illustration, no text",
+      "alt": {
+        "en": "One-click Strata setup",
+        "zh": "一键安装 Strata"
+      }
+    },
+    {
+      "id": "models-vram",
+      "page": "/models",
+      "slot": "hero",
+      "type": "image",
+      "prompt": "VRAM and RAM gauge dashboard for large language model, MoE layers diagram aesthetic, scientific dark UI, no text labels",
+      "alt": {
+        "en": "Model size and VRAM",
+        "zh": "模型体积与显存"
+      }
+    },
+    {
+      "id": "pulse-signals",
+      "page": "/pulse",
+      "slot": "hero",
+      "type": "image",
+      "prompt": "Social signal radar: GPU price tags and AI news waves, X-style feed abstract, dark blue teal, no logos no text",
+      "alt": {
+        "en": "Community pulse feed",
+        "zh": "社区情报流"
+      }
+    },
+    {
+      "id": "download-desktop",
+      "page": "/download",
+      "slot": "hero",
+      "type": "image",
+      "prompt": "Desktop app window floating over Windows and macOS tiles, download arrow, Strata launcher concept, dark modern, no text",
+      "alt": {
+        "en": "Desktop downloads",
+        "zh": "桌面客户端下载"
+      }
+    },
+    {
+      "id": "tts-home-en",
+      "page": "/",
+      "slot": "audio-intro",
+      "type": "tts",
+      "text": {
+        "en": "Strata brings Qwen three point eight Flash Next to your own PC. Private, fast, and open source."
+      }
+    },
+    {
+      "id": "tts-home-zh",
+      "page": "/",
+      "slot": "audio-intro",
+      "type": "tts",
+      "text": {
+        "zh": "Strata 让你在个人电脑上本地运行 Qwen 3.8 Flash Next，私密、快速、开源。"
+      }
+    },
+    {
+      "id": "demo-api-curl",
+      "page": "/install",
+      "slot": "demo-code",
+      "type": "code",
+      "language": "bash",
+      "title": {
+        "en": "Talk to local Strata",
+        "zh": "连接本地 Strata"
+      },
+      "body": "curl http://127.0.0.1:8080/v1/chat/completions \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"model\":\"strata\",\"messages\":[{\"role\":\"user\",\"content\":\"Hello local AI\"}]}'"
+    },
+    {
+      "id": "demo-openai-python",
+      "page": "/models",
+      "slot": "demo-code",
+      "type": "code",
+      "language": "python",
+      "title": {
+        "en": "OpenAI SDK pointed at Strata",
+        "zh": "OpenAI SDK 指向 Strata"
+      },
+      "body": "from openai import OpenAI\nclient = OpenAI(base_url=\"http://127.0.0.1:8080/v1\", api_key=\"local\")\nresp = client.chat.completions.create(\n    model=\"strata\",\n    messages=[{\"role\": \"user\", \"content\": \"Estimate VRAM for IQ3_XXS\"}],\n)\nprint(resp.choices[0].message.content)"
+    },
+    {
+      "id": "creator-x-seed-strix-win",
+      "page": "/creator",
+      "slot": "feed-art",
+      "type": "image",
+      "prompt": "Tech blog thumbnail, abstract: Strata wins by a tight margin against other Strix Halo inference engines on first try release, dark teal, no text",
+      "alt": {
+        "en": "Strata wins by a tight margin against other Strix Halo inference engines on firs"
+      }
+    },
+    {
+      "id": "creator-x-seed-780m",
+      "page": "/creator",
+      "slot": "feed-art",
+      "type": "image",
+      "prompt": "Tech blog thumbnail, abstract: Running Strata on Mini PC with iGPU 780M — about 13 tokens/s on first try, dark teal, no text",
+      "alt": {
+        "en": "Running Strata on Mini PC with iGPU 780M — about 13 tokens/s on first try"
+      }
+    },
+    {
+      "id": "creator-x-seed-qwen-compare",
+      "page": "/creator",
+      "slot": "feed-art",
+      "type": "image",
+      "prompt": "Tech blog thumbnail, abstract: For those who slept on Qwen3.8-Flash-Next — community ts-bench comparisons vs 27B stacks, dark teal, no text",
+      "alt": {
+        "en": "For those who slept on Qwen3.8-Flash-Next — community ts-bench comparisons vs 27"
+      }
+    },
+    {
+      "id": "creator-x-seed-strix-shipped",
+      "page": "/creator",
+      "slot": "feed-art",
+      "type": "image",
+      "prompt": "Tech blog thumbnail, abstract: Strix Halo officially supported in Strata v0.1.40, dark teal, no text",
+      "alt": {
+        "en": "Strix Halo officially supported in Strata v0.1.40"
+      }
+    },
+    {
+      "id": "signal-seed-strata-local",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Strata — local Qwen3.8-Flash-Next on consumer GPUs, GPU/local AI, no text",
+      "alt": {
+        "en": "Strata — local Qwen3.8-Flash-Next on consumer GPUs"
+      }
+    },
+    {
+      "id": "signal-gh-issue-138",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Multi-GPU Fork, GPU/local AI, no text",
+      "alt": {
+        "en": "Multi-GPU Fork"
+      }
+    },
+    {
+      "id": "signal-gh-issue-932",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Dual GPU support, GPU/local AI, no text",
+      "alt": {
+        "en": "Dual GPU support"
+      }
+    },
+    {
+      "id": "signal-gh-issue-675",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Feature request: `logprobs` / `top_logprobs` on `/v1/chat/completions` (typed decisions from one for, GPU/local AI, no text",
+      "alt": {
+        "en": "Feature request: `logprobs` / `top_logprobs` on `/v1/chat/completions` (typed de"
+      }
+    },
+    {
+      "id": "signal-gh-issue-776",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: --batch on a 100%-resident layer split: engine dies at \"captured the batch window over slots 0,1\" (z, GPU/local AI, no text",
+      "alt": {
+        "en": "--batch on a 100%-resident layer split: engine dies at \"captured the batch windo"
+      }
+    },
+    {
+      "id": "signal-gh-issue-922",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: RTX 5070 Ti 16GB / Windows / IQ3_S: calibration ~14 tok/s and ~9–10 tok/s in controlled runs, GPU/local AI, no text",
+      "alt": {
+        "en": "RTX 5070 Ti 16GB / Windows / IQ3_S: calibration ~14 tok/s and ~9–10 tok/s in con"
+      }
+    },
+    {
+      "id": "signal-gh-issue-967",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Unsloth ud-q4_k_xl - no vision?, GPU/local AI, no text",
+      "alt": {
+        "en": "Unsloth ud-q4_k_xl - no vision?"
+      }
+    },
+    {
+      "id": "signal-gh-issue-935",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: The models are subpar., GPU/local AI, no text",
+      "alt": {
+        "en": "The models are subpar."
+      }
+    },
+    {
+      "id": "signal-gh-issue-841",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: not stable start with 3+ cards, GPU/local AI, no text",
+      "alt": {
+        "en": "not stable start with 3+ cards"
+      }
+    },
+    {
+      "id": "signal-gh-issue-728",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Infinite loop issue, GPU/local AI, no text",
+      "alt": {
+        "en": "Infinite loop issue"
+      }
+    },
+    {
+      "id": "signal-gh-issue-804",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Tool call written inside `<think>` (no `</think>`) is returned as `reasoning_content`: no `tool_call, GPU/local AI, no text",
+      "alt": {
+        "en": "Tool call written inside `<think>` (no `</think>`) is returned as `reasoning_con"
+      }
+    },
+    {
+      "id": "signal-gh-issue-642",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: A dual-GPU fork for 32 GB PCs (resident mode on a layer split, pipelined windows), GPU/local AI, no text",
+      "alt": {
+        "en": "A dual-GPU fork for 32 GB PCs (resident mode on a layer split, pipelined windows"
+      }
+    },
+    {
+      "id": "signal-gh-issue-914",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: strata-vision helper leaks /tmp/strata-vision-* temp dirs (unbounded growth -> OOM on tmpfs /tmp), GPU/local AI, no text",
+      "alt": {
+        "en": "strata-vision helper leaks /tmp/strata-vision-* temp dirs (unbounded growth -> O"
+      }
+    },
+    {
+      "id": "signal-gh-issue-847",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Allow system ram to be used instead of SSD when available., GPU/local AI, no text",
+      "alt": {
+        "en": "Allow system ram to be used instead of SSD when available."
+      }
+    },
+    {
+      "id": "signal-gh-issue-606",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: After a 36,689-token request at 155k, every later request answers one repeated token until the engin, GPU/local AI, no text",
+      "alt": {
+        "en": "After a 36,689-token request at 155k, every later request answers one repeated t"
+      }
+    },
+    {
+      "id": "issue-935",
+      "page": "/issues/935",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: The models are subpar., GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "The models are subpar."
+      }
+    },
+    {
+      "id": "issue-29",
+      "page": "/issues/29",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Critical bug + Performance report RTX 4090, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Critical bug + Performance report RTX 4090"
+      }
+    },
+    {
+      "id": "issue-922",
+      "page": "/issues/922",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: RTX 5070 Ti 16GB / Windows / IQ3_S: calibration ~14 tok/s and ~9–10 tok/s in controlled runs, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "RTX 5070 Ti 16GB / Windows / IQ3_S: calibration ~14 tok/s and ~9–10 tok/s in con"
+      }
+    },
+    {
+      "id": "issue-57",
+      "page": "/issues/57",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Support bounded multi-conversation caching to avoid full prompt rereads in agent workflows, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Support bounded multi-conversation caching to avoid full prompt rereads in agent"
+      }
+    },
+    {
+      "id": "issue-728",
+      "page": "/issues/728",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Infinite loop issue, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Infinite loop issue"
+      }
+    },
+    {
+      "id": "issue-74",
+      "page": "/issues/74",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Low t/s speed on a NVIDIA RTX 3080 with 16GB VRAM, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Low t/s speed on a NVIDIA RTX 3080 with 16GB VRAM"
+      }
+    },
+    {
+      "id": "issue-31",
+      "page": "/issues/31",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Engine freezes mid-generation and never recovers: generated counter static, GPU spinning at idle pow, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Engine freezes mid-generation and never recovers: generated counter static, GPU "
+      }
+    },
+    {
+      "id": "issue-675",
+      "page": "/issues/675",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Feature request: `logprobs` / `top_logprobs` on `/v1/chat/completions` (typed decisions from one for, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Feature request: `logprobs` / `top_logprobs` on `/v1/chat/completions` (typed de"
+      }
+    },
+    {
+      "id": "issue-75",
+      "page": "/issues/75",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Frequent thinking loops., GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Frequent thinking loops."
+      }
+    },
+    {
+      "id": "issue-145",
+      "page": "/issues/145",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Stuck at max token limit, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Stuck at max token limit"
+      }
+    },
+    {
+      "id": "issue-804",
+      "page": "/issues/804",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Tool call written inside `<think>` (no `</think>`) is returned as `reasoning_content`: no `tool_call, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Tool call written inside `<think>` (no `</think>`) is returned as `reasoning_con"
+      }
+    },
+    {
+      "id": "issue-816",
+      "page": "/issues/816",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: 0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; STRATA_SH_STREAM=0 rem, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; ST"
+      }
+    },
+    {
+      "id": "signal-gh-issue-679",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Feature Request: Load/Offload/Swap mmproj dynamically from RAM to VRAM when used, GPU/local AI, no text",
+      "alt": {
+        "en": "Feature Request: Load/Offload/Swap mmproj dynamically from RAM to VRAM when used"
+      }
+    },
+    {
+      "id": "signal-gh-issue-872",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Session RESTARTS COMPUTER after 25-30 mins (gfx1100), GPU/local AI, no text",
+      "alt": {
+        "en": "Session RESTARTS COMPUTER after 25-30 mins (gfx1100)"
+      }
+    },
+    {
+      "id": "signal-gh-issue-884",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: HIP gfx1030, 2x RX 6900 XT: verify hangs after a long prompt when MMQ prompt path, adaptive expert s, GPU/local AI, no text",
+      "alt": {
+        "en": "HIP gfx1030, 2x RX 6900 XT: verify hangs after a long prompt when MMQ prompt pat"
+      }
+    },
+    {
+      "id": "signal-gh-issue-816",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: 0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; STRATA_SH_STREAM=0 rem, GPU/local AI, no text",
+      "alt": {
+        "en": "0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; ST"
+      }
+    },
+    {
+      "id": "signal-gh-issue-1178",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: serve: Special tokens (<|im_end|>) emitted during model thinking cause tasks to terminate early, GPU/local AI, no text",
+      "alt": {
+        "en": "serve: Special tokens (<|im_end|>) emitted during model thinking cause tasks to "
+      }
+    },
+    {
+      "id": "signal-gh-issue-771",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "type": "image",
+      "prompt": "News card illustration: Linux expert arena (0.1.39): MADV_HUGEPAGE + defrag=madvise makes the arena's faults 20x slower (25 , GPU/local AI, no text",
+      "alt": {
+        "en": "Linux expert arena (0.1.39): MADV_HUGEPAGE + defrag=madvise makes the arena's fa"
+      }
+    },
+    {
+      "id": "issue-679",
+      "page": "/issues/679",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Feature Request: Load/Offload/Swap mmproj dynamically from RAM to VRAM when used, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Feature Request: Load/Offload/Swap mmproj dynamically from RAM to VRAM when used"
+      }
+    },
+    {
+      "id": "issue-847",
+      "page": "/issues/847",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Allow system ram to be used instead of SSD when available., GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Allow system ram to be used instead of SSD when available."
+      }
+    },
+    {
+      "id": "issue-451",
+      "page": "/issues/451",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: Support Openai Responses api, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "Support Openai Responses api"
+      }
+    },
+    {
+      "id": "issue-642",
+      "page": "/issues/642",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: A dual-GPU fork for 32 GB PCs (resident mode on a layer split, pipelined windows), GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "A dual-GPU fork for 32 GB PCs (resident mode on a layer split, pipelined windows"
+      }
+    },
+    {
+      "id": "issue-654",
+      "page": "/issues/654",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: HIP (gfx1200) RuntimeError Exception Code: 0xC0000005, GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "HIP (gfx1200) RuntimeError Exception Code: 0xC0000005"
+      }
+    },
+    {
+      "id": "issue-496",
+      "page": "/issues/496",
+      "slot": "issue-hero",
+      "type": "image",
+      "prompt": "GitHub issue illustration, technical: RuntimeError(\"the engine exited before it was ready\" + (f\" (see {log})\" if log else \"\")), GPU local AI, dark teal, no text",
+      "alt": {
+        "en": "RuntimeError(\"the engine exited before it was ready\" + (f\" (see {log})\" if log e"
+      }
+    }
+  ]
+}

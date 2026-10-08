@@ -1,0 +1,44 @@
+{
+  "syncedAt": "2026-10-08T05:58:11.581Z",
+  "siteUrl": "https://www.stratat.com",
+  "engine": {
+    "tag": "v0.1.40.3",
+    "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.40.3",
+    "assets": [
+      {
+        "id": "strata-windows-x64-cuda12",
+        "name": "strata-windows-x64-cuda12.zip",
+        "platform": "windows",
+        "variant": "nvidia-legacy",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.40.3/strata-windows-x64-cuda12.zip",
+        "sizeBytes": 197411923
+      },
+      {
+        "id": "strata-windows-x64-hip",
+        "name": "strata-windows-x64-hip.zip",
+        "platform": "windows",
+        "variant": "amd",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.40.3/strata-windows-x64-hip.zip",
+        "sizeBytes": 628195410
+      },
+      {
+        "id": "strata-windows-x64",
+        "name": "strata-windows-x64.zip",
+        "platform": "windows",
+        "variant": "nvidia",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.40.3/strata-windows-x64.zip",
+        "sizeBytes": 135495187
+      }
+    ]
+  },
+  "desktop": {
+    "tag": null,
+    "note": "Set STRATAT_DESKTOP_REPO after first GitHub desktop release",
+    "assets": []
+  },
+  "macEngine": {
+    "method": "script",
+    "cloneUrl": "https://github.com/Niko1221/Strata.git",
+    "setupCommand": "git clone https://github.com/Niko1221/Strata.git ~/Strata && cd ~/Strata && ./setup.sh"
+  }
+}

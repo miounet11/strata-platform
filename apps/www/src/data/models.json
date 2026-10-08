@@ -1,0 +1,66 @@
+{
+  "baseModel": "Qwen3.8-Flash-Next",
+  "huggingface": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+  "variants": [
+    {
+      "id": "q2_0",
+      "name": "Q2_0",
+      "description": "Fastest quant; great for 48 GB RAM systems.",
+      "ramGbMin": 48,
+      "vramGbMin": 12,
+      "downloadGb": 70,
+      "outputTps5070": 94,
+      "tags": ["speed", "recommended-48gb"]
+    },
+    {
+      "id": "iq2_xs",
+      "name": "IQ2_XS",
+      "description": "Recommended default for 64 GB RAM; balance of speed and quality.",
+      "ramGbMin": 64,
+      "vramGbMin": 12,
+      "downloadGb": 72,
+      "outputTps5070": 79,
+      "tags": ["recommended", "64gb"]
+    },
+    {
+      "id": "iq3_xxs",
+      "name": "IQ3_XXS",
+      "description": "Smarter than IQ2; still fits most 64 GB builds.",
+      "ramGbMin": 64,
+      "vramGbMin": 12,
+      "downloadGb": 74,
+      "outputTps5070": 62,
+      "tags": ["quality"]
+    },
+    {
+      "id": "iq3_s",
+      "name": "IQ3_S",
+      "description": "Best quality that still runs on 64 GB; slowest of the IQ line.",
+      "ramGbMin": 64,
+      "vramGbMin": 12,
+      "downloadGb": 76,
+      "outputTps5070": 53,
+      "tags": ["quality", "best-64gb"]
+    },
+    {
+      "id": "coder",
+      "name": "Coder",
+      "description": "Coding-focused variant; fits 32 GB RAM (weaker on CJK general text).",
+      "ramGbMin": 32,
+      "vramGbMin": 12,
+      "downloadGb": 68,
+      "outputTps5070": 55,
+      "tags": ["code", "32gb"]
+    },
+    {
+      "id": "ud-iq4_xs",
+      "name": "Unsloth UD-IQ4_XS",
+      "description": "~4-bit Unsloth pack; needs ~80 GB RAM or partial SSD offload.",
+      "ramGbMin": 80,
+      "vramGbMin": 12,
+      "downloadGb": 94,
+      "outputTps5070": 45,
+      "tags": ["unsloth", "96gb"]
+    }
+  ]
+}

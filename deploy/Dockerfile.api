@@ -1,0 +1,24 @@
+FROM node:22-bookworm AS deps
+WORKDIR /app
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
+COPY apps/api/package.json apps/api/
+RUN pnpm install --filter @stratat/api...
+
+FROM node:22-bookworm AS builder
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN pnpm --filter @stratat/api build
+
+FROM node:22-bookworm AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/package.json ./
+COPY --from=deps /app/node_modules ./node_modules
+RUN mkdir -p /data
+EXPOSE 8787
+CMD ["node", "dist/index.js"]

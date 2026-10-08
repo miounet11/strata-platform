@@ -1,0 +1,72 @@
+{
+  "reciprocal": [
+    {
+      "id": "strata-upstream",
+      "name": "Niko1221/Strata",
+      "url": "https://github.com/Niko1221/Strata",
+      "description": {
+        "en": "Official open-source engine and installer",
+        "zh": "官方开源引擎与安装程序",
+        "ja": "公式オープンソースエンジン"
+      },
+      "rel": "official"
+    },
+    {
+      "id": "coldniko-x",
+      "name": "Niko Veit (@coldniko)",
+      "url": "https://x.com/coldniko",
+      "description": {
+        "en": "Creator updates, benchmarks, and release news",
+        "zh": "作者动态、评测与版本消息",
+        "ja": "作者の更新・ベンチマーク"
+      },
+      "rel": "author"
+    },
+    {
+      "id": "project-maya",
+      "name": "Project Maya",
+      "url": "https://github.com/mw00/project-maya",
+      "description": {
+        "en": "GLM-5.3-Flash (321B MoE) on your own NVIDIA GPUs — engine, server and dashboard built on Strata",
+        "zh": "在自有 NVIDIA GPU 上运行 GLM-5.3-Flash（321B MoE）——引擎、服务端与面板均派生自 Strata",
+        "ja": "自己の NVIDIA GPU で GLM-5.3-Flash（321B MoE）を動かす — Strata 派生エンジン"
+      },
+      "rel": "partner"
+    }
+  ],
+  "friends": [
+    {
+      "name": "JevCode",
+      "url": "https://www.jevcode.ai/",
+      "description": {
+        "en": "Typed AI judgments & clavue-jev docs",
+        "zh": "结构化 AI 决策与 Jev 文档站",
+        "ja": "型付き AI 判断 · Jev ドキュメント"
+      }
+    },
+    {
+      "name": "Clavue",
+      "url": "https://clavue.com",
+      "description": {
+        "en": "Agent tooling aligned with local LLM workflows",
+        "zh": "与本地 LLM 工作流配套的 Agent 工具",
+        "ja": "ローカル LLM 向け Agent ツール"
+      }
+    },
+    {
+      "name": "Qwen3.8-Flash-Next",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+      "description": {
+        "en": "Base model Strata runs locally",
+        "zh": "Strata 本地运行的基座模型",
+        "ja": "Strata が動かすベースモデル"
+      }
+    }
+  ],
+  "linkToUs": {
+    "html": "<a href=\"https://stratat.com/en\" rel=\"noopener\">Strata Platform</a> — local 125B-class AI on your gaming PC.",
+    "markdown": "[Strata Platform](https://stratat.com/en) — local Qwen3.8-Flash-Next on your PC.",
+    "markdownZh": "[Strata 平台](https://stratat.com/zh) — 本地运行 Qwen3.8-Flash-Next。",
+    "markdownJa": "[Strata プラットフォーム](https://stratat.com/ja) — ゲーミング PC で Qwen3.8-Flash-Next。"
+  }
+}

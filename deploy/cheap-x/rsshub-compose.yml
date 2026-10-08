@@ -1,0 +1,18 @@
+# Optional RSS fallback on same host (needs valid X session env).
+services:
+  rsshub:
+    image: diygod/rsshub:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1200:1200"
+    environment:
+      # Export auth_token from browser (see docs/INTAKE-CHEAP.md)
+      TWITTER_AUTH_TOKEN: ${TWITTER_AUTH_TOKEN:-}
+      CACHE_TYPE: redis
+      REDIS_URL: redis://redis:6379/
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped

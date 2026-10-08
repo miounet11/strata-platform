@@ -1,0 +1,22 @@
+FROM node:22-bookworm AS deps
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
+COPY apps/www/package.json apps/www/
+RUN pnpm install --filter @stratat/www...
+
+FROM node:22-bookworm AS builder
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN pnpm --filter @stratat/www build
+
+FROM node:22-bookworm AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/apps/www/.next/standalone ./
+COPY --from=builder /app/apps/www/.next/static ./apps/www/.next/static
+COPY --from=builder /app/apps/www/public ./apps/www/public
+EXPOSE 3000
+CMD ["node", "apps/www/server.js"]

@@ -1,0 +1,17 @@
+# Self-hosted X JSON bridge (twscrape) — no pay-per-post API.
+# See docs/INTAKE-CHEAP.md for cookie setup.
+services:
+  x-api:
+    image: ghcr.io/w95/x-api:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      X_API_DB: /data/x-api.db
+    volumes:
+      - x-api-data:/data
+    # Drop session cookies JSON here after twscrape add_accounts (see docs)
+    # env_file: .env
+
+volumes:
+  x-api-data:

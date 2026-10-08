@@ -1,0 +1,247 @@
+{
+  "syncedAt": "2026-10-08T05:58:15.898Z",
+  "feedUrl": "https://github.com/Niko1221/Strata/releases.atom",
+  "siteRssPath": "/changelog/rss.xml",
+  "items": [
+    {
+      "id": "release-v0.1.40.3",
+      "title": "Strata v0.1.40.3",
+      "summary": "Hotfix for 0.1.40.2: Intel Arc install and A-series fixes, Windows AMD speed and runtime fixes, Docker config links, and a few smaller fixes. Default answers are unchanged. Update with UPDATE.bat (Linux: ./update.sh);…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.40.3",
+      "publishedAt": "2026-10-07T18:01:30Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.40.2",
+      "title": "Strata v0.1.40.2",
+      "summary": "Faster and fixed across the board: official Intel Arc support (Arc Pro B70 and A750 tested), bug fixes and speed-ups merged from the open issues and PRs, and big gains on multi-GPU, low-RAM Linux and long-document use.…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.40.2",
+      "publishedAt": "2026-10-07T12:13:49Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.40.1",
+      "title": "Strata v0.1.40.1",
+      "summary": "Hotfix for 0.1.40: a tool call that is only quoted (in the thinking or in a code block) no longer runs, and requests waiting during an engine restart no longer hang. Python server fixes only. The engine is the same as…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.40.1",
+      "publishedAt": "2026-10-06T09:53:35Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.40",
+      "title": "Strata v0.1.40",
+      "summary": "Strix Halo (gfx1151) support, crash, NaN and security fixes, better multi-GPU, batching and resident modes, Q4_0 / Q4_1 and more PLE table formats, AMD fixes, a much faster Linux cold start, and a long list of opt-ins.…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.40",
+      "publishedAt": "2026-10-06T06:29:21Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.39",
+      "title": "Strata v0.1.39",
+      "summary": "Faster decode and long prompts, several requests at once, older and other hardware as experimental opt-ins, the OpenAI Responses API for Codex, a fix for slower prompts with a RAM budget, and a batch of fixes from your…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.39",
+      "publishedAt": "2026-10-04T12:32:47Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.38",
+      "title": "Strata v0.1.38",
+      "summary": "Faster prompts, --kv q4_0 prompts on tensor cores, a 6 GB card that starts, and a large batch of community PRs. Security: the server without an API key (DNS rebinding, cross-site requests). Without api_key, the server…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.38",
+      "publishedAt": "2026-10-03T01:17:05Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.37",
+      "title": "Strata v0.1.37",
+      "summary": "A frozen engine no longer hangs the server, Windows AMD counts the desktop's VRAM, and a batch of setup fixes from your reports. The server notices a silent engine (481): if the engine prints nothing during a request…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.37",
+      "publishedAt": "2026-10-02T19:51:24Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.36",
+      "title": "Strata v0.1.36",
+      "summary": "Faster: Q2_0 reads prompts 16-22% faster and writes up to 18% faster at long contexts. Plus one-click updates (UPDATE.bat), an opt-in memory of which experts you use, and clearer logs. Speed (136), measured on an RTX…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.36",
+      "publishedAt": "2026-10-02T16:38:48Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.35",
+      "title": "Strata v0.1.35",
+      "summary": "Windows AMD no longer crashes on the first prompt, the low-RAM mode works on 32 GB Windows PCs, and a batch of fixes from your reports. AMD on Windows (468, 461): the engine now uses the HIP runtime it ships with.…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.35",
+      "publishedAt": "2026-10-02T09:05:28Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.34",
+      "title": "Strata v0.1.34",
+      "summary": "AMD cards on Windows (new), an MCP server so your AI assistant can set Strata up, a shorter README - and a cancelled request now frees the engine within a second. AMD on Windows (new, 247 325): an AMD card on Windows is…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.34",
+      "publishedAt": "2026-10-02T01:21:56Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.33",
+      "title": "Strata v0.1.33",
+      "summary": "The image encoder runs on every CPU again, and setup recommends instead of forcing: a longer context, more GPUs or a bigger RAM budget you choose is kept, with a note about the risk. Images (411, 412): 0.1.32's…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.33",
+      "publishedAt": "2026-10-01T21:16:13Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.32",
+      "title": "Strata v0.1.32",
+      "summary": "Multi-GPU short prompts fixed, AMD decode +12%, Unsloth's Q4 model in setup with 2.8x faster prompts, and 30+ community changes - with the same answers. Multi-GPU: short prompts faster again (340, riverhh76). Since…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.32",
+      "publishedAt": "2026-10-01T17:28:36Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.31",
+      "title": "Strata v0.1.31",
+      "summary": "Unsloth's Q4 model runs on a 64 GB PC (experimental), AMD decode up to 15% faster, models load twice as fast on Windows, and a batch of fixes. Experimental: Unsloth UD-Q4_K_XL on a normal PC. Strata can now run…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.31",
+      "publishedAt": "2026-10-01T05:13:47Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.30",
+      "title": "Strata v0.1.30",
+      "summary": "Short prompts up to 28% faster (the same answers), multi-GPU and AMD RDNA4 improvements, a server that can give the GPU back, and several opt-in features. Faster short prompts. Prompts of 1K to 4K tokens read all…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.30",
+      "publishedAt": "2026-09-30T17:50:57Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.29",
+      "title": "Strata v0.1.29",
+      "summary": "Sampled answers up to 40% faster (the same text), faster prompt kernels, correctness fixes, and several contributions. Sampled answers (197, @gputier). With a temperature above 0 (most chat apps), each token's top-k…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.29",
+      "publishedAt": "2026-09-30T12:18:09Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.28",
+      "title": "Strata v0.1.28",
+      "summary": "Fixes: VRAM left free again after 0.1.27's larger draft head, a cancelled request no longer kills the next one, and the API key protects every endpoint. VRAM (199, 201, 217). The expert cache takes the free VRAM minus a…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.28",
+      "publishedAt": "2026-09-30T09:45:28Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.27",
+      "title": "Strata v0.1.27",
+      "summary": "Answers in Chinese, Japanese or Korean are written faster, RTX 20 cards are supported, and five fixes. Faster CJK answers (137). The draft layer (MTP speculative decoding) can only propose tokens from its subset of the…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.27",
+      "publishedAt": "2026-09-29T22:21:23Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.26",
+      "title": "Strata v0.1.26",
+      "summary": "Prompts up to 32K read 4-10% faster: the draft layer's prompt pass runs in batches. Before answering, Strata runs its draft layer over the prompt, so the drafter (MTP speculative decoding) knows the conversation. That…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.26",
+      "publishedAt": "2026-09-29T19:50:46Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.25",
+      "title": "Strata v0.1.25",
+      "summary": "Faster prompts, AMD Radeon support (experimental), and a smaller KV cache option. Faster prompts (same output): reading a prompt got 7% faster. RTX 5070, Q2_0: - 32K tokens: 1,901 → 2,030 tokens/s. - 128K tokens: 1,955…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.25",
+      "publishedAt": "2026-09-29T17:41:10Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.24",
+      "title": "Strata v0.1.24",
+      "summary": "Long prompts read faster: the sparse attention's selection runs on tensor cores. For every token of a prompt, Strata picks which earlier parts of the context its attention reads (the QSA selection). At long context that…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.24",
+      "publishedAt": "2026-09-29T12:07:17Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.23",
+      "title": "Strata v0.1.23",
+      "summary": "Faster decoding, llama.cpp-compatible server endpoints, and fixes for images, 8 GB cards and multi-GPU. Faster answers: the verify window's per-token kernels (router, norms, RoPE, the shared-expert cast, the combine)…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.23",
+      "publishedAt": "2026-09-29T11:50:09Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.22",
+      "title": "Strata v0.1.22",
+      "summary": "Faster prompts, and several GPUs without typing any flags. Prompts are read faster (RTX 5070, Q2_0): a 32K-token prompt 1,213 → 1,646 tokens/s, a 128K prompt with KV streaming 1,144 → 1,596 tokens/s (time to first token…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.22",
+      "publishedAt": "2026-09-29T09:41:22Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.21",
+      "title": "Strata v0.1.21",
+      "summary": "One model across two or three NVIDIA cards (experimental). - Layer split across GPUs: - Setup: START-HERE.bat --setup --gpus 0,2 (Linux: ./setup.sh --setup --gpus 0,2), or \"gpu\": [0, 2] in a run config. - Each card runs…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.21",
+      "publishedAt": "2026-09-29T04:33:29Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.20",
+      "title": "Strata v0.1.20",
+      "summary": "Faster new chats for agent clients, a hit-rate column in the Monitor, a PCIe-aware default, and community fixes. - New chats reuse the system prompt (62 by @j-luwierski, 65 by @code-martin): - A prompt read from the…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.20",
+      "publishedAt": "2026-09-28T17:59:33Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.19",
+      "title": "Strata v0.1.19",
+      "summary": "Penalties that really apply, tuning for your PC, tools from MCP servers, and a fix for starting with a small page file. - Fixed: repetition, presence and frequency penalties were mostly not applied (53). - What went…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.19",
+      "publishedAt": "2026-09-28T17:13:49Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.18",
+      "title": "Strata v0.1.18",
+      "summary": "Clearer engine updates, a SETUP.bat shortcut, and a sampler guard. - Updating right after a release no longer keeps the old engine without saying why (58, thanks @XeonG). New files on main could reach you a few minutes…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.18",
+      "publishedAt": "2026-09-28T14:06:44Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.17",
+      "title": "Strata v0.1.17",
+      "summary": "Claude Code works with Strata, sampling matches llama.cpp, and you can choose the GPU. - Claude Code can use Strata (55, 56, thanks @Nicolas0315): the server accepts /v1/messages?beta=true, and a system message in the…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.17",
+      "publishedAt": "2026-09-28T13:40:19Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.16",
+      "title": "Strata v0.1.16",
+      "summary": "New: the Coder model. No more re-downloads after an update. Strata is now open source (MIT). - The GSQ-RCO Coder ([ISTA-DASLab](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF)), thanks to…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.16",
+      "publishedAt": "2026-09-28T12:44:05Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.15",
+      "title": "Strata v0.1.15",
+      "summary": "Fixed: IQ3_XXS stopping on long prompts, and new speed tables. - Fixed: IQ3_XXS could stop on prompts of 64K tokens and more on a 12 GB card, with out of memory: cudaFuncSetAttribute in the log. CUDA loads a kernel's…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.15",
+      "publishedAt": "2026-09-28T11:34:55Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.14",
+      "title": "Strata v0.1.14",
+      "summary": "Fixed: the remaining stall with the IQ models, and a lot for Linux. - Fixed: generation could stop mid-answer with the IQ models (IQ2_XS, IQ3_XXS, IQ3_S) (31, 29, thanks @Zauberio, @marcosandresacevedo, @Lufen34). The…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.14",
+      "publishedAt": "2026-09-28T10:02:48Z",
+      "source": "releases-json"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "stratat",
+  "private": true,
+  "description": "Strata.com platform — marketing site, API, and desktop launcher",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:www": "pnpm --filter @stratat/www dev",
+    "dev:api": "pnpm --filter @stratat/api dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "sync:releases": "node scripts/sync-releases.mjs",
+    "sync:community": "node scripts/sync-github-community.mjs",
+    "sync:creator": "node scripts/sync-creator-social.mjs",
+    "sync:intelligence": "node scripts/sync-intelligence.mjs",
+    "sync:downloads": "node scripts/sync-downloads.mjs",
+    "sync:changelog": "node scripts/sync-changelog-rss.mjs",
+    "sync:all": "pnpm sync:releases && pnpm sync:community && pnpm sync:creator && pnpm sync:intelligence && pnpm sync:downloads && pnpm sync:changelog",
+    "intake:loop": "node scripts/run-intake-loop.mjs",
+    "content:grow": "node scripts/content-grow.mjs",
+    "enrich:assets": "node scripts/enrichment/generate-assets.mjs",
+    "enrich:loop": "node scripts/enrichment/run-enrich-loop.mjs",
+    "enrich:briefs": "node scripts/enrichment/sync-briefs-from-content.mjs",
+    "indexnow": "node scripts/indexnow-submit.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

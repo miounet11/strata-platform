@@ -1,0 +1,22 @@
+{
+  "name": "@stratat/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Strata Desktop — Win/Mac launcher for local Strata setup",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.8.0",
+    "@tauri-apps/plugin-shell": "^2.3.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.8.4",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7"
+  }
+}

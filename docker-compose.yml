@@ -1,0 +1,29 @@
+services:
+  www:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.www
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_SITE_URL: https://strata.com
+      NEXT_PUBLIC_API_URL: https://api.strata.com
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.api
+    ports:
+      - "8787:8787"
+    environment:
+      PORT: "8787"
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      CORS_ORIGIN: https://strata.com
+      DATABASE_URL: /data/strata.db
+    volumes:
+      - api-data:/data
+    restart: unless-stopped
+
+volumes:
+  api-data:

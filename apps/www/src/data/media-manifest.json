@@ -1,0 +1,301 @@
+{
+  "syncedAt": "2026-10-07T00:27:24.785Z",
+  "assets": {
+    "tts-home-en": {
+      "type": "tts",
+      "path": "/media/enriched/tts-home-en.wav",
+      "page": "/",
+      "slot": "audio-intro",
+      "locale": "en",
+      "text": "Strata brings Qwen three point eight Flash Next to your own PC. Private, fast, and open source."
+    },
+    "demo-api-curl": {
+      "type": "code",
+      "page": "/install",
+      "slot": "demo-code",
+      "language": "bash",
+      "title": {
+        "en": "Talk to local Strata",
+        "zh": "连接本地 Strata"
+      },
+      "body": "curl http://127.0.0.1:8080/v1/chat/completions \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"model\":\"strata\",\"messages\":[{\"role\":\"user\",\"content\":\"Hello local AI\"}]}'"
+    },
+    "demo-openai-python": {
+      "type": "code",
+      "page": "/models",
+      "slot": "demo-code",
+      "language": "python",
+      "title": {
+        "en": "OpenAI SDK pointed at Strata",
+        "zh": "OpenAI SDK 指向 Strata"
+      },
+      "body": "from openai import OpenAI\nclient = OpenAI(base_url=\"http://127.0.0.1:8080/v1\", api_key=\"local\")\nresp = client.chat.completions.create(\n    model=\"strata\",\n    messages=[{\"role\": \"user\", \"content\": \"Estimate VRAM for IQ3_XXS\"}],\n)\nprint(resp.choices[0].message.content)"
+    },
+    "hero-home": {
+      "type": "image",
+      "path": "/media/enriched/hero-home.png",
+      "page": "/",
+      "slot": "hero",
+      "alt": {
+        "en": "Local AI on a gaming PC",
+        "zh": "游戏电脑上的本地 AI"
+      },
+      "prompt": "Cinematic wide hero: gaming PC desk at night, GPU glow, holographic neural network, teal and cyan palette, Strata local AI mood, ultra clean, no text, no logos"
+    },
+    "card-local": {
+      "type": "image",
+      "path": "/media/enriched/card-local.png",
+      "page": "/",
+      "slot": "feature-local",
+      "alt": {
+        "en": "Data stays on your machine",
+        "zh": "数据留在本机"
+      },
+      "prompt": "Minimal isometric illustration: laptop and home server locked vault icon, data stays local, dark background teal accents, no text"
+    },
+    "card-speed": {
+      "type": "image",
+      "path": "/media/enriched/card-speed.png",
+      "page": "/",
+      "slot": "feature-speed",
+      "alt": {
+        "en": "High tokens per second",
+        "zh": "高 tok/s 性能"
+      },
+      "prompt": "Abstract speed visualization: GPU chip with token stream lines, benchmark chart glow, RTX class hardware, dark tech, no text"
+    },
+    "card-agents": {
+      "type": "image",
+      "path": "/media/enriched/card-agents.png",
+      "page": "/",
+      "slot": "feature-agents",
+      "alt": {
+        "en": "Agents via OpenAI-compatible API",
+        "zh": "OpenAI 兼容 API 对接 Agent"
+      },
+      "prompt": "Developer IDE with AI agent plugins connected to localhost API, cables of light to 127.0.0.1, cozy dark theme, no readable text"
+    },
+    "install-guide": {
+      "type": "image",
+      "path": "/media/enriched/install-guide.png",
+      "page": "/install",
+      "slot": "hero",
+      "alt": {
+        "en": "One-click Strata setup",
+        "zh": "一键安装 Strata"
+      },
+      "prompt": "One-click install wizard on monitor, terminal and progress bar, Windows and Linux subtle icons, friendly tech illustration, no text"
+    },
+    "models-vram": {
+      "type": "image",
+      "path": "/media/enriched/models-vram.png",
+      "page": "/models",
+      "slot": "hero",
+      "alt": {
+        "en": "Model size and VRAM",
+        "zh": "模型体积与显存"
+      },
+      "prompt": "VRAM and RAM gauge dashboard for large language model, MoE layers diagram aesthetic, scientific dark UI, no text labels"
+    },
+    "pulse-signals": {
+      "type": "image",
+      "path": "/media/enriched/pulse-signals.png",
+      "page": "/pulse",
+      "slot": "hero",
+      "alt": {
+        "en": "Community pulse feed",
+        "zh": "社区情报流"
+      },
+      "prompt": "Social signal radar: GPU price tags and AI news waves, X-style feed abstract, dark blue teal, no logos no text"
+    },
+    "download-desktop": {
+      "type": "image",
+      "path": "/media/enriched/download-desktop.png",
+      "page": "/download",
+      "slot": "hero",
+      "alt": {
+        "en": "Desktop downloads",
+        "zh": "桌面客户端下载"
+      },
+      "prompt": "Desktop app window floating over Windows and macOS tiles, download arrow, Strata launcher concept, dark modern, no text"
+    },
+    "tts-home-zh": {
+      "type": "tts",
+      "path": "/media/enriched/tts-home-zh.wav",
+      "page": "/",
+      "slot": "audio-intro",
+      "locale": "zh",
+      "text": "Strata 让你在个人电脑上本地运行 Qwen 3.8 Flash Next，私密、快速、开源。"
+    },
+    "creator-x-seed-strix-win": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-seed-strix-win.png",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "Strata wins by a tight margin against other Strix Halo inference engines on firs"
+      },
+      "prompt": "Tech blog thumbnail, abstract: Strata wins by a tight margin against other Strix Halo inference engines on first try release, dark teal, no text"
+    },
+    "creator-x-seed-780m": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-seed-780m.png",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "Running Strata on Mini PC with iGPU 780M — about 13 tokens/s on first try"
+      },
+      "prompt": "Tech blog thumbnail, abstract: Running Strata on Mini PC with iGPU 780M — about 13 tokens/s on first try, dark teal, no text"
+    },
+    "creator-x-seed-qwen-compare": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-seed-qwen-compare.png",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "For those who slept on Qwen3.8-Flash-Next — community ts-bench comparisons vs 27"
+      },
+      "prompt": "Tech blog thumbnail, abstract: For those who slept on Qwen3.8-Flash-Next — community ts-bench comparisons vs 27B stacks, dark teal, no text"
+    },
+    "creator-x-seed-strix-shipped": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-seed-strix-shipped.png",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "Strix Halo officially supported in Strata v0.1.40"
+      },
+      "prompt": "Tech blog thumbnail, abstract: Strix Halo officially supported in Strata v0.1.40, dark teal, no text"
+    },
+    "signal-seed-strata-local": {
+      "type": "image",
+      "path": "/media/enriched/signal-seed-strata-local.png",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Strata — local Qwen3.8-Flash-Next on consumer GPUs"
+      },
+      "prompt": "News card illustration: Strata — local Qwen3.8-Flash-Next on consumer GPUs, GPU/local AI, no text"
+    },
+    "issue-935": {
+      "type": "image",
+      "path": "/media/enriched/issue-935.png",
+      "page": "/issues/935",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "The models are subpar."
+      },
+      "prompt": "GitHub issue illustration, technical: The models are subpar., GPU local AI, dark teal, no text"
+    },
+    "issue-29": {
+      "type": "image",
+      "path": "/media/enriched/issue-29.png",
+      "page": "/issues/29",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Critical bug + Performance report RTX 4090"
+      },
+      "prompt": "GitHub issue illustration, technical: Critical bug + Performance report RTX 4090, GPU local AI, dark teal, no text"
+    },
+    "issue-922": {
+      "type": "image",
+      "path": "/media/enriched/issue-922.png",
+      "page": "/issues/922",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "RTX 5070 Ti 16GB / Windows / IQ3_S: calibration ~14 tok/s and ~9–10 tok/s in con"
+      },
+      "prompt": "GitHub issue illustration, technical: RTX 5070 Ti 16GB / Windows / IQ3_S: calibration ~14 tok/s and ~9–10 tok/s in controlled runs, GPU local AI, dark teal, no text"
+    },
+    "issue-57": {
+      "type": "image",
+      "path": "/media/enriched/issue-57.png",
+      "page": "/issues/57",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Support bounded multi-conversation caching to avoid full prompt rereads in agent"
+      },
+      "prompt": "GitHub issue illustration, technical: Support bounded multi-conversation caching to avoid full prompt rereads in agent workflows, GPU local AI, dark teal, no text"
+    },
+    "issue-728": {
+      "type": "image",
+      "path": "/media/enriched/issue-728.png",
+      "page": "/issues/728",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Infinite loop issue"
+      },
+      "prompt": "GitHub issue illustration, technical: Infinite loop issue, GPU local AI, dark teal, no text"
+    },
+    "issue-74": {
+      "type": "image",
+      "path": "/media/enriched/issue-74.png",
+      "page": "/issues/74",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Low t/s speed on a NVIDIA RTX 3080 with 16GB VRAM"
+      },
+      "prompt": "GitHub issue illustration, technical: Low t/s speed on a NVIDIA RTX 3080 with 16GB VRAM, GPU local AI, dark teal, no text"
+    },
+    "issue-31": {
+      "type": "image",
+      "path": "/media/enriched/issue-31.png",
+      "page": "/issues/31",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Engine freezes mid-generation and never recovers: generated counter static, GPU "
+      },
+      "prompt": "GitHub issue illustration, technical: Engine freezes mid-generation and never recovers: generated counter static, GPU spinning at idle pow, GPU local AI, dark teal, no text"
+    },
+    "issue-675": {
+      "type": "image",
+      "path": "/media/enriched/issue-675.png",
+      "page": "/issues/675",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Feature request: `logprobs` / `top_logprobs` on `/v1/chat/completions` (typed de"
+      },
+      "prompt": "GitHub issue illustration, technical: Feature request: `logprobs` / `top_logprobs` on `/v1/chat/completions` (typed decisions from one for, GPU local AI, dark teal, no text"
+    },
+    "issue-75": {
+      "type": "image",
+      "path": "/media/enriched/issue-75.png",
+      "page": "/issues/75",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Frequent thinking loops."
+      },
+      "prompt": "GitHub issue illustration, technical: Frequent thinking loops., GPU local AI, dark teal, no text"
+    },
+    "issue-145": {
+      "type": "image",
+      "path": "/media/enriched/issue-145.png",
+      "page": "/issues/145",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Stuck at max token limit"
+      },
+      "prompt": "GitHub issue illustration, technical: Stuck at max token limit, GPU local AI, dark teal, no text"
+    },
+    "issue-804": {
+      "type": "image",
+      "path": "/media/enriched/issue-804.png",
+      "page": "/issues/804",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Tool call written inside `<think>` (no `</think>`) is returned as `reasoning_con"
+      },
+      "prompt": "GitHub issue illustration, technical: Tool call written inside `<think>` (no `</think>`) is returned as `reasoning_content`: no `tool_call, GPU local AI, dark teal, no text"
+    },
+    "issue-816": {
+      "type": "image",
+      "path": "/media/enriched/issue-816.png",
+      "page": "/issues/816",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; ST"
+      },
+      "prompt": "GitHub issue illustration, technical: 0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; STRATA_SH_STREAM=0 rem, GPU local AI, dark teal, no text"
+    }
+  }
+}

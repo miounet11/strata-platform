@@ -1,0 +1,76 @@
+{
+  "xUsers": [
+    "coldniko",
+    "ZedLLM",
+    "Niko1221",
+    "karan4d",
+    "simonw",
+    "sama",
+    "DrJimFan"
+  ],
+  "xSearchQueries": [
+    "Strata inference engine",
+    "Qwen3.8 Flash Next local",
+    "Strata tok/s",
+    "Strix Halo Strata"
+  ],
+  "xComparisonQueries": [
+    "Strata vs llama.cpp",
+    "Strata vs vllm",
+    "Strata benchmark tok/s",
+    "Qwen3.8 Flash Next vs 27B",
+    "local MoE vs dense llama",
+    "Strata compared exllama",
+    "Strata Strix Halo vs"
+  ],
+  "xUpgradeQueries": [
+    "Strata upgrade v0.1",
+    "Strata update.sh",
+    "switched to Strata",
+    "migrated to Strata local",
+    "after installing Strata",
+    "Strata v0.1.40.3",
+    "Strata v0.1.40 upgrade"
+  ],
+  "gpuPriceQueries": [
+    "RTX 5090 price",
+    "RTX 5080 MSRP",
+    "RTX 4090 price drop",
+    "显卡 5080 价格",
+    "RX 9070 XT price"
+  ],
+  "rsshubBaseUrls": [
+    "https://rsshub.app",
+    "https://rsshub.rssforever.com",
+    "https://rsshub.netlify.app"
+  ],
+  "relevanceKeywords": [
+    "strata",
+    "qwen3",
+    "flash-next",
+    "flash next",
+    "local llm",
+    "local model",
+    "llama.cpp",
+    "vllm",
+    "ollama",
+    "tok/s",
+    "tokens/s",
+    "vram",
+    "gguf",
+    "moe",
+    "inference",
+    "versus",
+    "vs ",
+    "compared",
+    "upgrade",
+    "upgraded",
+    "本地",
+    "部署",
+    "显卡",
+    "rtx",
+    "radeon",
+    "rocm",
+    "cuda"
+  ]
+}
