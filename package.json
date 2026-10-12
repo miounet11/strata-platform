@@ -16,6 +16,7 @@
     "sync:changelog": "node scripts/sync-changelog-rss.mjs",
     "sync:all": "pnpm sync:releases && pnpm sync:community && pnpm sync:creator && pnpm sync:intelligence && pnpm sync:downloads && pnpm sync:changelog",
     "intake:loop": "node scripts/run-intake-loop.mjs",
+    "freshness:watch": "node scripts/freshness-watch.mjs",
     "content:grow": "node scripts/content-grow.mjs",
     "enrich:assets": "node scripts/enrichment/generate-assets.mjs",
     "enrich:loop": "node scripts/enrichment/run-enrich-loop.mjs",

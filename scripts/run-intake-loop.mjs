@@ -26,8 +26,17 @@ function runNodeScript(rel) {
 async function tick(n) {
   console.log(`\n[intake loop] tick #${n} ${new Date().toISOString()}`);
   await runIntelligenceSync();
+  // releases + changelog first: newest data is what search engines see
+  if (process.env.INTAKE_RUN_RELEASES !== "0") {
+    await runNodeScript("scripts/sync-releases.mjs");
+    await runNodeScript("scripts/sync-changelog-rss.mjs");
+  }
   if (process.env.INTAKE_RUN_CREATOR !== "0") {
     await runNodeScript("scripts/sync-creator-social.mjs");
+  }
+  // freshness watcher: rebuilds + IndexNow when new releases appear
+  if (process.env.INTAKE_FRESHNESS !== "0") {
+    await runNodeScript("scripts/freshness-watch.mjs");
   }
   if (process.env.INTAKE_REBUILD_WWW === "1") {
     console.log("[intake loop] rebuild: run `pnpm --filter @stratat/www build` (or pm2 restart) on server");

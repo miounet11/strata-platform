@@ -1,8 +1,40 @@
 {
-  "syncedAt": "2026-10-08T05:58:15.898Z",
+  "syncedAt": "2026-10-12T03:05:24.915Z",
   "feedUrl": "https://github.com/Niko1221/Strata/releases.atom",
   "siteRssPath": "/changelog/rss.xml",
   "items": [
+    {
+      "id": "release-v0.1.43",
+      "title": "Strata v0.1.43",
+      "summary": "Faster decode and prompts on NVIDIA, AMD and Intel, plus the fixes since 0.1.42. Decode is up to 38% faster on a 16 GB Radeon, 5-11% on RTX 30-series and Tesla P100 under Linux, up to 19% on four Radeons, and 14-21% on…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.43",
+      "publishedAt": "2026-10-11T14:40:33Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.42",
+      "title": "Strata v0.1.42",
+      "summary": "About 13-16% faster decode on one NVIDIA GPU or a layer split, up to 30% more on a single card whose CPU outruns its PCIe link, a long list of fixes for multi-GPU splits, Windows AMD, Intel Arc and tight-RAM machines,…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.42",
+      "publishedAt": "2026-10-10T16:10:01Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.41",
+      "title": "Strata v0.1.41",
+      "summary": "Faster on more than one GPU, faster short prompts on NVIDIA, about twice as fast prompts on Windows with little RAM, and a long list of fixes. Two defaults change: --batch on a layer split now runs one pipeline group…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.41",
+      "publishedAt": "2026-10-08T12:14:59Z",
+      "source": "releases-json"
+    },
+    {
+      "id": "release-v0.1.40.4",
+      "title": "Strata v0.1.40.4",
+      "summary": "Hotfix for 0.1.40.3: decode on Pascal cards (Tesla P40, GTX 1080, GTX 1070) is back to the 0.1.40 speed. Default answers are unchanged. Update with UPDATE.bat (Linux: ./update.sh); setup replaces the engine with…",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.40.4",
+      "publishedAt": "2026-10-08T08:04:33Z",
+      "source": "releases-json"
+    },
     {
       "id": "release-v0.1.40.3",
       "title": "Strata v0.1.40.3",
@@ -209,38 +241,6 @@
       "summary": "Clearer engine updates, a SETUP.bat shortcut, and a sampler guard. - Updating right after a release no longer keeps the old engine without saying why (58, thanks @XeonG). New files on main could reach you a few minutes…",
       "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.18",
       "publishedAt": "2026-09-28T14:06:44Z",
-      "source": "releases-json"
-    },
-    {
-      "id": "release-v0.1.17",
-      "title": "Strata v0.1.17",
-      "summary": "Claude Code works with Strata, sampling matches llama.cpp, and you can choose the GPU. - Claude Code can use Strata (55, 56, thanks @Nicolas0315): the server accepts /v1/messages?beta=true, and a system message in the…",
-      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.17",
-      "publishedAt": "2026-09-28T13:40:19Z",
-      "source": "releases-json"
-    },
-    {
-      "id": "release-v0.1.16",
-      "title": "Strata v0.1.16",
-      "summary": "New: the Coder model. No more re-downloads after an update. Strata is now open source (MIT). - The GSQ-RCO Coder ([ISTA-DASLab](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF)), thanks to…",
-      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.16",
-      "publishedAt": "2026-09-28T12:44:05Z",
-      "source": "releases-json"
-    },
-    {
-      "id": "release-v0.1.15",
-      "title": "Strata v0.1.15",
-      "summary": "Fixed: IQ3_XXS stopping on long prompts, and new speed tables. - Fixed: IQ3_XXS could stop on prompts of 64K tokens and more on a 12 GB card, with out of memory: cudaFuncSetAttribute in the log. CUDA loads a kernel's…",
-      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.15",
-      "publishedAt": "2026-09-28T11:34:55Z",
-      "source": "releases-json"
-    },
-    {
-      "id": "release-v0.1.14",
-      "title": "Strata v0.1.14",
-      "summary": "Fixed: the remaining stall with the IQ models, and a lot for Linux. - Fixed: generation could stop mid-answer with the IQ models (IQ2_XS, IQ3_XXS, IQ3_S) (31, 29, thanks @Zauberio, @marcosandresacevedo, @Lufen34). The…",
-      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.14",
-      "publishedAt": "2026-09-28T10:02:48Z",
       "source": "releases-json"
     }
   ]
