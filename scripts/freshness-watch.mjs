@@ -8,7 +8,11 @@
  * Logic:
  *  1. Sync releases + changelog data.
  *  2. Compare the top release tag / newest publishedAt against .freshness-state.json.
- *  3. On change: rebuild www (standalone), pm2 restart, submit IndexNow.
+ *  3. On change — or when .freshness-build-failed exists and data is unchanged —
+ *     rebuild www (standalone), pm2 restart, submit IndexNow.
+ *     The build is tried 3 times (2 retries, 60s apart). Final failure alerts on
+ *     stderr and writes .freshness-build-failed (ISO timestamp). State is written
+ *     only after a successful build; the marker is removed then.
  *  4. Always exit 0 — a failed rebuild must not break the loop.
  */
 import { spawnSync } from "node:child_process";
@@ -19,7 +23,10 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const STATE = join(ROOT, ".freshness-state.json");
 const LOCK = join(ROOT, ".freshness.lock");
+const FAILED_MARK = join(ROOT, ".freshness-build-failed");
 const RELEASES = join(ROOT, "apps/www/src/data/releases.json");
+const BUILD_ATTEMPTS = 3;
+const BUILD_RETRY_MS = 60_000;
 
 const log = (...a) => console.log("[freshness]", ...a);
 
@@ -89,6 +96,46 @@ function readJson(path) {
   }
 }
 
+// sync sleep; no PATH lookup so cron still waits the full interval
+function sleepMs(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function buildWww() {
+  for (let attempt = 1; attempt <= BUILD_ATTEMPTS; attempt++) {
+    if (run("pnpm", ["--filter", "@stratat/www", "build"])) return true;
+    log(`ERROR: www build failed (attempt ${attempt}/${BUILD_ATTEMPTS})`);
+    if (attempt < BUILD_ATTEMPTS) {
+      log("retrying www build in 60s…");
+      sleepMs(BUILD_RETRY_MS);
+    }
+  }
+  return false;
+}
+
+function alertBuildFailed() {
+  const at = new Date().toISOString();
+  writeFileSync(FAILED_MARK, `${at}\n`);
+  const bar = "!".repeat(72);
+  console.error("");
+  console.error(bar);
+  console.error("[freshness] ALERT: www build failed after 3 attempts");
+  console.error("[freshness] state NOT advanced — previous site build stays live");
+  console.error(`[freshness] wrote .freshness-build-failed (${at})`);
+  console.error("[freshness] next run forces one rebuild if the data is unchanged");
+  console.error(bar);
+  console.error("");
+}
+
+function clearBuildFailedMark() {
+  if (!existsSync(FAILED_MARK)) return;
+  try {
+    unlinkSync(FAILED_MARK);
+  } catch (err) {
+    log(`WARN: could not remove .freshness-build-failed (${err.message})`);
+  }
+}
+
 function fingerprint() {
   const rel = readJson(RELEASES);
   const releases = rel?.releases ?? [];
@@ -141,24 +188,29 @@ if (degraded) {
   process.exit(0);
 }
 
-if (!changed) {
+const priorBuildFailed = existsSync(FAILED_MARK);
+if (!changed && !priorBuildFailed) {
   log(`no change (top=${next.topTag}). done.`);
   writeFileSync(STATE, JSON.stringify(next, null, 2));
   process.exit(0);
 }
 
-log(
-  firstRun
-    ? `first run — building baseline ${next.topTag}…`
-    : `NEW CONTENT detected: ${prev.topTag || "(none)"} -> ${next.topTag}. rebuilding…`,
-);
+if (!changed) {
+  log(`no change (top=${next.topTag}) but .freshness-build-failed exists — forcing rebuild`);
+} else {
+  log(
+    firstRun
+      ? `first run — building baseline ${next.topTag}…`
+      : `NEW CONTENT detected: ${prev.topTag || "(none)"} -> ${next.topTag}. rebuilding…`,
+  );
+}
 
 // ---- 3. rebuild + restart (state advances only after success) -------------
-const rebuilt = run("pnpm", ["--filter", "@stratat/www", "build"]);
-if (!rebuilt) {
-  log("ERROR: www build failed — state NOT advanced, will retry next tick");
+if (!buildWww()) {
+  alertBuildFailed();
   process.exit(0);
 }
+clearBuildFailedMark();
 writeFileSync(STATE, JSON.stringify(next, null, 2));
 
 // standalone static copy (same as remote-bootstrap)
