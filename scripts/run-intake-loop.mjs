@@ -45,7 +45,8 @@ async function tick(n) {
     await safe("sync-creator", () => runNodeScript("scripts/sync-creator-social.mjs"));
   }
   // freshness watcher: rebuilds + IndexNow when new releases appear.
-  // loop already synced data this tick, so skip the watcher's own sync.
+  // loop already synced data this tick, so skip the watcher's own sync;
+  // honor the changelog/release switches by passing them through.
   if (process.env.INTAKE_FRESHNESS !== "0") {
     await safe(
       "freshness-watch",
@@ -53,7 +54,13 @@ async function tick(n) {
         new Promise((resolve, reject) => {
           const child = spawn(process.execPath, [join(ROOT, "scripts/freshness-watch.mjs")], {
             stdio: "inherit",
-            env: { ...process.env, FRESHNESS_SKIP_SYNC: "1" },
+            env: {
+      ...process.env,
+      FRESHNESS_SKIP_SYNC: "1",
+      // honor loop-level switches inside the watcher too
+      ...(process.env.INTAKE_RUN_RELEASES === "0" ? { FRESHNESS_SKIP_RELEASES: "1" } : {}),
+      ...(process.env.INTAKE_RUN_CHANGELOG === "0" ? { FRESHNESS_SKIP_CHANGELOG: "1" } : {}),
+    },
           });
           child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`freshness-watch exit ${code}`))));
         }),

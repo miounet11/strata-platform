@@ -35,9 +35,10 @@ try {
     const ageMs = Date.now() - (stale.at ?? 0);
     let alive = false;
     try {
-      alive = Boolean(stale.pid && process.kill(stale.pid, 0));
-    } catch {
-      alive = false; // ESRCH: process is gone
+      process.kill(stale.pid, 0);
+      alive = true;
+    } catch (e) {
+      alive = e.code === "EPERM"; // EPERM: running but not ours; ESRCH: dead
     }
     if (!alive || ageMs > 45 * 60 * 1000) {
       log(`reclaiming stale lock (pid=${stale.pid ?? "?"} age=${Math.round(ageMs / 60000)}min)`);
@@ -56,7 +57,9 @@ try {
 process.on("exit", () => {
   try {
     closeSync(lockFd);
-    unlinkSync(LOCK);
+    // only remove the lock if we still own it (pid matches)
+    const owner = JSON.parse(readFileSync(LOCK, "utf8"));
+    if (owner.pid === process.pid) unlinkSync(LOCK);
   } catch {}
 });
 
@@ -97,8 +100,12 @@ if (process.env.FRESHNESS_SKIP_SYNC === "1") {
   log("skip sync (caller already refreshed data)");
 } else {
   log("syncing releases + changelog…");
-  run("node", ["scripts/sync-releases.mjs"]) || log("WARN: sync-releases failed");
-  run("node", ["scripts/sync-changelog-rss.mjs"]) || log("WARN: sync-changelog failed");
+  if (process.env.FRESHNESS_SKIP_RELEASES !== "1") {
+    run("node", ["scripts/sync-releases.mjs"]) || log("WARN: sync-releases failed");
+  }
+  if (process.env.FRESHNESS_SKIP_CHANGELOG !== "1") {
+    run("node", ["scripts/sync-changelog-rss.mjs"]) || log("WARN: sync-changelog failed");
+  }
 }
 
 // ---- 2. compare -----------------------------------------------------------
@@ -110,6 +117,16 @@ const changed =
   prev.releaseCount !== next.releaseCount ||
   prev.changelogTop !== next.changelogTop ||
   prev.changelogCount !== next.changelogCount;
+// data regression (sync failed → empty/shorter) is NOT new content
+const degraded =
+  !firstRun &&
+  (next.releaseCount < prev.releaseCount ||
+    (next.releaseCount === 0 && prev.topTag !== "") ||
+    next.changelogCount < prev.changelogCount);
+if (degraded) {
+  log(`data looks degraded (releases ${prev.releaseCount}->${next.releaseCount}, changelog ${prev.changelogCount}->${next.changelogCount}) — skipping rebuild`);
+  process.exit(0);
+}
 
 if (!changed) {
   log(`no change (top=${next.topTag}). done.`);
