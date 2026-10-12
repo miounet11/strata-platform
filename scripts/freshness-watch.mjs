@@ -14,9 +14,10 @@
  *     stderr and writes .freshness-build-failed (ISO timestamp). State is written
  *     only after a successful build; the marker is removed then.
  *  4. Always exit 0 — a failed rebuild must not break the loop.
+ *  5. Append one NDJSON line per key node to .logs/freshness.log.
  */
 import { spawnSync } from "node:child_process";
-import { closeSync, existsSync, openSync, readFileSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -25,10 +26,24 @@ const STATE = join(ROOT, ".freshness-state.json");
 const LOCK = join(ROOT, ".freshness.lock");
 const FAILED_MARK = join(ROOT, ".freshness-build-failed");
 const RELEASES = join(ROOT, "apps/www/src/data/releases.json");
+const FRESHNESS_LOG = join(ROOT, ".logs", "freshness.log");
 const BUILD_ATTEMPTS = 3;
 const BUILD_RETRY_MS = 60_000;
 
 const log = (...a) => console.log("[freshness]", ...a);
+
+// NDJSON: {"ts","event","detail"}. A log failure must not affect the main flow.
+function appendLog(event, detail) {
+  try {
+    mkdirSync(dirname(FRESHNESS_LOG), { recursive: true });
+    appendFileSync(
+      FRESHNESS_LOG,
+      `${JSON.stringify({ ts: new Date().toISOString(), event, detail: String(detail ?? "") })}\n`,
+    );
+  } catch {
+    // ignore
+  }
+}
 
 // single-instance lock: cron and intake loop may both call this
 let lockFd = null;
@@ -59,7 +74,9 @@ try {
     })();
   const fresh = stale && Date.now() - (stale.at ?? 0) < 45 * 60 * 1000;
   if (alivePid && fresh) {
-    log(`another run holds the lock (pid=${stale.pid}) — exiting`);
+    const detail = `another run holds the lock (pid=${stale.pid}) — exiting`;
+    log(detail);
+    appendLog("lock-skip", detail);
     process.exit(0);
   }
   // reclaim: dead process, missing pid, stale age, or corrupt file
@@ -104,7 +121,9 @@ function sleepMs(ms) {
 function buildWww() {
   for (let attempt = 1; attempt <= BUILD_ATTEMPTS; attempt++) {
     if (run("pnpm", ["--filter", "@stratat/www", "build"])) return true;
-    log(`ERROR: www build failed (attempt ${attempt}/${BUILD_ATTEMPTS})`);
+    const detail = `ERROR: www build failed (attempt ${attempt}/${BUILD_ATTEMPTS})`;
+    log(detail);
+    if (attempt === BUILD_ATTEMPTS) appendLog("rebuild-fail", detail);
     if (attempt < BUILD_ATTEMPTS) {
       log("retrying www build in 60s…");
       sleepMs(BUILD_RETRY_MS);
@@ -157,14 +176,26 @@ const firstRun = !existsSync(STATE);
 
 // ---- 1. sync data ---------------------------------------------------------
 if (process.env.FRESHNESS_SKIP_SYNC === "1") {
-  log("skip sync (caller already refreshed data)");
+  const detail = "skip sync (caller already refreshed data)";
+  log(detail);
+  appendLog("sync", detail);
 } else {
-  log("syncing releases + changelog…");
+  const detail = "syncing releases + changelog…";
+  log(detail);
+  appendLog("sync", detail);
   if (process.env.FRESHNESS_SKIP_RELEASES !== "1") {
-    run("node", ["scripts/sync-releases.mjs"]) || log("WARN: sync-releases failed");
+    if (!run("node", ["scripts/sync-releases.mjs"])) {
+      const warn = "WARN: sync-releases failed";
+      log(warn);
+      appendLog("sync", warn);
+    }
   }
   if (process.env.FRESHNESS_SKIP_CHANGELOG !== "1") {
-    run("node", ["scripts/sync-changelog-rss.mjs"]) || log("WARN: sync-changelog failed");
+    if (!run("node", ["scripts/sync-changelog-rss.mjs"])) {
+      const warn = "WARN: sync-changelog failed";
+      log(warn);
+      appendLog("sync", warn);
+    }
   }
 }
 
@@ -184,25 +215,31 @@ const degraded =
     (next.releaseCount === 0 && prev.topTag !== "") ||
     next.changelogCount < prev.changelogCount);
 if (degraded) {
-  log(`data looks degraded (releases ${prev.releaseCount}->${next.releaseCount}, changelog ${prev.changelogCount}->${next.changelogCount}) — skipping rebuild`);
+  const detail = `data looks degraded (releases ${prev.releaseCount}->${next.releaseCount}, changelog ${prev.changelogCount}->${next.changelogCount}) — skipping rebuild`;
+  log(detail);
+  appendLog("degraded", detail);
   process.exit(0);
 }
 
 const priorBuildFailed = existsSync(FAILED_MARK);
 if (!changed && !priorBuildFailed) {
-  log(`no change (top=${next.topTag}). done.`);
+  const detail = `no change (top=${next.topTag}). done.`;
+  log(detail);
+  appendLog("no-change", detail);
   writeFileSync(STATE, JSON.stringify(next, null, 2));
   process.exit(0);
 }
 
 if (!changed) {
-  log(`no change (top=${next.topTag}) but .freshness-build-failed exists — forcing rebuild`);
+  const detail = `no change (top=${next.topTag}) but .freshness-build-failed exists — forcing rebuild`;
+  log(detail);
+  appendLog("rebuild-start", detail);
 } else {
-  log(
-    firstRun
-      ? `first run — building baseline ${next.topTag}…`
-      : `NEW CONTENT detected: ${prev.topTag || "(none)"} -> ${next.topTag}. rebuilding…`,
-  );
+  const detail = firstRun
+    ? `first run — building baseline ${next.topTag}…`
+    : `NEW CONTENT detected: ${prev.topTag || "(none)"} -> ${next.topTag}. rebuilding…`;
+  log(detail);
+  appendLog(firstRun ? "first-run" : "rebuild-start", detail);
 }
 
 // ---- 3. rebuild + restart (state advances only after success) -------------
@@ -210,6 +247,7 @@ if (!buildWww()) {
   alertBuildFailed();
   process.exit(0);
 }
+appendLog("rebuild-ok", `www build ok (top=${next.topTag})`);
 clearBuildFailedMark();
 writeFileSync(STATE, JSON.stringify(next, null, 2));
 
@@ -230,7 +268,9 @@ run(pm2Bin, ["restart", "strata-www"]) || log("WARN: pm2 restart failed (dev mac
 
 // ---- 4. notify IndexNow ---------------------------------------------------
 if (run("node", ["scripts/indexnow-submit.mjs"])) {
-  log("IndexNow pinged.");
+  const detail = "IndexNow pinged.";
+  log(detail);
+  appendLog("indexnow", detail);
 }
 
 log(`done ${new Date().toISOString()}`);
