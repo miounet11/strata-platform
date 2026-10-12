@@ -12,7 +12,7 @@
  *  4. Always exit 0 — a failed rebuild must not break the loop.
  */
 import { spawnSync } from "node:child_process";
-import { closeSync, existsSync, openSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import { closeSync, existsSync, openSync, readFileSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -27,9 +27,31 @@ const log = (...a) => console.log("[freshness]", ...a);
 let lockFd = null;
 try {
   lockFd = openSync(LOCK, "wx");
+  writeSync(lockFd, JSON.stringify({ pid: process.pid, at: Date.now() }));
 } catch {
-  log("another run holds the lock — exiting");
-  process.exit(0);
+  // stale lock recovery: kill -9 / reboot leaves the file behind
+  try {
+    const stale = JSON.parse(readFileSync(LOCK, "utf8"));
+    const ageMs = Date.now() - (stale.at ?? 0);
+    let alive = false;
+    try {
+      alive = Boolean(stale.pid && process.kill(stale.pid, 0));
+    } catch {
+      alive = false; // ESRCH: process is gone
+    }
+    if (!alive || ageMs > 45 * 60 * 1000) {
+      log(`reclaiming stale lock (pid=${stale.pid ?? "?"} age=${Math.round(ageMs / 60000)}min)`);
+      unlinkSync(LOCK);
+      lockFd = openSync(LOCK, "wx");
+      writeSync(lockFd, JSON.stringify({ pid: process.pid, at: Date.now() }));
+    } else {
+      log(`another run holds the lock (pid=${stale.pid}) — exiting`);
+      process.exit(0);
+    }
+  } catch {
+    log("another run holds the lock — exiting");
+    process.exit(0);
+  }
 }
 process.on("exit", () => {
   try {
@@ -61,12 +83,14 @@ function fingerprint() {
   const items = changelog?.items ?? [];
   return {
     topTag: top?.tag ?? "",
-    topPublishedAt: top?.publishedAt ?? "",
     releaseCount: releases.length,
     changelogTop: items[0]?.id ?? "",
     changelogCount: items.length,
   };
 }
+
+// first run = no state file yet; empty releases.json must NOT loop rebuilds
+const firstRun = !existsSync(STATE);
 
 // ---- 1. sync data ---------------------------------------------------------
 if (process.env.FRESHNESS_SKIP_SYNC === "1") {
@@ -81,7 +105,7 @@ if (process.env.FRESHNESS_SKIP_SYNC === "1") {
 const prev = readJson(STATE) ?? {};
 const next = fingerprint();
 const changed =
-  !prev.topTag ||
+  firstRun ||
   prev.topTag !== next.topTag ||
   prev.releaseCount !== next.releaseCount ||
   prev.changelogTop !== next.changelogTop ||
@@ -93,7 +117,11 @@ if (!changed) {
   process.exit(0);
 }
 
-log(`NEW CONTENT detected: ${prev.topTag || "(none)"} -> ${next.topTag}. rebuilding…`);
+log(
+  firstRun
+    ? `first run — building baseline ${next.topTag}…`
+    : `NEW CONTENT detected: ${prev.topTag || "(none)"} -> ${next.topTag}. rebuilding…`,
+);
 
 // ---- 3. rebuild + restart (state advances only after success) -------------
 const rebuilt = run("pnpm", ["--filter", "@stratat/www", "build"]);

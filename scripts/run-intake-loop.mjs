@@ -23,27 +23,41 @@ function runNodeScript(rel) {
   });
 }
 
+async function safe(rel, fn) {
+  try {
+    await fn();
+  } catch (e) {
+    console.error(`[intake loop] ${rel} failed: ${e.message} — continuing tick`);
+  }
+}
+
 async function tick(n) {
   console.log(`\n[intake loop] tick #${n} ${new Date().toISOString()}`);
-  await runIntelligenceSync();
+  await safe("sync-intelligence", runIntelligenceSync);
   // releases + changelog first: newest data is what search engines see
   if (process.env.INTAKE_RUN_RELEASES !== "0") {
-    await runNodeScript("scripts/sync-releases.mjs");
-    await runNodeScript("scripts/sync-changelog-rss.mjs");
+    await safe("sync-releases", () => runNodeScript("scripts/sync-releases.mjs"));
+  }
+  if (process.env.INTAKE_RUN_CHANGELOG !== "0") {
+    await safe("sync-changelog", () => runNodeScript("scripts/sync-changelog-rss.mjs"));
   }
   if (process.env.INTAKE_RUN_CREATOR !== "0") {
-    await runNodeScript("scripts/sync-creator-social.mjs");
+    await safe("sync-creator", () => runNodeScript("scripts/sync-creator-social.mjs"));
   }
   // freshness watcher: rebuilds + IndexNow when new releases appear.
   // loop already synced data this tick, so skip the watcher's own sync.
   if (process.env.INTAKE_FRESHNESS !== "0") {
-    await new Promise((resolve, reject) => {
-      const child = spawn(process.execPath, [join(ROOT, "scripts/freshness-watch.mjs")], {
-        stdio: "inherit",
-        env: { ...process.env, FRESHNESS_SKIP_SYNC: "1" },
-      });
-      child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`freshness-watch exit ${code}`))));
-    });
+    await safe(
+      "freshness-watch",
+      () =>
+        new Promise((resolve, reject) => {
+          const child = spawn(process.execPath, [join(ROOT, "scripts/freshness-watch.mjs")], {
+            stdio: "inherit",
+            env: { ...process.env, FRESHNESS_SKIP_SYNC: "1" },
+          });
+          child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`freshness-watch exit ${code}`))));
+        }),
+    );
   }
   if (process.env.INTAKE_REBUILD_WWW === "1") {
     console.log("[intake loop] rebuild: run `pnpm --filter @stratat/www build` (or pm2 restart) on server");
