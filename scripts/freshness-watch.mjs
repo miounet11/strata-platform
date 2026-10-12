@@ -28,31 +28,44 @@ let lockFd = null;
 try {
   lockFd = openSync(LOCK, "wx");
   writeSync(lockFd, JSON.stringify({ pid: process.pid, at: Date.now() }));
-} catch {
-  // stale lock recovery: kill -9 / reboot leaves the file behind
-  try {
-    const stale = JSON.parse(readFileSync(LOCK, "utf8"));
-    const ageMs = Date.now() - (stale.at ?? 0);
-    let alive = false;
-    try {
-      process.kill(stale.pid, 0);
-      alive = true;
-    } catch (e) {
-      alive = e.code === "EPERM"; // EPERM: running but not ours; ESRCH: dead
-    }
-    if (!alive || ageMs > 45 * 60 * 1000) {
-      log(`reclaiming stale lock (pid=${stale.pid ?? "?"} age=${Math.round(ageMs / 60000)}min)`);
-      unlinkSync(LOCK);
-      lockFd = openSync(LOCK, "wx");
-      writeSync(lockFd, JSON.stringify({ pid: process.pid, at: Date.now() }));
-    } else {
-      log(`another run holds the lock (pid=${stale.pid}) — exiting`);
-      process.exit(0);
-    }
-  } catch {
-    log("another run holds the lock — exiting");
+} catch (err) {
+  if (err.code !== "EEXIST") {
+    log(`cannot create lock (${err.message}) — exiting`);
     process.exit(0);
   }
+  // EEXIST: either another live run holds it, or a stale/corrupt file remains
+  let stale = null;
+  try {
+    stale = JSON.parse(readFileSync(LOCK, "utf8"));
+  } catch {
+    stale = null; // corrupt/truncated/empty lock file
+  }
+  const alivePid =
+    stale?.pid &&
+    (() => {
+      try {
+        process.kill(stale.pid, 0);
+        return true;
+      } catch (e) {
+        return e.code === "EPERM"; // running but not ours
+      }
+    })();
+  const fresh = stale && Date.now() - (stale.at ?? 0) < 45 * 60 * 1000;
+  if (alivePid && fresh) {
+    log(`another run holds the lock (pid=${stale.pid}) — exiting`);
+    process.exit(0);
+  }
+  // reclaim: dead process, missing pid, stale age, or corrupt file
+  log(
+    stale
+      ? `reclaiming lock (pid=${stale.pid ?? "?"} age=${Math.round((Date.now() - (stale.at ?? 0)) / 60000)}min)`
+      : "reclaiming corrupt lock file",
+  );
+  try {
+    unlinkSync(LOCK);
+  } catch {}
+  lockFd = openSync(LOCK, "wx");
+  writeSync(lockFd, JSON.stringify({ pid: process.pid, at: Date.now() }));
 }
 process.on("exit", () => {
   try {

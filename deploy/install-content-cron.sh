@@ -1,8 +1,8 @@
+#!/usr/bin/env bash
+# Install crontab lines for stratat content growth + freshness watcher + IndexNow.
 # Note: this script also replaces any existing PATH= line in crontab with the
 # standard PATH below (cron's default PATH lacks /usr/local/bin where pnpm lives).
 # Non-marked crontab entries other than PATH= lines are preserved.
-#!/usr/bin/env bash
-# Install crontab lines for stratat content growth + weekly IndexNow.
 set -euo pipefail
 ROOT="${STRATAT_ROOT:-/opt/stratat}"
 MARK="# stratat-content-grow"
