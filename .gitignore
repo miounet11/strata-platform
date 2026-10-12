@@ -17,3 +17,7 @@ apps/desktop/src-tauri/target
 !.env.example
 deploy/.env.rsshub
 apps/www/tsconfig.tsbuildinfo
+
+# freshness watcher runtime files
+.freshness-state.json
+.freshness.lock

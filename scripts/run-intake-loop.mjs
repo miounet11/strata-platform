@@ -3,7 +3,7 @@
  * Long-running intake loop for VPS or dev machine.
  *
  *   INTAKE_INTERVAL_MINUTES=30 node scripts/run-intake-loop.mjs
- *   INTAKE_RUN_CREATOR=1  — also refresh creator-pulse after each tick
+ *   INTAKE_RUN_CREATOR=0  — skip creator-pulse refresh (on by default)
  */
 import { spawn } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -34,9 +34,16 @@ async function tick(n) {
   if (process.env.INTAKE_RUN_CREATOR !== "0") {
     await runNodeScript("scripts/sync-creator-social.mjs");
   }
-  // freshness watcher: rebuilds + IndexNow when new releases appear
+  // freshness watcher: rebuilds + IndexNow when new releases appear.
+  // loop already synced data this tick, so skip the watcher's own sync.
   if (process.env.INTAKE_FRESHNESS !== "0") {
-    await runNodeScript("scripts/freshness-watch.mjs");
+    await new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, [join(ROOT, "scripts/freshness-watch.mjs")], {
+        stdio: "inherit",
+        env: { ...process.env, FRESHNESS_SKIP_SYNC: "1" },
+      });
+      child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`freshness-watch exit ${code}`))));
+    });
   }
   if (process.env.INTAKE_REBUILD_WWW === "1") {
     console.log("[intake loop] rebuild: run `pnpm --filter @stratat/www build` (or pm2 restart) on server");
