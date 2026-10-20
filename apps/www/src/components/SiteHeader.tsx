@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { localeNames, resolveLocale } from "@/lib/locale";
+import { localesForTopicPath } from "@/lib/topic-locales";
 
 const primary = [
   ["/download", "download"],
@@ -68,7 +69,7 @@ export function SiteHeader() {
         <details className="nav-locale">
           <summary aria-label="Language">{active.toUpperCase()}</summary>
           <ul>
-            {routing.locales.map((code) => (
+            {(localesForTopicPath(pathname) ?? routing.locales).map((code) => (
               <li key={code}>
                 <Link
                   href={pathname}
