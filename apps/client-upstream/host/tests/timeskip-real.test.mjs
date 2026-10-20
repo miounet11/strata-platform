@@ -12,9 +12,19 @@ import { fileURLToPath } from 'node:url';
 import { createTimeSkip, diffRun, measureFolder, timeskipRevisionMessage } from '../server/timeskip.mjs';
 
 const HOST_DIR = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '..', '..', '..');
+// Upstream keeps the host at apps/host; this fork keeps it at apps/client-upstream/host, so walk up
+// to the checkout that actually holds the engine instead of counting levels.
+function findRepoRoot(from) {
+  for (let dir = resolve(from); ; dir = resolve(dir, '..')) {
+    if (existsSync(join(dir, 'strata.py'))) return dir;
+    if (resolve(dir, '..') === dir) return resolve(from, '..', '..', '..');
+  }
+}
+const REPO = findRepoRoot(HOST_DIR);
 const PYTHON = process.env.STRATA_TEST_PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3');
 const hasPython = spawnSync(PYTHON, ['--version'], { windowsHide: true }).status === 0;
+// A client-only fork ships without the engine; these runs drive strata.py.
+const noEngine = !existsSync(join(REPO, 'strata.py')) && 'the engine checkout (strata.py) is not part of this client-only fork';
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -53,7 +63,7 @@ test('diffRun lists added, changed and removed files and says which revision to 
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('a run starts without the caller waiting, shows its changed files, and applies the chosen revision with a rollback copy', { skip: !hasPython && 'no python on this machine', timeout: 120000 }, async () => {
+test('a run starts without the caller waiting, shows its changed files, and applies the chosen revision with a rollback copy', { skip: noEngine || (!hasPython && 'no python on this machine'), timeout: 120000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ts-run-'));
   try {
     const workspace = join(dir, 'work'); mkdirSync(workspace);
@@ -96,7 +106,7 @@ test('a run whose host is gone reads as interrupted, not as still working', { sk
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('Stop ends the job and everything it started, deletes the copies, leaves the person\'s files alone, and the run then reads as cancelled', { skip: !hasPython && 'no python on this machine', timeout: 120000 }, async () => {
+test('Stop ends the job and everything it started, deletes the copies, leaves the person\'s files alone, and the run then reads as cancelled', { skip: noEngine || (!hasPython && 'no python on this machine'), timeout: 120000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ts-stop-'));
   try {
     const workspace = join(dir, 'work'); mkdirSync(workspace);

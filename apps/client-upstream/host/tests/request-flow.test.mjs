@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import http from 'node:http';
-import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, writeFile, rm, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -40,7 +40,7 @@ test('skill instructions require both enabled state and a matching workspace', (
 });
 
 test('stream usage comes from the server, includes reasoning latency and preserves instructions', async () => {
-  const home = await mkdtemp(join(tmpdir(), 'strata-stream-test-'));
+  const home = await realpath(await mkdtemp(join(tmpdir(), 'strata-stream-test-')));
   process.env.STRATA_HOME = home;
   process.env.STRATA_MODELS_DIR = join(home, 'models');
   const { proxyCompletion } = await import('../server/inference.mjs');
@@ -78,7 +78,7 @@ test('a stream without usage never presents chunks as tokens', async () => {
 });
 
 test('Serving cancellation stops active and queued demo requests; test keys enforce access', { timeout: 90000 }, async () => {
-  const home = await mkdtemp(join(tmpdir(), 'strata-request-host-'));
+  const home = await realpath(await mkdtemp(join(tmpdir(), 'strata-request-host-')));
   await mkdir(join(home, 'data'));
   const id = 'qwen38-q4_k_m';
   await writeFile(join(home, 'data/state.json'), JSON.stringify({ installed: { [id]: { installedAt: new Date().toISOString(), bytes: 491400032, simulated:true } }, beginner:{priority:'balanced',contextLength:'32k',readImages:false,gpuIdle:'never'}, current: id, loaded: id }));

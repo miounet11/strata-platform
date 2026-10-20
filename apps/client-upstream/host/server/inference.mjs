@@ -41,6 +41,15 @@ export function requiresRealEngine() {
   return process.env.STRATA_PACKAGED === '1';
 }
 
+/**
+ * True when the caller explicitly asked for simulated output. A packaged build can never opt in,
+ * the same rule `requiresRealEngine` enforces in the other direction.
+ */
+function simulationRequested() {
+  if (process.env.STRATA_PACKAGED === '1') return false;
+  return process.env.STRATA_FORCE_DEMO === '1' || process.env.STRATA_REAL_ENGINE === '0';
+}
+
 /** Where the Stratat API worker is, if it was named explicitly. */
 function strataUrl() {
   const raw = process.env.STRATA_SERVER_URL?.trim();
@@ -109,7 +118,10 @@ export async function detectBackend({ force = false } = {}) {
 
   if (!force && backend && backend.kind !== 'engine' && Date.now() - checkedAt < 20_000) return backend;
 
-  for (const c of CANDIDATES) {
+  // `STRATA_REAL_ENGINE=0` asks for simulation. Adopting whatever OpenAI-compatible server happens
+  // to be listening (Ollama, LM Studio) would make a demo run answer from a foreign model, so the
+  // candidate scan only runs when simulation is not explicitly requested.
+  if (!simulationRequested()) for (const c of CANDIDATES) {
     try {
       const res = await fetch(`${c.url}/models`, { signal: AbortSignal.timeout(700) });
       if (res.ok) {

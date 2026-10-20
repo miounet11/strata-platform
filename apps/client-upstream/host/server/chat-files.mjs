@@ -10,9 +10,28 @@
 
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync, realpathSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { basename, dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { externalEnvironment } from './external-env.mjs';
+
+/**
+ * macOS keeps per-user temp files under /var/folders (realpath: /private/var/folders).
+ * That is a place people write to, so the blanket `/var` rule must not catch it.
+ */
+function isTempDir(p) {
+  const t = realpathSafe(tmpdir());
+  const q = realpathSafe(p);
+  return q === t || q.startsWith(t + sep);
+}
+
+function realpathSafe(p) {
+  try {
+    return realpathSync(p);
+  } catch {
+    return resolve(p);
+  }
+}
 
 /** A folder no chat may use as its project: the top of a drive, or the system's own folders. */
 export function refusedFolder(dir) {
@@ -22,7 +41,7 @@ export function refusedFolder(dir) {
     const win = (process.env.SystemRoot ?? 'C:\\Windows').toLowerCase();
     const q = p.toLowerCase();
     if (q === win || q.startsWith(win + sep) || /^[a-z]:\\(program files( \(x86\))?|programdata)(\\|$)/.test(q)) return 'That is a system folder. Choose one of your own folders.';
-  } else if (/^\/(bin|boot|dev|etc|lib|lib64|proc|root|run|sbin|sys|usr|var)(\/|$)/.test(p)) return 'That is a system folder. Choose one of your own folders.';
+  } else if (!isTempDir(p) && /^\/(bin|boot|dev|etc|lib|lib64|proc|root|run|sbin|sys|usr|var)(\/|$)/.test(p)) return 'That is a system folder. Choose one of your own folders.';
   return null;
 }
 

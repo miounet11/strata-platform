@@ -3,14 +3,14 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
-import {mkdtemp,mkdir,writeFile,rm} from 'node:fs/promises';
+import {mkdtemp,mkdir,writeFile,rm,realpath} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createServer} from 'node:net';
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function freePort(){const server=createServer();await new Promise(r=>server.listen(0,'127.0.0.1',r));const port=server.address().port;await new Promise(r=>server.close(r));return port;}
 test('HTTP gateway lists all models, routes both protocols exactly, and isolates lifecycle requests',{timeout:30000},async()=>{
- const home=await mkdtemp(join(tmpdir(),'strata-multiple-model-test-'));await mkdir(join(home,'data'));
+ const home=await realpath(await mkdtemp(join(tmpdir(),'strata-multiple-model-test-')));await mkdir(join(home,'data'));
  await writeFile(join(home,'data','state.json'),JSON.stringify({installed:{'qwen38-q4_k_m':{installedAt:'2026-10-14',simulated:true},'qwen36-q4_k_m':{installedAt:'2026-10-14',simulated:true}}}));
  const port=await freePort(),base=`http://127.0.0.1:${port}`;
  const host=spawn(process.execPath,['server/index.mjs'],{cwd:fileURLToPath(new URL('..',import.meta.url)),env:{...process.env,STRATA_HOME:home,STRATA_MODELS_DIR:join(home,'models'),STRATA_REAL_ENGINE:'0',STRATA_TEST_HARDWARE:ROOMY_HOST,STRATA_PORT:String(port),STRATA_BIND:'127.0.0.1'},stdio:'ignore'});

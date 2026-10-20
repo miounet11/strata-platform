@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { existsSync } from 'node:fs';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, realpathSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { tmpdir } from 'node:os';
 import { bundledPython, componentsDirectory, controlEnvironment, createControl, findControl, runCli } from '../server/control-runtime.mjs';
@@ -12,7 +12,7 @@ import { createNativeControl } from '../server/native-control.mjs';
 const isWin = process.platform === 'win32';
 
 function fakeControlDir() {
-  const dir = mkdtempSync(join(tmpdir(), 'strata-control-dir-'));
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), 'strata-control-dir-')));
   mkdirSync(join(dir, 'python', ...(isWin ? [] : ['bin'])), { recursive: true });
   mkdirSync(join(dir, 'strata_control'), { recursive: true });
   mkdirSync(join(dir, 'serve'), { recursive: true });
@@ -31,7 +31,7 @@ test('the Control component is found by STRATA_CONTROL_DIR or beside the host, a
     assert.equal(found.python, bundledPython(dir));
     assert.equal(found.bundle.python, '3.12.15');
     // beside the host: <install>/host + <install>/control
-    const install = mkdtempSync(join(tmpdir(), 'strata-install-'));
+    const install = realpathSync(mkdtempSync(join(tmpdir(), 'strata-install-')));
     try {
       mkdirSync(join(install, 'host', 'server'), { recursive: true });
       assert.equal(findControl({ env: {}, hostDir: join(install, 'host') }), null, 'nothing beside the host yet');
@@ -86,7 +86,8 @@ test('runCli passes the arguments untouched (no shell) and reads JSON', async ()
 // ---------------------------------------------------------------------------------- native-control in packaged mode
 
 function packagedFixture({ engineUsable = true, updater = null, repair = false } = {}) {
-  const root = mkdtempSync(join(tmpdir(), 'strata-packaged-test-'));
+  // macOS resolves /var to /private/var; the server reports real paths, so the fixture must too.
+  const root = realpathSync(mkdtempSync(join(tmpdir(), 'strata-packaged-test-')));
   const install = join(root, 'install'), data = join(root, 'data');
   mkdirSync(install, { recursive: true });
   const earlierInstallEnv = process.env.STRATA_INSTALL_DIR;
