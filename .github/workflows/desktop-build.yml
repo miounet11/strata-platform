@@ -54,11 +54,25 @@ jobs:
         working-directory: ${{ env.DESKTOP_DIR }}
         run: npm ci
 
+      # The updater private key never lives in the repo: it is a repository secret.
+      # Losing it means shipped builds can no longer verify our updates.
       - name: Build the app
         working-directory: ${{ env.DESKTOP_DIR }}
         env:
           CI: true
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npx tauri build --target ${{ matrix.target }}
+
+      - name: Assert the updater manifest was produced
+        shell: bash
+        run: |
+          found=$(find "${{ env.DESKTOP_DIR }}/src-tauri/target" -name 'latest.json' -print -quit)
+          if [ -z "$found" ]; then
+            echo "::error::tauri did not emit latest.json — check bundle.createUpdaterArtifacts and TAURI_SIGNING_PRIVATE_KEY"
+            exit 1
+          fi
+          echo "updater manifest: $found"
 
       - uses: actions/upload-artifact@v4
         with:
