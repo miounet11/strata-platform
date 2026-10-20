@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-10-20T13:21:57.517Z",
+  "syncedAt": "2026-10-20T13:36:54.051Z",
   "assets": {
     "tts-home-en": {
       "type": "tts",
@@ -1144,6 +1144,136 @@
         "en": "Unsloth ud-q4_k_xl - no vision?"
       },
       "prompt": "GitHub issue illustration, technical: Unsloth ud-q4_k_xl - no vision?, GPU local AI, dark teal, no text"
+    },
+    "signal-x-seed-project-maya-deep-dive": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-seed-project-maya-deep-dive.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Project Maya deep dive: running GLM-5.3-Flash (321B MoE) on your own NVIDIA GPUs"
+      },
+      "prompt": "News card illustration: Project Maya deep dive: running GLM-5.3-Flash (321B MoE) on your own NVIDIA GPUs, built on Strata, GPU/local AI, no text"
+    },
+    "issue-2936": {
+      "type": "image",
+      "path": "/media/enriched/issue-2936.webp",
+      "page": "/issues/2936",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[sm_86 / RTX 3090] 0.1.43→0.1.44 decode regression = commit 661ff29 (STRATA_ADAP"
+      },
+      "prompt": "GitHub issue illustration, technical: [sm_86 / RTX 3090] 0.1.43→0.1.44 decode regression = commit 661ff29 (STRATA_ADAPT_OVERLAP default fl, GPU local AI, dark teal, no text"
+    },
+    "issue-3198": {
+      "type": "image",
+      "path": "/media/enriched/issue-3198.webp",
+      "page": "/issues/3198",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[Engine] Return the ability to run local models with --host 0.0.0.0 WITHOUT api "
+      },
+      "prompt": "GitHub issue illustration, technical: [Engine] Return the ability to run local models with --host 0.0.0.0 WITHOUT api keys, GPU local AI, dark teal, no text"
+    },
+    "issue-3330": {
+      "type": "image",
+      "path": "/media/enriched/issue-3330.webp",
+      "page": "/issues/3330",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[Other] Opinion: Strata app should be separate repo from Strata Engine"
+      },
+      "prompt": "GitHub issue illustration, technical: [Other] Opinion: Strata app should be separate repo from Strata Engine, GPU local AI, dark teal, no text"
+    },
+    "issue-3201": {
+      "type": "image",
+      "path": "/media/enriched/issue-3201.webp",
+      "page": "/issues/3201",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[Engine] NUMA-split CPU expert pool: +10 to +14 % decode on a dual-socket Xeon, "
+      },
+      "prompt": "GitHub issue illustration, technical: [Engine] NUMA-split CPU expert pool: +10 to +14 % decode on a dual-socket Xeon, measured, opt-in, GPU local AI, dark teal, no text"
+    },
+    "issue-3021": {
+      "type": "image",
+      "path": "/media/enriched/issue-3021.webp",
+      "page": "/issues/3021",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[Bug]: gfx1100 2x RX 7900 XT layer split + --resident-experts (0.1.45,Q2_0):16K–"
+      },
+      "prompt": "GitHub issue illustration, technical: [Bug]: gfx1100 2x RX 7900 XT layer split + --resident-experts (0.1.45,Q2_0):16K–100K prompt prefill , GPU local AI, dark teal, no text"
+    },
+    "issue-2971": {
+      "type": "image",
+      "path": "/media/enriched/issue-2971.webp",
+      "page": "/issues/2971",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[GUI] Web app: page overflows sideways on phones when a tool call appears"
+      },
+      "prompt": "GitHub issue illustration, technical: [GUI] Web app: page overflows sideways on phones when a tool call appears, GPU local AI, dark teal, no text"
+    },
+    "issue-2453": {
+      "type": "image",
+      "path": "/media/enriched/issue-2453.webp",
+      "page": "/issues/2453",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Windows/NVIDIA performance regression: v0.1.42 ~69 tok/s vs v0.1.44.1 ~55–58 tok"
+      },
+      "prompt": "GitHub issue illustration, technical: Windows/NVIDIA performance regression: v0.1.42 ~69 tok/s vs v0.1.44.1 ~55–58 tok/s on RTX 5060 Ti, GPU local AI, dark teal, no text"
+    },
+    "issue-2633": {
+      "type": "image",
+      "path": "/media/enriched/issue-2633.webp",
+      "page": "/issues/2633",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Qwen3.6-35B-A3B is not working"
+      },
+      "prompt": "GitHub issue illustration, technical: Qwen3.6-35B-A3B is not working, GPU local AI, dark teal, no text"
+    },
+    "issue-2500": {
+      "type": "image",
+      "path": "/media/enriched/issue-2500.webp",
+      "page": "/issues/2500",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Long generation ratchets to !×256 at the default 20,000 spin bound — 2× Arc Pro "
+      },
+      "prompt": "GitHub issue illustration, technical: Long generation ratchets to !×256 at the default 20,000 spin bound — 2× Arc Pro B60 (xe), 4,331 host, GPU local AI, dark teal, no text"
+    },
+    "issue-2464": {
+      "type": "image",
+      "path": "/media/enriched/issue-2464.webp",
+      "page": "/issues/2464",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[Engine] Qwen3.6-35B-A3B decode falls with context (V100: 109 to 14.6 tok/s at 1"
+      },
+      "prompt": "GitHub issue illustration, technical: [Engine] Qwen3.6-35B-A3B decode falls with context (V100: 109 to 14.6 tok/s at 114K on 0.2.0-beta); , GPU local AI, dark teal, no text"
+    },
+    "issue-2883": {
+      "type": "image",
+      "path": "/media/enriched/issue-2883.webp",
+      "page": "/issues/2883",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[Other] gfx906 / MI50: reproducible Linux releases and community validation"
+      },
+      "prompt": "GitHub issue illustration, technical: [Other] gfx906 / MI50: reproducible Linux releases and community validation, GPU local AI, dark teal, no text"
+    },
+    "issue-2671": {
+      "type": "image",
+      "path": "/media/enriched/issue-2671.webp",
+      "page": "/issues/2671",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "[Engine] --expert-cache above the setup default kills the engine on Metal (Apple"
+      },
+      "prompt": "GitHub issue illustration, technical: [Engine] --expert-cache above the setup default kills the engine on Metal (Apple Silicon), GPU local AI, dark teal, no text"
     }
   },
   "cluster": "192.168.2.100"
