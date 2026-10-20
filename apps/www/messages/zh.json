@@ -66,7 +66,8 @@
     "bookmark": "收藏",
     "bookmarked": "已收藏",
     "loginToBookmark": "登录后可收藏",
-    "trackedOpen": "正在打开下载页，会帮你记录。"
+    "trackedOpen": "正在打开下载页，会帮你记录。",
+    "tokPerSec": "RTX 5070 tok/s"
   },
   "dashboard": {
     "title": "我的",
@@ -105,7 +106,17 @@
     "windows": "Windows",
     "linux": "Mac / Linux（用命令装）",
     "desktopApp": "Strata 桌面版（Win & Mac）",
-    "desktopHint": "跟着界面点，一步一步装好。"
+    "desktopHint": "跟着界面点，一步一步装好。",
+    "cloneRepo": "下载或克隆",
+    "startHere": "双击",
+    "acceptDefaults": "接受推荐的模型与设置",
+    "openWhenReady": "准备就绪后打开",
+    "updateLater": "以后用",
+    "runAgain": "再次运行",
+    "againToStart": "即可启动；用",
+    "toUpdate": "更新。",
+    "buildFromRepo": "从本仓库构建：",
+    "requiresRust": "（需要 Rust）。"
   },
   "community": {
     "hubTitle": "Strata 社区",
@@ -128,7 +139,8 @@
     "whyMirror": "为什么有这个页面",
     "why1": "每条反馈都有独立网址，方便查找。",
     "why2": "顺手链到安装、模型和版本页。",
-    "why3": "每天自动和 GitHub 同步一次。"
+    "why3": "每天自动和 GitHub 同步一次。",
+    "noDescription": "GitHub 上没有填写描述。"
   },
   "pulse": {
     "title": "最新动态",

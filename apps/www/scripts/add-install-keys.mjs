@@ -1,0 +1,112 @@
+import { readFileSync, writeFileSync } from "node:fs";
+
+const copy = {
+  en: {
+    cloneRepo: "Download or clone",
+    startHere: "Double-click",
+    acceptDefaults: "Accept the recommended model and settings",
+    openWhenReady: "When it's ready, open",
+    updateLater: "Update later with",
+    runAgain: "Run",
+    againToStart: "again to start;",
+    toUpdate: "to update.",
+    buildFromRepo: "Build from this repo:",
+    requiresRust: "(requires Rust).",
+    noDescription: "No description on GitHub.",
+    tokPerSec: "RTX 5070 tok/s",
+  },
+  zh: {
+    cloneRepo: "下载或克隆",
+    startHere: "双击",
+    acceptDefaults: "接受推荐的模型与设置",
+    openWhenReady: "准备就绪后打开",
+    updateLater: "以后用",
+    runAgain: "再次运行",
+    againToStart: "即可启动；用",
+    toUpdate: "更新。",
+    buildFromRepo: "从本仓库构建：",
+    requiresRust: "（需要 Rust）。",
+    noDescription: "GitHub 上没有填写描述。",
+    tokPerSec: "RTX 5070 tok/s",
+  },
+  ja: {
+    cloneRepo: "ダウンロードまたはクローン",
+    startHere: "ダブルクリック：",
+    acceptDefaults: "推奨のモデルと設定をそのまま使う",
+    openWhenReady: "準備できたら開く：",
+    updateLater: "更新は後で",
+    runAgain: "再度",
+    againToStart: "を実行して起動、",
+    toUpdate: "で更新。",
+    buildFromRepo: "このリポジトリからビルド：",
+    requiresRust: "（Rust が必要）。",
+    noDescription: "GitHub に説明がありません。",
+    tokPerSec: "RTX 5070 tok/s",
+  },
+  de: {
+    cloneRepo: "Herunterladen oder klonen",
+    startHere: "Doppelklick auf",
+    acceptDefaults: "Empfohlenes Modell und Einstellungen übernehmen",
+    openWhenReady: "Wenn es bereit ist, öffnen:",
+    updateLater: "Später aktualisieren mit",
+    runAgain: "Erneut",
+    againToStart: "ausführen zum Start,",
+    toUpdate: "zum Aktualisieren.",
+    buildFromRepo: "Aus diesem Repo bauen:",
+    requiresRust: "(Rust erforderlich).",
+    noDescription: "Keine Beschreibung auf GitHub.",
+    tokPerSec: "RTX 5070 Tok./s",
+  },
+  fr: {
+    cloneRepo: "Télécharger ou cloner",
+    startHere: "Double-cliquez sur",
+    acceptDefaults: "Acceptez le modèle et les réglages recommandés",
+    openWhenReady: "Une fois prêt, ouvrez",
+    updateLater: "Pour mettre à jour plus tard :",
+    runAgain: "Relancez",
+    againToStart: "pour démarrer ;",
+    toUpdate: "pour mettre à jour.",
+    buildFromRepo: "Compiler depuis ce dépôt :",
+    requiresRust: "(Rust requis).",
+    noDescription: "Aucune description sur GitHub.",
+    tokPerSec: "RTX 5070 tok/s",
+  },
+  es: {
+    cloneRepo: "Descarga o clona",
+    startHere: "Haz doble clic en",
+    acceptDefaults: "Acepta el modelo y los ajustes recomendados",
+    openWhenReady: "Cuando esté listo, abre",
+    updateLater: "Más tarde actualiza con",
+    runAgain: "Ejecuta",
+    againToStart: "otra vez para iniciar;",
+    toUpdate: "para actualizar.",
+    buildFromRepo: "Compila desde este repo:",
+    requiresRust: "(requiere Rust).",
+    noDescription: "Sin descripción en GitHub.",
+    tokPerSec: "RTX 5070 tok/s",
+  },
+  pt: {
+    cloneRepo: "Baixe ou clone",
+    startHere: "Clique duas vezes em",
+    acceptDefaults: "Aceite o modelo e as configurações recomendadas",
+    openWhenReady: "Quando estiver pronto, abra",
+    updateLater: "Atualize depois com",
+    runAgain: "Execute",
+    againToStart: "de novo para iniciar;",
+    toUpdate: "para atualizar.",
+    buildFromRepo: "Compile a partir deste repositório:",
+    requiresRust: "(requer Rust).",
+    noDescription: "Sem descrição no GitHub.",
+    tokPerSec: "RTX 5070 tok/s",
+  },
+};
+
+for (const [locale, keys] of Object.entries(copy)) {
+  const path = `messages/${locale}.json`;
+  const messages = JSON.parse(readFileSync(path, "utf8"));
+  messages.install = { ...messages.install, ...keys };
+  messages.models = { ...messages.models, tokPerSec: keys.tokPerSec };
+  messages.community = { ...messages.community, noDescription: keys.noDescription };
+  writeFileSync(path, `${JSON.stringify(messages, null, 2)}\n`);
+  console.log(locale, "ok");
+}

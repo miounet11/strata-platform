@@ -33,19 +33,19 @@ export default async function InstallPage({
         <h2>{t("windows")}</h2>
         <ol style={{ lineHeight: 1.8 }}>
           <li>
-            Download or clone{" "}
+            {t("cloneRepo")}{" "}
             <a href="https://github.com/Niko1221/Strata">Niko1221/Strata</a>
           </li>
           <li>
-            Double-click <code>START-HERE.bat</code>
+            {t("startHere")} <code>START-HERE.bat</code>
           </li>
-          <li>Accept the recommended model and settings</li>
+          <li>{t("acceptDefaults")}</li>
           <li>
-            When it's ready, open <code>http://127.0.0.1:8080</code>
+            {t("openWhenReady")} <code>http://127.0.0.1:8080</code>
           </li>
         </ol>
         <p className="meta" style={{ marginBottom: 0 }}>
-          Update later with <code>UPDATE.bat</code> · {version}
+          {t("updateLater")} <code>UPDATE.bat</code> · {version}
         </p>
       </section>
       <section className="card section">
@@ -54,14 +54,16 @@ export default async function InstallPage({
 cd Strata
 ./setup.sh`}</pre>
         <p className="meta" style={{ marginBottom: 0 }}>
-          Run <code>./setup.sh</code> again to start; <code>./update.sh</code> to update.
+          {t("runAgain")} <code>./setup.sh</code> {t("againToStart")} <code>./update.sh</code>{" "}
+          {t("toUpdate")}
         </p>
       </section>
       <section className="card section">
         <h2>{t("desktopApp")}</h2>
         <p style={{ color: "var(--muted)" }}>{t("desktopHint")}</p>
         <p className="meta" style={{ marginBottom: 0 }}>
-          Build from this repo: <code>pnpm --filter @stratat/desktop tauri:build</code> (requires Rust).
+          {t("buildFromRepo")} <code>pnpm --filter @stratat/desktop tauri:build</code>{" "}
+          {t("requiresRust")}
         </p>
       </section>
       <section className="section">

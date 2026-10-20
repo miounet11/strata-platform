@@ -66,7 +66,8 @@
     "bookmark": "保存",
     "bookmarked": "保存しました",
     "loginToBookmark": "ログインして保存",
-    "trackedOpen": "ダウンロードページを開いています"
+    "trackedOpen": "ダウンロードページを開いています",
+    "tokPerSec": "RTX 5070 tok/s"
   },
   "download": {
     "title": "ダウンロード",
@@ -87,7 +88,17 @@
     "windows": "Windows",
     "linux": "Linux / macOS",
     "desktopApp": "Strata Desktop",
-    "desktopHint": "GUI ランチャー"
+    "desktopHint": "GUI ランチャー",
+    "cloneRepo": "ダウンロードまたはクローン",
+    "startHere": "ダブルクリック：",
+    "acceptDefaults": "推奨のモデルと設定をそのまま使う",
+    "openWhenReady": "準備できたら開く：",
+    "updateLater": "更新は後で",
+    "runAgain": "再度",
+    "againToStart": "を実行して起動、",
+    "toUpdate": "で更新。",
+    "buildFromRepo": "このリポジトリからビルド：",
+    "requiresRust": "（Rust が必要）。"
   },
   "pulse": {
     "title": "Intelligence pulse",
@@ -226,7 +237,8 @@
     "whyMirror": "ミラー理由",
     "why1": "各 issue/PR に固定 URL。",
     "why2": "サイト内ドキュメントへ誘導。",
-    "why3": "pnpm sync:community で更新。"
+    "why3": "pnpm sync:community で更新。",
+    "noDescription": "GitHub に説明がありません。"
   },
   "auth": {
     "loginTitle": "ログイン",

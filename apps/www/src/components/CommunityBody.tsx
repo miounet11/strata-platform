@@ -1,7 +1,10 @@
+import { getTranslations } from "next-intl/server";
+
 /** Plain-text GitHub body for indexable content (no MD parser required). */
-export function CommunityBody({ body }: { body: string }) {
+export async function CommunityBody({ body }: { body: string }) {
   if (!body.trim()) {
-    return <p style={{ color: "var(--muted)" }}>No description on GitHub.</p>;
+    const t = await getTranslations("community");
+    return <p style={{ color: "var(--muted)" }}>{t("noDescription")}</p>;
   }
   return (
     <pre

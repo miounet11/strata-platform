@@ -66,7 +66,8 @@
     "bookmark": "Favori",
     "bookmarked": "Enregistré",
     "loginToBookmark": "Connectez-vous pour enregistrer",
-    "trackedOpen": "Ouverture de la page de téléchargement"
+    "trackedOpen": "Ouverture de la page de téléchargement",
+    "tokPerSec": "RTX 5070 tok/s"
   },
   "download": {
     "title": "Télécharger",
@@ -87,7 +88,17 @@
     "windows": "Windows",
     "linux": "Linux / macOS",
     "desktopApp": "Strata Desktop",
-    "desktopHint": "Lanceur GUI"
+    "desktopHint": "Lanceur GUI",
+    "cloneRepo": "Télécharger ou cloner",
+    "startHere": "Double-cliquez sur",
+    "acceptDefaults": "Acceptez le modèle et les réglages recommandés",
+    "openWhenReady": "Une fois prêt, ouvrez",
+    "updateLater": "Pour mettre à jour plus tard :",
+    "runAgain": "Relancez",
+    "againToStart": "pour démarrer ;",
+    "toUpdate": "pour mettre à jour.",
+    "buildFromRepo": "Compiler depuis ce dépôt :",
+    "requiresRust": "(Rust requis)."
   },
   "pulse": {
     "title": "Intelligence pulse",
@@ -226,7 +237,8 @@
     "whyMirror": "Pourquoi",
     "why1": "URL stable par fil.",
     "why2": "Docs internes.",
-    "why3": "sync:community quotidien."
+    "why3": "sync:community quotidien.",
+    "noDescription": "Aucune description sur GitHub."
   },
   "auth": {
     "loginTitle": "Connexion",

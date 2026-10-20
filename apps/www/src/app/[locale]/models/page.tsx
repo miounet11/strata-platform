@@ -38,7 +38,7 @@ export default async function ModelsPage({
               <th>{t("ram")}</th>
               <th>{t("vram")}</th>
               <th>{t("size")}</th>
-              <th className="num">RTX 5070 tok/s</th>
+              <th className="num">{t("tokPerSec")}</th>
               <th>{t("actions")}</th>
             </tr>
           </thead>

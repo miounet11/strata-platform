@@ -130,7 +130,8 @@
     "downloads": "Downloads",
     "newer": "Newer release",
     "older": "Older release"
-  },  "models": {
+  },
+  "models": {
     "title": "Pick a model",
     "vram": "VRAM",
     "ram": "System RAM",
@@ -140,7 +141,8 @@
     "bookmark": "Save",
     "bookmarked": "Saved to your account",
     "loginToBookmark": "Sign in to save",
-    "trackedOpen": "Opening the download page — we'll log it for you"
+    "trackedOpen": "Opening the download page — we'll log it for you",
+    "tokPerSec": "RTX 5070 tok/s"
   },
   "dashboard": {
     "title": "My stuff",
@@ -179,7 +181,17 @@
     "windows": "Windows",
     "linux": "Mac / Linux (command line)",
     "desktopApp": "Strata Desktop (Win & Mac)",
-    "desktopHint": "Follow the screen, step by step."
+    "desktopHint": "Follow the screen, step by step.",
+    "cloneRepo": "Download or clone",
+    "startHere": "Double-click",
+    "acceptDefaults": "Accept the recommended model and settings",
+    "openWhenReady": "When it's ready, open",
+    "updateLater": "Update later with",
+    "runAgain": "Run",
+    "againToStart": "again to start;",
+    "toUpdate": "to update.",
+    "buildFromRepo": "Build from this repo:",
+    "requiresRust": "(requires Rust)."
   },
   "community": {
     "hubTitle": "Strata community",
@@ -202,7 +214,8 @@
     "whyMirror": "Why this page exists",
     "why1": "Every issue has its own address, easy to find and share.",
     "why2": "Each page links to install, models, and releases.",
-    "why3": "Synced with GitHub once a day, automatically."
+    "why3": "Synced with GitHub once a day, automatically.",
+    "noDescription": "No description on GitHub."
   },
   "pulse": {
     "title": "What people say",

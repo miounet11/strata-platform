@@ -66,7 +66,8 @@
     "bookmark": "Merken",
     "bookmarked": "Gespeichert",
     "loginToBookmark": "Zum Merken anmelden",
-    "trackedOpen": "Downloadseite wird geöffnet"
+    "trackedOpen": "Downloadseite wird geöffnet",
+    "tokPerSec": "RTX 5070 Tok./s"
   },
   "download": {
     "title": "Download",
@@ -87,7 +88,17 @@
     "windows": "Windows",
     "linux": "Linux / macOS",
     "desktopApp": "Strata Desktop",
-    "desktopHint": "GUI-Launcher"
+    "desktopHint": "GUI-Launcher",
+    "cloneRepo": "Herunterladen oder klonen",
+    "startHere": "Doppelklick auf",
+    "acceptDefaults": "Empfohlenes Modell und Einstellungen übernehmen",
+    "openWhenReady": "Wenn es bereit ist, öffnen:",
+    "updateLater": "Später aktualisieren mit",
+    "runAgain": "Erneut",
+    "againToStart": "ausführen zum Start,",
+    "toUpdate": "zum Aktualisieren.",
+    "buildFromRepo": "Aus diesem Repo bauen:",
+    "requiresRust": "(Rust erforderlich)."
   },
   "pulse": {
     "title": "Intelligence pulse",
@@ -226,7 +237,8 @@
     "whyMirror": "Warum spiegeln",
     "why1": "Stabile URLs pro Thread.",
     "why2": "Interne Docs verknüpft.",
-    "why3": "Täglich sync:community."
+    "why3": "Täglich sync:community.",
+    "noDescription": "Keine Beschreibung auf GitHub."
   },
   "auth": {
     "loginTitle": "Anmelden",
