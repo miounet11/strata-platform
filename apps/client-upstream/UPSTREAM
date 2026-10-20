@@ -1,0 +1,4 @@
+repo: Niko1221/Strata
+tag:  v0.2.0-beta
+license: MIT
+fetched-by: scripts/fetch-upstream.sh

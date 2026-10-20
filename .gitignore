@@ -21,3 +21,7 @@ apps/www/tsconfig.tsbuildinfo
 # freshness watcher runtime files
 .freshness-state.json
 .freshness.lock
+
+# Client fork build output
+apps/client-upstream/host/dist
+apps/client-upstream/desktop/dist
