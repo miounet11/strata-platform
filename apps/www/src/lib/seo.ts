@@ -23,10 +23,11 @@ export function siteMetadata(
   description: string,
   path = "",
   index = true,
+  availableLocales: readonly string[] = routing.locales,
 ): Metadata {
   const url = `${SITE}/${locale}${path}`;
   const languages = Object.fromEntries(
-    routing.locales.map((code) => [code, `${SITE}/${code}${path}`]),
+    availableLocales.map((code) => [code, `${SITE}/${code}${path}`]),
   );
   const ogLocale = OG_LOCALES[locale] ?? OG_LOCALES.en;
   return {
@@ -40,7 +41,10 @@ export function siteMetadata(
       url,
       siteName: SITE_NAME,
       locale: ogLocale,
-      alternateLocale: Object.values(OG_LOCALES).filter((code) => code !== ogLocale),
+      alternateLocale: availableLocales
+        .filter((code) => code !== locale)
+        .map((code) => OG_LOCALES[code])
+        .filter(Boolean),
       type: "website",
     },
     twitter: {

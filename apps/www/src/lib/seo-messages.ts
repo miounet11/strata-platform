@@ -12,6 +12,7 @@ export async function seoMetadata(
   index = true,
   title?: string,
   description?: string,
+  availableLocales?: readonly string[],
 ) {
   const t = await getTranslations({ locale, namespace: "seo" });
   return siteMetadata(
@@ -20,5 +21,6 @@ export async function seoMetadata(
     description ?? t(`${key}.description`),
     path,
     index,
+    availableLocales,
   );
 }

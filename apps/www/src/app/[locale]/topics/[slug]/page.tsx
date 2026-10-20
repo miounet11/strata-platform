@@ -1,11 +1,15 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
 import { getLiveTopics, getTopic, hasTopic, rigsForTopic, topicText } from "@/lib/topics";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export function generateStaticParams() {
-  return getLiveTopics().map((topic) => ({ slug: topic.slug }));
+  // Editorial topics differ per locale, so only build the pairs that exist.
+  return routing.locales.flatMap((locale) =>
+    getLiveTopics(locale).map((topic) => ({ locale, slug: topic.slug })),
+  );
 }
 
 export async function generateMetadata({
@@ -18,7 +22,8 @@ export async function generateMetadata({
   if (!topic || topic.status !== "live" || !hasTopic(topic, locale)) return {};
   const title = topicText(topic.title, locale);
   const description = topicText(topic.body, locale).slice(0, 180);
-  return seoMetadata(locale, "topics", `/topics/${topic.slug}`, true, title, description);
+  const siblings = routing.locales.filter((code) => hasTopic(topic, code));
+  return seoMetadata(locale, "topics", `/topics/${topic.slug}`, true, title, description, siblings);
 }
 
 function TopicHref({ href, children }: { href: string; children: string }) {
