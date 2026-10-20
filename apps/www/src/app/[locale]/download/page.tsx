@@ -55,7 +55,8 @@ export default async function DownloadPage({
         <h2 style={{ marginTop: 0 }}>{t("windowsEngine")}</h2>
         <p style={{ color: "var(--muted)" }}>{t("windowsEngineHint")}</p>
         <div className="hero-actions">
-          {[...engine.assets]
+          {engine.assets
+            .filter((a) => a.platform === "windows")
             .sort((a, b) => engineVariantRank(a.name, a.variant) - engineVariantRank(b.name, b.variant))
             .map((a) => (
               <a key={a.name} className="btn btn-primary btn-lg" href={a.downloadUrl} rel="noopener noreferrer">
@@ -75,6 +76,20 @@ export default async function DownloadPage({
       <section className="card section">
         <h2 style={{ marginTop: 0 }}>{t("macEngine")}</h2>
         <p style={{ color: "var(--muted)" }}>{t("macEngineHint")}</p>
+        <div className="hero-actions">
+          {engine.assets
+            .filter((a) => a.platform === "linux" || a.platform === "macos")
+            .sort(
+              (a, b) =>
+                engineVariantRank(a.name, a.variant) - engineVariantRank(b.name, b.variant) ||
+                a.name.localeCompare(b.name),
+            )
+            .map((a) => (
+              <a key={a.name} className="btn" href={a.downloadUrl} rel="noopener noreferrer">
+                {a.platform === "macos" ? "macOS" : "Linux"} · {engineVariantLabel(a.name, a.variant)}
+              </a>
+            ))}
+        </div>
         <pre className="copy-block">{macEngine.setupCommand}</pre>
       </section>
 

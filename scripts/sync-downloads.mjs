@@ -12,6 +12,26 @@ const OUT = join(
 const DESKTOP_REPO = process.env.DESKTOP_RELEASE_REPO ?? "miounet11/strata-platform";
 const DESKTOP_TAG = process.env.DESKTOP_RELEASE_TAG ?? "";
 
+/** A file a person can actually install. Everything else is release plumbing. */
+function isInstaller(name) {
+  return /\.(exe|msi|dmg|AppImage|deb|rpm|tar\.gz|zip)$/i.test(name);
+}
+
+function assetPlatform(name) {
+  if (/windows/i.test(name)) return "windows";
+  if (/linux/i.test(name)) return "linux";
+  if (/mac|darwin|\.dmg/i.test(name)) return "macos";
+  return "other";
+}
+
+function assetVariant(name) {
+  if (/hip|rx7900|rx9070|strixhalo|rdna3|halo/i.test(name)) return "amd";
+  if (/cuda12/i.test(name)) return "nvidia-legacy";
+  if (/cuda13|cuda/i.test(name)) return "nvidia";
+  if (/metal/i.test(name)) return "apple";
+  return "other";
+}
+
 async function latestEngine() {
   const res = await fetch(`https://api.github.com/repos/Niko1221/Strata/releases/latest`, {
     headers: { Accept: "application/vnd.github+json", "User-Agent": "stratat-downloads" },
@@ -21,18 +41,18 @@ async function latestEngine() {
   return {
     tag: r.tag_name,
     url: r.html_url,
-    assets: (r.assets ?? []).map((a) => ({
-      id: a.name.replace(/\.[^.]+$/, ""),
-      name: a.name,
-      platform: a.name.includes("windows") ? "windows" : "other",
-      variant: a.name.includes("hip")
-        ? "amd"
-        : a.name.includes("cuda12")
-          ? "nvidia-legacy"
-          : "nvidia",
-      downloadUrl: a.browser_download_url,
-      sizeBytes: a.size,
-    })),
+    // Only installable artifacts belong on the page: `install.sh`, `latest.json`,
+    // `SHA256SUMS.txt` and the feed files are plumbing, not downloads.
+    assets: (r.assets ?? [])
+      .filter((a) => isInstaller(a.name))
+      .map((a) => ({
+        id: a.name.replace(/\.[^.]+$/, ""),
+        name: a.name,
+        platform: assetPlatform(a.name),
+        variant: assetVariant(a.name),
+        downloadUrl: a.browser_download_url,
+        sizeBytes: a.size,
+      })),
   };
 }
 

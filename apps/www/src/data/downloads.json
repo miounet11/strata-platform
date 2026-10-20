@@ -1,78 +1,38 @@
 {
-  "syncedAt": "2026-10-20T08:24:05.826Z",
+  "syncedAt": "2026-10-20T08:47:43.927Z",
   "siteUrl": "https://www.stratat.com",
   "engine": {
     "tag": "v0.2.1",
     "url": "https://github.com/Niko1221/Strata/releases/tag/v0.2.1",
     "assets": [
       {
-        "id": "install-manifest",
-        "name": "install-manifest.txt",
-        "platform": "other",
-        "variant": "nvidia",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/install-manifest.txt",
-        "sizeBytes": 407
-      },
-      {
-        "id": "install",
-        "name": "install.ps1",
-        "platform": "other",
-        "variant": "nvidia",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/install.ps1",
-        "sizeBytes": 7840
-      },
-      {
-        "id": "install",
-        "name": "install.sh",
-        "platform": "other",
-        "variant": "nvidia",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/install.sh",
-        "sizeBytes": 6864
-      },
-      {
-        "id": "latest",
-        "name": "latest.json",
-        "platform": "other",
-        "variant": "nvidia",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/latest.json",
-        "sizeBytes": 2187
-      },
-      {
-        "id": "SHA256SUMS",
-        "name": "SHA256SUMS.txt",
-        "platform": "other",
-        "variant": "nvidia",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/SHA256SUMS.txt",
-        "sizeBytes": 3291
-      },
-      {
         "id": "Strata-0.2.1-linux-amd-rx7900",
         "name": "Strata-0.2.1-linux-amd-rx7900.AppImage",
-        "platform": "other",
-        "variant": "nvidia",
+        "platform": "linux",
+        "variant": "amd",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-amd-rx7900.AppImage",
         "sizeBytes": 518892024
       },
       {
         "id": "Strata-0.2.1-linux-amd-rx9070",
         "name": "Strata-0.2.1-linux-amd-rx9070.AppImage",
-        "platform": "other",
-        "variant": "nvidia",
+        "platform": "linux",
+        "variant": "amd",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-amd-rx9070.AppImage",
         "sizeBytes": 685853176
       },
       {
         "id": "Strata-0.2.1-linux-amd-strixhalo",
         "name": "Strata-0.2.1-linux-amd-strixhalo.AppImage",
-        "platform": "other",
-        "variant": "nvidia",
+        "platform": "linux",
+        "variant": "amd",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-amd-strixhalo.AppImage",
         "sizeBytes": 452581880
       },
       {
         "id": "Strata-0.2.1-linux-nvidia-cuda12",
         "name": "Strata-0.2.1-linux-nvidia-cuda12.AppImage",
-        "platform": "other",
+        "platform": "linux",
         "variant": "nvidia-legacy",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-nvidia-cuda12.AppImage",
         "sizeBytes": 1006520824
@@ -80,7 +40,7 @@
       {
         "id": "Strata-0.2.1-linux-nvidia-cuda13",
         "name": "Strata-0.2.1-linux-nvidia-cuda13.AppImage",
-        "platform": "other",
+        "platform": "linux",
         "variant": "nvidia",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-nvidia-cuda13.AppImage",
         "sizeBytes": 887634424
@@ -88,16 +48,16 @@
       {
         "id": "Strata-0.2.1-linux-update",
         "name": "Strata-0.2.1-linux-update.AppImage",
-        "platform": "other",
-        "variant": "nvidia",
+        "platform": "linux",
+        "variant": "other",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-update.AppImage",
         "sizeBytes": 290040312
       },
       {
         "id": "Strata-0.2.1-mac",
         "name": "Strata-0.2.1-mac.dmg",
-        "platform": "other",
-        "variant": "nvidia",
+        "platform": "macos",
+        "variant": "other",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-mac.dmg",
         "sizeBytes": 166033207
       },
@@ -137,23 +97,23 @@
         "id": "Strata-0.2.1-windows-update",
         "name": "Strata-0.2.1-windows-update.exe",
         "platform": "windows",
-        "variant": "nvidia",
+        "variant": "other",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-windows-update.exe",
         "sizeBytes": 111376441
       },
       {
         "id": "strata-control-0.1.46-linux-x86_64.tar",
         "name": "strata-control-0.1.46-linux-x86_64.tar.gz",
-        "platform": "other",
-        "variant": "nvidia",
+        "platform": "linux",
+        "variant": "other",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46-linux-x86_64.tar.gz",
         "sizeBytes": 98567975
       },
       {
         "id": "strata-control-0.1.46-macos-arm64.tar",
         "name": "strata-control-0.1.46-macos-arm64.tar.gz",
-        "platform": "other",
-        "variant": "nvidia",
+        "platform": "macos",
+        "variant": "other",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46-macos-arm64.tar.gz",
         "sizeBytes": 49838509
       },
@@ -161,14 +121,14 @@
         "id": "strata-control-0.1.46-windows-x86_64",
         "name": "strata-control-0.1.46-windows-x86_64.zip",
         "platform": "windows",
-        "variant": "nvidia",
+        "variant": "other",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46-windows-x86_64.zip",
         "sizeBytes": 72113252
       },
       {
         "id": "strata-engine-0.1.46-linux-x86_64-cuda-cuda12.tar",
         "name": "strata-engine-0.1.46-linux-x86_64-cuda-cuda12.tar.gz",
-        "platform": "other",
+        "platform": "linux",
         "variant": "nvidia-legacy",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-cuda-cuda12.tar.gz",
         "sizeBytes": 738816999
@@ -176,7 +136,7 @@
       {
         "id": "strata-engine-0.1.46-linux-x86_64-cuda-cuda13.tar",
         "name": "strata-engine-0.1.46-linux-x86_64-cuda-cuda13.tar.gz",
-        "platform": "other",
+        "platform": "linux",
         "variant": "nvidia",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-cuda-cuda13.tar.gz",
         "sizeBytes": 604965163
@@ -184,7 +144,7 @@
       {
         "id": "strata-engine-0.1.46-linux-x86_64-hip-halo.tar",
         "name": "strata-engine-0.1.46-linux-x86_64-hip-halo.tar.gz",
-        "platform": "other",
+        "platform": "linux",
         "variant": "amd",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-hip-halo.tar.gz",
         "sizeBytes": 168581071
@@ -192,7 +152,7 @@
       {
         "id": "strata-engine-0.1.46-linux-x86_64-hip-rx7900.tar",
         "name": "strata-engine-0.1.46-linux-x86_64-hip-rx7900.tar.gz",
-        "platform": "other",
+        "platform": "linux",
         "variant": "amd",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-hip-rx7900.tar.gz",
         "sizeBytes": 241466491
@@ -200,7 +160,7 @@
       {
         "id": "strata-engine-0.1.46-linux-x86_64-hip-rx9070.tar",
         "name": "strata-engine-0.1.46-linux-x86_64-hip-rx9070.tar.gz",
-        "platform": "other",
+        "platform": "linux",
         "variant": "amd",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-hip-rx9070.tar.gz",
         "sizeBytes": 402910184
@@ -208,8 +168,8 @@
       {
         "id": "strata-engine-0.1.46-macos-arm64-metal.tar",
         "name": "strata-engine-0.1.46-macos-arm64-metal.tar.gz",
-        "platform": "other",
-        "variant": "nvidia",
+        "platform": "macos",
+        "variant": "apple",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-macos-arm64-metal.tar.gz",
         "sizeBytes": 5079311
       },
@@ -246,26 +206,10 @@
         "sizeBytes": 562198572
       },
       {
-        "id": "strata-feed",
-        "name": "strata-feed.json",
-        "platform": "other",
-        "variant": "nvidia",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-feed.json",
-        "sizeBytes": 10239
-      },
-      {
-        "id": "strata-feed.json",
-        "name": "strata-feed.json.sig",
-        "platform": "other",
-        "variant": "nvidia",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-feed.json.sig",
-        "sizeBytes": 151
-      },
-      {
         "id": "Strata.app.tar",
         "name": "Strata.app.tar.gz",
         "platform": "other",
-        "variant": "nvidia",
+        "variant": "other",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata.app.tar.gz",
         "sizeBytes": 165921339
       }

@@ -12,6 +12,7 @@ export function engineVariantLabel(name: string, variant?: string) {
   if (key === "nvidia") return "NVIDIA · CUDA 13";
   if (key === "nvidia-legacy") return "NVIDIA · CUDA 12";
   if (key === "amd") return "AMD · HIP";
+  if (key === "apple") return "Apple · Metal";
   return name.replace(/^strata-/, "").replace(/\.zip$/, "");
 }
 
@@ -20,5 +21,6 @@ export function engineVariantRank(name: string, variant?: string) {
   if (label.startsWith("NVIDIA · CUDA 13")) return 0;
   if (label.startsWith("NVIDIA · CUDA 12")) return 1;
   if (label.startsWith("AMD")) return 2;
+  if (label.startsWith("Apple")) return 3;
   return 9;
 }
