@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-10-20T12:28:24.581Z",
+  "syncedAt": "2026-10-20T13:21:57.517Z",
   "assets": {
     "tts-home-en": {
       "type": "tts",
@@ -754,6 +754,396 @@
         "zh": "以光线相连的友链星座图"
       },
       "prompt": "Constellation of small glowing website windows connected by light threads, friendly network mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth of fiel"
+    },
+    "creator-seed-project-maya-deep-dive": {
+      "type": "image",
+      "path": "/media/enriched/creator-seed-project-maya-deep-dive.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "Project Maya deep dive: running GLM-5.3-Flash (321B MoE) on your own NVIDIA GPUs"
+      },
+      "prompt": "Tech blog thumbnail, abstract: Project Maya deep dive: running GLM-5.3-Flash (321B MoE) on your own NVIDIA GPUs, built on Strata, dark teal, no text"
+    },
+    "creator-x-2107835937468420440": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107835937468420440.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "Small patch coming in approx 1h for this issue"
+      },
+      "prompt": "Tech blog thumbnail, abstract: Small patch coming in approx 1h for this issue, dark teal, no text"
+    },
+    "creator-x-2107810312145588377": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107810312145588377.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "New release is out!\n\n - Intel Arc works fast now!\n - Multi-GPU (+40%) boost\n - L"
+      },
+      "prompt": "Tech blog thumbnail, abstract: New release is out!\n\n - Intel Arc works fast now!\n - Multi-GPU (+40%) boost\n - Low-RAM setups now fly\n - DGX Spark 10X f, dark teal, no text"
+    },
+    "creator-x-2107571956258328821": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107571956258328821.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@rskjr Hey Robert! I have seen your live stream and concerns in Strata and total"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @rskjr Hey Robert! I have seen your live stream and concerns in Strata and totally agree. Things are progressing a bit f, dark teal, no text"
+    },
+    "creator-x-2107535003521310805": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107535003521310805.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@yue_neg_631 I have a surprise for that :))"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @yue_neg_631 I have a surprise for that :)), dark teal, no text"
+    },
+    "creator-x-2107529439001411655": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107529439001411655.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@servasyy_ai Amazing work from you! I love the community and all the help I get "
+      },
+      "prompt": "Tech blog thumbnail, abstract: @servasyy_ai Amazing work from you! I love the community and all the help I get with great PR's and benchmarks you are d, dark teal, no text"
+    },
+    "creator-x-2107518943237652537": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107518943237652537.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@toolowgear @__kutluk Soon 👀👀👀"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @toolowgear @__kutluk Soon 👀👀👀, dark teal, no text"
+    },
+    "creator-x-2107515460841533689": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107515460841533689.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "Only loses to @ciruai engine on Hermes benchmarks. Kudos 🫡"
+      },
+      "prompt": "Tech blog thumbnail, abstract: Only loses to @ciruai engine on Hermes benchmarks. Kudos 🫡, dark teal, no text"
+    },
+    "creator-x-2107515343107399967": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107515343107399967.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "Strata wins by a tight margin against all other Strix Halo inference engines in "
+      },
+      "prompt": "Tech blog thumbnail, abstract: Strata wins by a tight margin against all other Strix Halo inference engines in it’s first try release. Did not expect t, dark teal, no text"
+    },
+    "creator-x-2107493977922707936": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107493977922707936.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@joseed801 Yes"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @joseed801 Yes, dark teal, no text"
+    },
+    "creator-x-2107487196995625229": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107487196995625229.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@badguyty @LotusDecoder I have Aura, but it’s catching up on me 😭"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @badguyty @LotusDecoder I have Aura, but it’s catching up on me 😭, dark teal, no text"
+    },
+    "creator-x-2107486862025654605": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107486862025654605.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@Biggest I’m waiting @Alibaba_Qwen @QwenDevs 👀"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @Biggest I’m waiting @Alibaba_Qwen @QwenDevs 👀, dark teal, no text"
+    },
+    "creator-x-2107478982967067126": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107478982967067126.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@shishimaimidori You are correct and it packs better power."
+      },
+      "prompt": "Tech blog thumbnail, abstract: @shishimaimidori You are correct and it packs better power., dark teal, no text"
+    },
+    "creator-x-2107477488196805012": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107477488196805012.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@gabu3d_pl @pardoxAI I'm just doing tests on 4x cards. Hold up ;)"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @gabu3d_pl @pardoxAI I'm just doing tests on 4x cards. Hold up ;), dark teal, no text"
+    },
+    "creator-x-2107477338816495896": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107477338816495896.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@D3PR3C4T0R @AMD @ColbyCakesss @AzorFrank I'm dealing with Strata, I have finger"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @D3PR3C4T0R @AMD @ColbyCakesss @AzorFrank I'm dealing with Strata, I have finger crossed for you to handle it!, dark teal, no text"
+    },
+    "creator-x-2107477101704306795": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107477101704306795.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@ibrahim_sanata5 Works steadily on 8GB"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @ibrahim_sanata5 Works steadily on 8GB, dark teal, no text"
+    },
+    "creator-x-2107467670711128175": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107467670711128175.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@RRunner144 Get me SSH!!!"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @RRunner144 Get me SSH!!!, dark teal, no text"
+    },
+    "creator-x-2107467630705537026": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107467630705537026.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@arnewc @forgalaforus There is a lot more to go."
+      },
+      "prompt": "Tech blog thumbnail, abstract: @arnewc @forgalaforus There is a lot more to go., dark teal, no text"
+    },
+    "creator-x-2107463493561860266": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107463493561860266.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@sami3dat Need to get W7800 to optimize -.-"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @sami3dat Need to get W7800 to optimize -.-, dark teal, no text"
+    },
+    "creator-x-2107461140267913565": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107461140267913565.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@sami3dat Yes, but very soon optimized ;)"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @sami3dat Yes, but very soon optimized ;), dark teal, no text"
+    },
+    "creator-x-2107461024764883208": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107461024764883208.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@zharoboy Check my latest post :))"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @zharoboy Check my latest post :)), dark teal, no text"
+    },
+    "creator-x-2107460895282462981": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107460895282462981.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "@cryptodreki @LotusDecoder I will in 2-3 days tops"
+      },
+      "prompt": "Tech blog thumbnail, abstract: @cryptodreki @LotusDecoder I will in 2-3 days tops, dark teal, no text"
+    },
+    "creator-x-2107456702459359404": {
+      "type": "image",
+      "path": "/media/enriched/creator-x-2107456702459359404.webp",
+      "page": "/creator",
+      "slot": "feed-art",
+      "alt": {
+        "en": "Running Strata on Mini PC with iGPU 780M \n\n- 13 tokens/second on first try 😅"
+      },
+      "prompt": "Tech blog thumbnail, abstract: Running Strata on Mini PC with iGPU 780M \n\n- 13 tokens/second on first try 😅, dark teal, no text"
+    },
+    "signal-x-2107842761953018179": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107842761953018179.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "#strata 0.1.40.2, 247K context cold intake 717 tok/s -> 816 tok/s on my 2*V100 -"
+      },
+      "prompt": "News card illustration: #strata 0.1.40.2, 247K context cold intake 717 tok/s -> 816 tok/s on my 2*V100 -- very good progress, GPU/local AI, no text"
+    },
+    "signal-x-2107842643539427681": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107842643539427681.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Strata now officially supports Intel Arc, on Linux. 0.1.40.2 ports its own engin"
+      },
+      "prompt": "News card illustration: Strata now officially supports Intel Arc, on Linux. 0.1.40.2 ports its own engine to Intel cards.\n\nI, GPU/local AI, no text"
+    },
+    "signal-x-2107840593401405531": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107840593401405531.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Strata是很好，我也在旧3090节点上跑到了60tks的速度，但是X上现在明显在夸大其词了。5070ti没有暴涨。MacStudio M5 Ultra 25"
+      },
+      "prompt": "News card illustration: Strata是很好，我也在旧3090节点上跑到了60tks的速度，但是X上现在明显在夸大其词了。5070ti没有暴涨。MacStudio M5 Ultra 256G二手比新的贵，我不知道为什么，但我不, GPU/local AI, no text"
+    },
+    "signal-x-2107835937468420440": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107835937468420440.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Small patch coming in approx 1h for this issue"
+      },
+      "prompt": "News card illustration: Small patch coming in approx 1h for this issue, GPU/local AI, no text"
+    },
+    "signal-x-2107831993060721070": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107831993060721070.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "En dan hier de poging met Qwen 3.8 flash next code via Strata\n\nOngeveer 95 t/s d"
+      },
+      "prompt": "News card illustration: En dan hier de poging met Qwen 3.8 flash next code via Strata\n\nOngeveer 95 t/s decode\n\n24 gb vram\n32, GPU/local AI, no text"
+    },
+    "signal-x-2107831158818189803": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107831158818189803.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "5060Ti16GBx2枚のstrataでqwen3.8-flash-next iq3_xxs, だいたい85tok/s出てて、読むより書く方が早いw 8末に9"
+      },
+      "prompt": "News card illustration: 5060Ti16GBx2枚のstrataでqwen3.8-flash-next iq3_xxs, だいたい85tok/s出てて、読むより書く方が早いw 8末に9tok/sで1ヵ月で10倍早くなった。, GPU/local AI, no text"
+    },
+    "signal-x-2107826037166133508": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107826037166133508.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Antigravityがローカルqwen内蔵型チャッピーもどき作ってくれた。内部的にはStrataがうごいててそれをウェブアプリとしてラップしてるっぽい？"
+      },
+      "prompt": "News card illustration: Antigravityがローカルqwen内蔵型チャッピーもどき作ってくれた。内部的にはStrataがうごいててそれをウェブアプリとしてラップしてるっぽい？, GPU/local AI, no text"
+    },
+    "signal-x-2107823497758310781": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107823497758310781.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "StrataでQwen-Flash-Next（Nvidia-NVFP4より賢い）が93TPS プリフィル2500TPSで動いたことを受けて、本日GPUを買い増し"
+      },
+      "prompt": "News card illustration: StrataでQwen-Flash-Next（Nvidia-NVFP4より賢い）が93TPS プリフィル2500TPSで動いたことを受けて、本日GPUを買い増ししました。少なくともこれで2x 93TP, GPU/local AI, no text"
+    },
+    "signal-x-2107810312145588377": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107810312145588377.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "New release is out!\n\n - Intel Arc works fast now!\n - Multi-GPU (+40%) boost\n - L"
+      },
+      "prompt": "News card illustration: New release is out!\n\n - Intel Arc works fast now!\n - Multi-GPU (+40%) boost\n - Low-RAM setups now fl, GPU/local AI, no text"
+    },
+    "signal-x-2107675983947948407": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107675983947948407.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "@leypascua @HuggingModels X reports: 150-180 tok/s on RTX 5090 (Strata), 35-45 o"
+      },
+      "prompt": "News card illustration: @leypascua @HuggingModels X reports: 150-180 tok/s on RTX 5090 (Strata), 35-45 on 20-series for the , GPU/local AI, no text"
+    },
+    "signal-x-2107674879516615045": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107674879516615045.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Old Ethereum mining GPUs got a new job: running a 125B model.\n\nQwen3.8-Flash-Nex"
+      },
+      "prompt": "News card illustration: Old Ethereum mining GPUs got a new job: running a 125B model.\n\nQwen3.8-Flash-Next + Strata, 16/24 GB, GPU/local AI, no text"
+    },
+    "signal-x-2107673485527142700": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107673485527142700.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "125B params at 94 tok/s on a 12GB RTX 5070. Strata runs Qwen 3.8 Flash Next on a"
+      },
+      "prompt": "News card illustration: 125B params at 94 tok/s on a 12GB RTX 5070. Strata runs Qwen 3.8 Flash Next on a gaming PC with 64GB, GPU/local AI, no text"
+    },
+    "signal-x-2107661808672612855": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107661808672612855.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "@Androthon @Oluwaphilemon1 Qwen3.8-Flash-Next (125B MoE, ~6B active + 51B n-gram"
+      },
+      "prompt": "News card illustration: @Androthon @Oluwaphilemon1 Qwen3.8-Flash-Next (125B MoE, ~6B active + 51B n-gram). Inference server , GPU/local AI, no text"
+    },
+    "signal-x-2107661455008944573": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107661455008944573.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "@Androthon @Oluwaphilemon1 It's just Strata. Strata is the complete open-source "
+      },
+      "prompt": "News card illustration: @Androthon @Oluwaphilemon1 It's just Strata. Strata is the complete open-source inference engine for, GPU/local AI, no text"
+    },
+    "signal-x-2107654149060153445": {
+      "type": "image",
+      "path": "/media/enriched/signal-x-2107654149060153445.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Time for test results of Qwen3.8-flash-next-GSQ-RSO-IQ3_S on my 3090 \n\nHere is a"
+      },
+      "prompt": "News card illustration: Time for test results of Qwen3.8-flash-next-GSQ-RSO-IQ3_S on my 3090 \n\nHere is a jungle fps theme ga, GPU/local AI, no text"
+    },
+    "issue-967": {
+      "type": "image",
+      "path": "/media/enriched/issue-967.webp",
+      "page": "/issues/967",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Unsloth ud-q4_k_xl - no vision?"
+      },
+      "prompt": "GitHub issue illustration, technical: Unsloth ud-q4_k_xl - no vision?, GPU local AI, dark teal, no text"
     }
   },
   "cluster": "192.168.2.100"
