@@ -3,70 +3,213 @@
     {
       "slug": "niko-strata",
       "status": "live",
+      "locales": ["en", "zh", "ja", "de", "fr", "es", "pt"],
       "filter": null,
       "title": {
         "en": "Niko Strata",
-        "zh": "Niko Strata"
+        "zh": "Niko Strata",
+        "ja": "Niko Strata",
+        "de": "Niko Strata",
+        "fr": "Niko Strata",
+        "es": "Niko Strata",
+        "pt": "Niko Strata"
       },
       "body": {
         "en": "Strata here is the local inference engine at Niko1221/Strata. It runs Qwen3.8-Flash-Next on a Windows or Linux PC with an NVIDIA or AMD GPU. The same word is also used for rock layers and for some legal writing. If you want this project, search Niko Strata or Strata local.",
-        "zh": "这里的 Strata 是 Niko1221/Strata 这个本地推理引擎，在 Windows 或 Linux 上用 NVIDIA 或 AMD 显卡跑 Qwen3.8-Flash-Next。这个英文词也指岩层，法律文章里也会出现。要找这个项目，搜 Niko Strata 或 Strata local。"
+        "zh": "这里的 Strata 是 Niko1221/Strata 这个本地推理引擎，在 Windows 或 Linux 上用 NVIDIA 或 AMD 显卡跑 Qwen3.8-Flash-Next。这个英文词也指岩层，法律文章里也会出现。要找这个项目，搜 Niko Strata 或 Strata local。",
+        "ja": "ここでいう Strata は Niko1221/Strata のローカル推論エンジンを指します。NVIDIA または AMD の GPU を積んだ Windows / Linux PC で Qwen3.8-Flash-Next を動かします。同じ語は地層や法律文書でも使われるため、検索するときは Niko Strata か Strata local を添えてください。",
+        "de": "Strata meint hier die lokale Inferenz-Engine unter Niko1221/Strata. Sie führt Qwen3.8-Flash-Next auf einem Windows- oder Linux-PC mit NVIDIA- oder AMD-GPU aus. Dasselbe Wort steht auch für Gesteinsschichten und in juristischen Texten – suchen Sie deshalb nach Niko Strata oder Strata local.",
+        "fr": "Strata désigne ici le moteur d’inférence local Niko1221/Strata. Il exécute Qwen3.8-Flash-Next sur un PC Windows ou Linux équipé d’un GPU NVIDIA ou AMD. Le mot désigne aussi des couches géologiques et apparaît dans des textes juridiques : cherchez plutôt Niko Strata ou Strata local.",
+        "es": "Aquí Strata es el motor de inferencia local de Niko1221/Strata. Ejecuta Qwen3.8-Flash-Next en un PC con Windows o Linux y una GPU NVIDIA o AMD. La misma palabra también se usa para estratos de roca y en textos jurídicos, así que busca Niko Strata o Strata local.",
+        "pt": "Aqui Strata é o motor de inferência local em Niko1221/Strata. Ele roda o Qwen3.8-Flash-Next em um PC Windows ou Linux com GPU NVIDIA ou AMD. A mesma palavra também aparece em geologia e em textos jurídicos, então busque por Niko Strata ou Strata local."
       },
       "links": [
-        { "href": "/download", "label": { "en": "Download", "zh": "下载" } },
-        { "href": "/install", "label": { "en": "Install", "zh": "安装" } },
-        { "href": "https://github.com/Niko1221/Strata", "label": { "en": "Niko1221/Strata", "zh": "Niko1221/Strata" } }
+        { "href": "/download", "label": { "en": "Download", "zh": "下载", "ja": "ダウンロード", "de": "Herunterladen", "fr": "Télécharger", "es": "Descargar", "pt": "Baixar" } },
+        { "href": "/install", "label": { "en": "Install", "zh": "安装", "ja": "インストール", "de": "Installieren", "fr": "Installer", "es": "Instalar", "pt": "Instalar" } },
+        { "href": "https://github.com/Niko1221/Strata", "label": { "en": "Niko1221/Strata", "zh": "Niko1221/Strata", "ja": "Niko1221/Strata", "de": "Niko1221/Strata", "fr": "Niko1221/Strata", "es": "Niko1221/Strata", "pt": "Niko1221/Strata" } }
       ]
     },
     {
       "slug": "local-qwen",
       "status": "live",
+      "locales": ["en", "zh", "ja", "de", "fr", "es", "pt"],
       "filter": null,
       "title": {
         "en": "Run Qwen on your PC",
-        "zh": "在自己的电脑上跑 Qwen"
+        "zh": "在自己的电脑上跑 Qwen",
+        "ja": "自分の PC で Qwen を動かす",
+        "de": "Qwen auf dem eigenen PC ausführen",
+        "fr": "Exécuter Qwen sur votre PC",
+        "es": "Ejecutar Qwen en tu PC",
+        "pt": "Rodar o Qwen no seu PC"
       },
       "body": {
         "en": "Qwen3.8-Flash-Next is the model these pages cover. The weights stay on your machine. Pick a quant on the models page, then follow install. The smallest quants ask for about 12 GB of VRAM and 48 GB of RAM.",
-        "zh": "这些页面讲的模型是 Qwen3.8-Flash-Next。权重留在你自己的电脑上。先在模型页选量化版本，再按安装页来。最小的量化大约要 12 GB 显存和 48 GB 内存。"
+        "zh": "这些页面讲的模型是 Qwen3.8-Flash-Next。权重留在你自己的电脑上。先在模型页选量化版本，再按安装页来。最小的量化大约要 12 GB 显存和 48 GB 内存。",
+        "ja": "このサイトが扱うモデルは Qwen3.8-Flash-Next です。重みは手元のマシンに残ります。モデルページで量子化を選び、インストール手順に進んでください。最小の量子化でも VRAM 約 12 GB、システム RAM 約 48 GB が必要です。",
+        "de": "Qwen3.8-Flash-Next ist das Modell, um das es auf diesen Seiten geht. Die Gewichte bleiben auf Ihrem Rechner. Wählen Sie auf der Modellseite eine Quantisierung und folgen Sie dann der Installation. Die kleinste Variante braucht etwa 12 GB VRAM und 48 GB RAM.",
+        "fr": "Le modèle présenté sur ce site est Qwen3.8-Flash-Next. Les poids restent sur votre machine. Choisissez une quantification sur la page des modèles, puis suivez l’installation. La plus petite quantification demande environ 12 Go de VRAM et 48 Go de RAM.",
+        "es": "El modelo del que tratan estas páginas es Qwen3.8-Flash-Next. Los pesos se quedan en tu equipo. Elige una cuantización en la página de modelos y sigue la instalación. La más pequeña pide unos 12 GB de VRAM y 48 GB de RAM.",
+        "pt": "O modelo destas páginas é o Qwen3.8-Flash-Next. Os pesos ficam na sua máquina. Escolha uma quantização na página de modelos e siga a instalação. A menor delas pede cerca de 12 GB de VRAM e 48 GB de RAM."
       },
       "links": [
-        { "href": "/models", "label": { "en": "Models", "zh": "模型" } },
-        { "href": "/install", "label": { "en": "Install", "zh": "安装" } }
+        { "href": "/models", "label": { "en": "Models", "zh": "模型", "ja": "モデル", "de": "Modelle", "fr": "Modèles", "es": "Modelos", "pt": "Modelos" } },
+        { "href": "/install", "label": { "en": "Install", "zh": "安装", "ja": "インストール", "de": "Installieren", "fr": "Installer", "es": "Instalar", "pt": "Instalar" } }
       ]
     },
     {
       "slug": "sixteen-gb",
       "status": "live",
+      "locales": ["en", "zh", "ja", "de", "fr", "es", "pt"],
       "filter": { "memoryMax": 16 },
       "title": {
         "en": "16 GB and under",
-        "zh": "16 GB 及以下"
+        "zh": "16 GB 及以下",
+        "ja": "16 GB 以下",
+        "de": "16 GB und darunter",
+        "fr": "16 Go et moins",
+        "es": "16 GB o menos",
+        "pt": "16 GB ou menos"
       },
       "body": {
         "en": "These benchmark rows have 16 GB of memory or less. A tight fit may need a smaller quant. Open a row for the measured read and write speeds. The list comes from the benchmark file. It is not a promise that every 16 GB card runs every quant.",
-        "zh": "下面这些跑分行的显存或统一内存不超过 16 GB。偏紧的机器往往要更小的量化。点进去看实测的读取和生成速度。名单来自跑分数据，不是说每张 16 GB 卡都能跑所有量化。"
+        "zh": "下面这些跑分行的显存或统一内存不超过 16 GB。偏紧的机器往往要更小的量化。点进去看实测的读取和生成速度。名单来自跑分数据，不是说每张 16 GB 卡都能跑所有量化。",
+        "ja": "ここに並ぶベンチマーク行はメモリが 16 GB 以下のものです。ぎりぎりの構成ではより小さい量子化が必要になります。各行を開くと実測の読み出し・生成速度を確認できます。この一覧はベンチマークファイル由来であり、16 GB のカードすべてがすべての量子化を動かせるという意味ではありません。",
+        "de": "Diese Benchmark-Zeilen haben 16 GB Speicher oder weniger. Knappe Konfigurationen brauchen oft eine kleinere Quantisierung. Öffnen Sie eine Zeile, um die gemessenen Lese- und Schreibgeschwindigkeiten zu sehen. Die Liste stammt aus der Benchmark-Datei und verspricht nicht, dass jede 16-GB-Karte jede Quantisierung schafft.",
+        "fr": "Les lignes ci-dessous ont 16 Go de mémoire ou moins. Une configuration juste demande souvent une quantification plus petite. Ouvrez une ligne pour voir les débits mesurés en lecture et en génération. Cette liste vient du fichier de benchmarks : elle ne garantit pas que chaque carte de 16 Go fasse tourner toutes les quantifications.",
+        "es": "Las filas siguientes tienen 16 GB de memoria o menos. Un equipo justo suele necesitar una cuantización más pequeña. Abre una fila para ver las velocidades medidas de lectura y generación. La lista sale del archivo de benchmarks: no garantiza que cada tarjeta de 16 GB pueda con todas las cuantizaciones.",
+        "pt": "As linhas abaixo têm 16 GB de memória ou menos. Uma máquina no limite costuma pedir uma quantização menor. Abra uma linha para ver as velocidades medidas de leitura e geração. A lista vem do arquivo de benchmarks e não promete que toda placa de 16 GB rode todas as quantizações."
       },
       "links": [
-        { "href": "/benchmarks", "label": { "en": "All benchmarks", "zh": "全部跑分" } },
-        { "href": "/models", "label": { "en": "Models", "zh": "模型" } }
+        { "href": "/benchmarks", "label": { "en": "All benchmarks", "zh": "全部跑分", "ja": "ベンチマーク一覧", "de": "Alle Benchmarks", "fr": "Tous les benchmarks", "es": "Todos los benchmarks", "pt": "Todos os benchmarks" } },
+        { "href": "/models", "label": { "en": "Models", "zh": "模型", "ja": "モデル", "de": "Modelle", "fr": "Modèles", "es": "Modelos", "pt": "Modelos" } }
       ]
     },
     {
       "slug": "amd",
       "status": "live",
+      "locales": ["en", "zh", "ja", "de", "fr", "es", "pt"],
       "filter": { "vendor": "amd" },
       "title": {
         "en": "AMD and Radeon",
-        "zh": "AMD 与 Radeon"
+        "zh": "AMD 与 Radeon",
+        "ja": "AMD と Radeon",
+        "de": "AMD und Radeon",
+        "fr": "AMD et Radeon",
+        "es": "AMD y Radeon",
+        "pt": "AMD e Radeon"
       },
       "body": {
         "en": "AMD rows from the same benchmark file: discrete Radeon cards and the Ryzen AI Max machine. Install covers the HIP build. Speeds are on each machine's page.",
-        "zh": "同一份跑分里的 AMD：独立 Radeon，以及 Ryzen AI Max 那台。安装页写了 HIP 构建。速度在每台机器自己的页面上。"
+        "zh": "同一份跑分里的 AMD：独立 Radeon，以及 Ryzen AI Max 那台。安装页写了 HIP 构建。速度在每台机器自己的页面上。",
+        "ja": "同じベンチマークファイルの AMD 行です。単体 Radeon と Ryzen AI Max のマシンが含まれます。インストール手順に HIP ビルドの説明があります。速度は各マシンのページに記載しています。",
+        "de": "AMD-Zeilen aus derselben Benchmark-Datei: dedizierte Radeon-Karten und der Ryzen-AI-Max-Rechner. Die Installation beschreibt den HIP-Build. Die Geschwindigkeiten stehen auf der jeweiligen Maschinenseite.",
+        "fr": "Les lignes AMD du même fichier de benchmarks : cartes Radeon dédiées et la machine Ryzen AI Max. L’installation décrit la compilation HIP. Les débits figurent sur la page de chaque machine.",
+        "es": "Filas AMD del mismo archivo de benchmarks: tarjetas Radeon dedicadas y el equipo Ryzen AI Max. La instalación explica la compilación HIP. Las velocidades están en la página de cada equipo.",
+        "pt": "Linhas AMD do mesmo arquivo de benchmarks: placas Radeon dedicadas e a máquina Ryzen AI Max. A instalação descreve a compilação HIP. As velocidades ficam na página de cada máquina."
       },
       "links": [
-        { "href": "/install", "label": { "en": "Install", "zh": "安装" } },
-        { "href": "/benchmarks", "label": { "en": "All benchmarks", "zh": "全部跑分" } }
+        { "href": "/install", "label": { "en": "Install", "zh": "安装", "ja": "インストール", "de": "Installieren", "fr": "Installer", "es": "Instalar", "pt": "Instalar" } },
+        { "href": "/benchmarks", "label": { "en": "All benchmarks", "zh": "全部跑分", "ja": "ベンチマーク一覧", "de": "Alle Benchmarks", "fr": "Tous les benchmarks", "es": "Todos los benchmarks", "pt": "Todos os benchmarks" } }
+      ]
+    },
+    {
+      "slug": "cn-network",
+      "status": "live",
+      "locales": ["zh"],
+      "filter": null,
+      "title": { "zh": "国内网络的下载与安装" },
+      "body": {
+        "zh": "模型权重和安装包体积都不小，从 GitHub Releases 直接拉可能很慢。安装页列出的入口按平台分组，先下引擎再下模型；如果中途断开，重新运行安装命令会从已完成的文件继续。装好之后推理服务只监听本机 127.0.0.1:8080，不依赖外网。"
+      },
+      "links": [
+        { "href": "/install", "label": { "zh": "安装步骤" } },
+        { "href": "/download", "label": { "zh": "下载入口" } },
+        { "href": "/models", "label": { "zh": "模型与量化" } }
+      ]
+    },
+    {
+      "slug": "jp-japanese",
+      "status": "live",
+      "locales": ["ja"],
+      "filter": null,
+      "title": { "ja": "日本語環境で使うときの注意" },
+      "body": {
+        "ja": "日本語プロンプトは英語よりトークン数が多くなりがちなので、コンテキスト長には余裕を持たせてください。Windows でユーザー名に日本語が含まれているとパス関連の処理が失敗することがあるため、インストール先は ASCII のパスを選ぶのが安全です。"
+      },
+      "links": [
+        { "href": "/install", "label": { "ja": "インストール" } },
+        { "href": "/models", "label": { "ja": "モデル" } }
+      ]
+    },
+    {
+      "slug": "de-stromkosten",
+      "status": "live",
+      "locales": ["de"],
+      "filter": null,
+      "title": { "de": "Stromkosten und Amortisation" },
+      "body": {
+        "de": "Eine GPU unter Volllast zieht je nach Modell 250 bis 400 Watt. Bei rund 30 bis 40 Cent pro Kilowattstunde kostet eine Stunde Volllast also etwa 8 bis 16 Cent. Die Benchmark-Seite rechnet mit einem hinterlegten Referenzpreis; für eine eigene Schätzung setzen Sie dort Ihren lokalen Tarif ein."
+      },
+      "links": [
+        { "href": "/benchmarks", "label": { "de": "Benchmarks und Kosten" } },
+        { "href": "/install", "label": { "de": "Installieren" } }
+      ]
+    },
+    {
+      "slug": "fr-electricite",
+      "status": "live",
+      "locales": ["fr"],
+      "filter": null,
+      "title": { "fr": "Consommation électrique et coût réel" },
+      "body": {
+        "fr": "Une carte graphique sollicitée consomme selon le modèle entre 250 et 400 watts. Avec un tarif réglementé autour de 25 centimes le kilowattheure, une heure à pleine charge revient à 6 à 10 centimes. La page benchmarks utilise un prix de référence : remplacez-le par votre tarif pour une estimation juste."
+      },
+      "links": [
+        { "href": "/benchmarks", "label": { "fr": "Benchmarks et coûts" } },
+        { "href": "/install", "label": { "fr": "Installer" } }
+      ]
+    },
+    {
+      "slug": "es-precios",
+      "status": "live",
+      "locales": ["es"],
+      "filter": null,
+      "title": { "es": "Precios de GPU y coste por hora" },
+      "body": {
+        "es": "El precio de una GPU cambia mucho entre España y Latinoamérica, y la importación añade aduanas. En la página de benchmarks cada equipo muestra el precio de la tarjeta y el total del equipo; toma esas cifras como referencia y ajústalas a lo que veas en tu mercado antes de decidir."
+      },
+      "links": [
+        { "href": "/benchmarks", "label": { "es": "Benchmarks y costes" } },
+        { "href": "/models", "label": { "es": "Modelos" } }
+      ]
+    },
+    {
+      "slug": "pt-brasil",
+      "status": "live",
+      "locales": ["pt"],
+      "filter": null,
+      "title": { "pt": "Preços no Brasil e custo de energia" },
+      "body": {
+        "pt": "Placas de vídeo no Brasil costumam custar bem mais que o preço em dólar listado nos benchmarks, por causa de impostos e câmbio. Some a isso o consumo: uma GPU em carga total puxa de 250 a 400 watts. Use os valores da página de benchmarks como base e recalcule com o preço que você encontra na sua região."
+      },
+      "links": [
+        { "href": "/benchmarks", "label": { "pt": "Benchmarks e custos" } },
+        { "href": "/models", "label": { "pt": "Modelos" } }
+      ]
+    },
+    {
+      "slug": "us-power",
+      "status": "live",
+      "locales": ["en"],
+      "filter": null,
+      "title": { "en": "Electricity cost in the US" },
+      "body": {
+        "en": "At the US average of roughly 17 cents per kWh, an hour at 350 W costs about 6 cents. That is why the payback column on the benchmarks page is measured in months rather than years for a card replacing an API subscription. Check your own utility rate before relying on it."
+      },
+      "links": [
+        { "href": "/benchmarks", "label": { "en": "Benchmarks and cost" } },
+        { "href": "/install", "label": { "en": "Install" } }
       ]
     }
   ]

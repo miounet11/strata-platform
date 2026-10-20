@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BenchmarkBoard } from "@/components/BenchmarkBoard";
 import { getBenchmarks } from "@/lib/benchmarks";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
   params,
@@ -9,8 +9,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "benchmarks" });
-  return siteMetadata(locale, t("title"), t("intro"), "/benchmarks");
+  return seoMetadata(locale, "benchmarks", "/benchmarks");
 }
 
 export default async function BenchmarksPage({

@@ -50,19 +50,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pullAt = new Map(community.pulls.map((pull) => [pull.number, pull.updatedAt]));
   const postAt = new Map(creator.posts.map((post) => [post.id, post.publishedAt]));
 
-  const paths = [
+  const sharedPaths = [
     ...staticPaths,
     ...community.issues.map((issue) => `/issues/${issue.number}`),
     ...community.pulls.map((pull) => `/pulls/${pull.number}`),
     ...community.labels.map((label) => `/community/labels/${label.slug}`),
     ...creator.posts.map((post) => `/creator/updates/${post.id}`),
     ...getRigs().map((rig) => `/benchmarks/${rig.id}`),
-    ...getLiveTopics().map((topic) => `/topics/${topic.slug}`),
     ...releases.releases.map((release) => `/releases/${release.tag}`),
   ];
 
   const entries: MetadataRoute.Sitemap = [];
   for (const locale of routing.locales) {
+    // Topics are editorial per locale, not translations of a single list.
+    const paths = [...sharedPaths, ...getLiveTopics(locale).map((topic) => `/topics/${topic.slug}`)];
     for (const path of paths) {
       const issue = path.match(/^\/issues\/(\d+)$/);
       const pull = path.match(/^\/pulls\/(\d+)$/);

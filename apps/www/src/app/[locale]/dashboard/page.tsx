@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { DashboardPanel } from "@/components/DashboardPanel";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
   params,
@@ -8,7 +8,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(locale, "Dashboard", "Bookmarks and download history for your Strata account.", "/dashboard", false);
+  return seoMetadata(locale, "dashboard", "/dashboard", false);
 }
 
 export default async function DashboardPage({

@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { changelogLead, getChangelog } from "@/lib/changelog";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export const revalidate = 1800;
 
@@ -11,7 +11,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const meta = siteMetadata(locale, "Changelog", "Strata engine releases and platform updates.", "/changelog");
+  const meta = await seoMetadata(locale, "changelog", "/changelog");
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
   return {
     ...meta,

@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { EnrichedCode, EnrichedImage } from "@/components/EnrichedBlock";
 import { ModelActions } from "@/components/ModelActions";
 import modelsData from "@/data/models.json";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
   params,
@@ -10,7 +10,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(locale, "Models", "Strata quant sizes, RAM requirements, and download hints.", "/models");
+  return seoMetadata(locale, "models", "/models");
 }
 
 export default async function ModelsPage({

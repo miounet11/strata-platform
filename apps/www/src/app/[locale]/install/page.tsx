@@ -1,7 +1,7 @@
 import { EnrichedCode, EnrichedImage } from "@/components/EnrichedBlock";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getReleases } from "@/lib/releases";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export const revalidate = 1800;
 
@@ -11,7 +11,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(locale, "Install", "One-click Strata setup for Windows and Linux.", "/install");
+  return seoMetadata(locale, "install", "/install");
 }
 
 export default async function InstallPage({

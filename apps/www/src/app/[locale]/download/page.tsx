@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { engineVariantLabel, engineVariantRank, getDownloads } from "@/lib/downloads";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export const revalidate = 1800;
 
@@ -18,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(locale, "Download", "Strata engine (Windows) and Desktop launcher for Windows and macOS.", "/download");
+  return seoMetadata(locale, "download", "/download");
 }
 
 export default async function DownloadPage({

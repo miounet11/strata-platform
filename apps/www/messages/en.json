@@ -3,41 +3,124 @@
     "siteName": "Strata",
     "tagline": "Run Qwen3.8-Flash-Next on your gaming PC — private, local, open source."
   },
+  "seo": {
+    "suffix": "Strata",
+    "home": {
+      "title": "Run a 125B-class AI model on your own gaming PC",
+      "description": "Run a large local AI model on consumer NVIDIA or AMD hardware. Windows, Linux, and macOS supported, OpenAI-compatible API, free and open source."
+    },
+    "models": {
+      "title": "Pick a model for local inference",
+      "description": "Compare quantization sizes, VRAM and system RAM requirements for local models, with download links for each variant."
+    },
+    "download": {
+      "title": "Download Strata engine and desktop app",
+      "description": "Download the Strata inference engine for Windows, Linux, and macOS, plus the Strata Desktop launcher for Windows and macOS."
+    },
+    "install": {
+      "title": "Install Strata step by step",
+      "description": "One-click Strata setup on Windows, command-line install on Linux and macOS, and the guided Strata Desktop installer."
+    },
+    "releases": {
+      "title": "Strata release notes",
+      "description": "Every Strata engine release with notes, download counts, and upgrade history."
+    },
+    "community": {
+      "title": "Strata community — issues, pull requests, and labels",
+      "description": "Browse the Strata GitHub community: reported issues, contributed pull requests, and topic labels, mirrored for search."
+    },
+    "issues": {
+      "title": "Strata issues and troubleshooting",
+      "description": "All reported Strata issues — installation failures, hardware compatibility, feature requests, and fixes."
+    },
+    "pulls": {
+      "title": "Strata pull requests",
+      "description": "Community contributions to Strata: performance work, bug fixes, documentation, and extra benchmark data."
+    },
+    "labels": {
+      "title": "Browse Strata by topic label",
+      "description": "Filter Strata issues and pull requests by GitHub label to find hardware, install, and performance discussions."
+    },
+    "pulse": {
+      "title": "Local LLM pulse — signals and GPU prices",
+      "description": "Daily signals from X about local LLM deployment, Strata mentions, and community GPU prices in USD."
+    },
+    "creator": {
+      "title": "Strata — posts from the author",
+      "description": "The latest posts from Niko Veit (@coldniko), the author of Strata, collected from X."
+    },
+    "changelog": {
+      "title": "Strata changelog",
+      "description": "Every Strata update in one place: engine releases, desktop app changes, and platform fixes."
+    },
+    "links": {
+      "title": "Friendly links",
+      "description": "Sites that recommend Strata and each other: the author's projects, JevCode, and other local-AI tools."
+    },
+    "topics": {
+      "title": "Guides for running models locally",
+      "description": "Step-by-step guides: choosing a model name, running Qwen on your own PC, and picking hardware that actually fits."
+    },
+    "benchmarks": {
+      "title": "Local LLM hardware benchmarks and cost",
+      "description": "Tokens per second, power draw, and payback period for consumer GPUs running a 125B-class model locally."
+    },
+    "login": {
+      "title": "Sign in to Strata",
+      "description": "Sign in to your Strata account to keep model bookmarks and download history in sync."
+    },
+    "register": {
+      "title": "Create a Strata account",
+      "description": "Create a free Strata account to save models and track downloads across devices."
+    },
+    "dashboard": {
+      "title": "Your Strata dashboard",
+      "description": "Your saved models and tracked downloads in one place."
+    }
+  },
   "nav": {
     "home": "Home",
     "releases": "Releases",
     "community": "Community",
     "issues": "Issues",
-    "pulls": "PRs",
+    "pulls": "Pull requests",
     "models": "Models",
     "install": "Install",
-    "download": "Download app",
+    "download": "Download",
     "login": "Sign in",
     "register": "Register",
-    "creator": "Creator",
-    "pulse": "Pulse",
-    "dashboard": "Dashboard",
-    "links": "Links",
+    "creator": "From the author",
+    "pulse": "What people say",
+    "dashboard": "My stuff",
+    "links": "Friends",
     "benchmarks": "Benchmarks",
     "more": "More",
-    "changelog": "Changelog"
+    "changelog": "Changelog",
+    "topics": "Guides"
+  },
+  "topics": {
+    "title": "Guides",
+    "intro": "Pages for the jobs this engine does: which name to search, running Qwen on your PC, and which machines fit.",
+    "rigs": "Machines in the benchmarks",
+    "emptyRigs": "No machines match this page yet.",
+    "openBench": "Open the full table"
   },
   "home": {
-    "heroTitle": "125B-class AI on your desk",
-    "heroSub": "NVIDIA or AMD · 12 GB+ VRAM · Windows & Linux · MIT licensed engine from the community.",
-    "ctaInstall": "One-click setup",
+    "heroTitle": "Run a big AI model on your own PC",
+    "heroSub": "Your data never leaves the machine. Works on NVIDIA and AMD, Windows and Linux — free and open source.",
+    "ctaInstall": "Get started",
     "ctaRelease": "What's new in {version}",
-    "ctaGithub": "View on GitHub",
-    "ctaCommunity": "Community · Issues & PRs",
+    "ctaGithub": "View source on GitHub",
+    "ctaCommunity": "Community",
     "featureLocal": "Nothing leaves your PC",
-    "featureSpeed": "60+ tokens/s on RTX 5070 class GPUs",
-    "featureAgents": "OpenAI-compatible API for Cursor, Claude Code, Codex",
-    "featureLocalBody": "Setup keeps the models and the chats on this PC.",
-    "featureSpeedBody": "Compare daily tokens, power cost, and break-even on the benchmark board.",
-    "featureAgentsBody": "Download the engine, then point Cursor or Codex at 127.0.0.1:8080.",
+    "featureSpeed": "60+ tokens/s on a good GPU",
+    "featureAgents": "Plugs into your coding assistant",
+    "featureLocalBody": "Once installed, the model and your chats stay on this computer.",
+    "featureSpeedBody": "Compare speed, power cost, and payback time on the benchmarks page.",
+    "featureAgentsBody": "Paste one address and Cursor or Claude Code can use it.",
     "aiPromptTitle": "Let your AI install Strata",
     "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
-    "ctaBenchmarks": "Hardware benchmarks"
+    "ctaBenchmarks": "See benchmarks"
   },
   "releases": {
     "title": "Release notes",
@@ -47,22 +130,21 @@
     "downloads": "Downloads",
     "newer": "Newer release",
     "older": "Older release"
-  },
-  "models": {
-    "title": "Model catalog",
+  },  "models": {
+    "title": "Pick a model",
     "vram": "VRAM",
     "ram": "System RAM",
     "size": "Download size",
     "actions": "Actions",
-    "downloadHint": "Open Hugging Face",
-    "bookmark": "Bookmark",
+    "downloadHint": "Get it",
+    "bookmark": "Save",
     "bookmarked": "Saved to your account",
-    "loginToBookmark": "Sign in to bookmark",
-    "trackedOpen": "Opening HF — download logged if signed in"
+    "loginToBookmark": "Sign in to save",
+    "trackedOpen": "Opening the download page — we'll log it for you"
   },
   "dashboard": {
-    "title": "Your dashboard",
-    "intro": "Model bookmarks and engine download history tied to your Strata account.",
+    "title": "My stuff",
+    "intro": "Models you saved and things you downloaded.",
     "loading": "Loading…",
     "loginRequired": "Sign in to view bookmarks and history.",
     "login": "Sign in",
@@ -75,63 +157,63 @@
   },
   "changelog": {
     "title": "Changelog",
-    "intro": "Engine releases from upstream Strata and this site’s release mirror.",
-    "synced": "Feed synced"
+    "intro": "Every update, noted here.",
+    "synced": "Updated"
   },
   "download": {
     "title": "Download Strata",
-    "intro": "Windows engine builds come directly from the official GitHub release. macOS uses the open-source installer script. Strata Desktop (launcher) ships for Windows and Mac when CI artifacts are published.",
-    "synced": "Catalog synced",
-    "windowsEngine": "Windows engine (official)",
-    "windowsEngineHint": "Pick NVIDIA (default), CUDA 12 (older GPUs), or AMD HIP.",
-    "macEngine": "macOS / Linux engine",
-    "macEngineHint": "Clone upstream and run setup.sh — Apple Silicon and Intel supported via build.",
-    "desktopApp": "Strata Desktop app",
-    "desktopHint": "GUI launcher for setup, updates, and opening http://127.0.0.1:8080",
-    "desktopFallbackZip": "Full source zip (manual setup)",
-    "desktopCi": "Desktop installers appear here after tag desktop-v* CI. Site:",
-    "releaseNotes": "Release notes on GitHub"
+    "intro": "Pick your system and click once — that's the whole install.",
+    "synced": "Updated",
+    "windowsEngine": "Windows installer",
+    "windowsEngineHint": "Pick the one that matches your GPU.",
+    "macEngine": "Mac / Linux",
+    "macEngineHint": "Download the code, run one command.",
+    "desktopApp": "Strata Desktop",
+    "desktopHint": "A few clicks to install, update, and open.",
+    "desktopFallbackZip": "Full source zip (do it yourself)",
+    "desktopCi": "Installers are published automatically after tagging. Site:",
+    "releaseNotes": "Notes on GitHub"
   },
   "install": {
     "title": "Install Strata",
     "windows": "Windows",
-    "linux": "Linux / macOS (clone)",
+    "linux": "Mac / Linux (command line)",
     "desktopApp": "Strata Desktop (Win & Mac)",
-    "desktopHint": "GUI launcher that runs setup.sh / START-HERE.bat with guided steps."
+    "desktopHint": "Follow the screen, step by step."
   },
   "community": {
-    "hubTitle": "Strata community mirror",
-    "hubIntro": "Issues and pull requests from",
-    "synced": "Last synced",
+    "hubTitle": "Strata community",
+    "hubIntro": "From",
+    "synced": "Updated",
     "issues": "Issues",
     "pulls": "Pull requests",
-    "labels": "Labels",
-    "items": "entries",
+    "labels": "Topics",
+    "items": "items",
     "topics": "topics",
     "hub": "Community",
-    "issuesTitle": "GitHub issues (Strata engine)",
-    "pullsTitle": "Pull requests (Strata engine)",
-    "labelsTitle": "Browse by label",
+    "issuesTitle": "Problems people reported",
+    "pullsTitle": "Changes people contributed",
+    "labelsTitle": "Browse by topic",
     "comments": "comments",
     "onGithub": "View on GitHub",
     "description": "Description",
-    "relatedOnSite": "Related on strata.com",
-    "relatedHint": "Editorial links to help you install, pick models, or read release notes — not part of the upstream thread.",
-    "whyMirror": "Why we mirror GitHub",
-    "why1": "Search engines and AI assistants can cite stable URLs per issue/PR.",
-    "why2": "Each page links to install docs, models, and releases on this site.",
-    "why3": "Run pnpm sync:community daily to stay current with Niko1221/Strata."
+    "relatedOnSite": "Related on this site",
+    "relatedHint": "Quick links to related pages.",
+    "whyMirror": "Why this page exists",
+    "why1": "Every issue has its own address, easy to find and share.",
+    "why2": "Each page links to install, models, and releases.",
+    "why3": "Synced with GitHub once a day, automatically."
   },
   "pulse": {
-    "title": "Intelligence pulse",
-    "intro": "Continuous feed from X — local model deploy tips, Strata mentions, and community GPU price snippets (not official MSRP).",
-    "synced": "Last intake",
-    "disclaimer": "Quotes are extracted from public posts; verify before buying.",
+    "title": "What people say",
+    "intro": "Discussions and GPU prices from around the web, updated daily.",
+    "synced": "Updated",
+    "disclaimer": "Prices come from public posts — verify before buying.",
     "install": "Install Strata",
     "creator": "@coldniko",
     "onX": "Search on X",
-    "gpuQuotes": "GPU price mentions",
-    "noQuotes": "No price mentions yet — run pnpm sync:intelligence or set X_BEARER_TOKEN.",
+    "gpuQuotes": "GPU prices",
+    "noQuotes": "No prices yet — check back later.",
     "model": "Model",
     "price": "Price",
     "asOf": "Date",
@@ -140,53 +222,53 @@
     "xLatest": "Latest on X",
     "fresh": "Worth reading now",
     "newest": "Newest post",
-    "xLatestHint": "Posts from tracked accounts and Strata-related searches (RSSHub / X API).",
-    "noX": "No X posts yet — set X_BEARER_TOKEN or self-host RSSHub (docs/INTAKE.md).",
-    "comparisons": "Comparisons & benchmarks",
-    "comparisonsHint": "Strata vs llama.cpp, vllm, tok/s threads, and MoE comparisons.",
-    "noComparisons": "No comparison posts matched this sync.",
-    "upgrades": "Upgrades & migration",
-    "upgradesHint": "Version bumps, switch stories, and after-install notes from X.",
-    "noUpgrades": "No upgrade threads matched this sync.",
-    "allSignals": "All signals (incl. GitHub fallback)",
-    "methods": "Intake methods"
+    "xLatestHint": "From tracked accounts and searches on X.",
+    "noX": "Nothing yet — check back later.",
+    "comparisons": "Comparisons",
+    "comparisonsHint": "How people compare Strata with similar tools.",
+    "noComparisons": "Nothing here yet.",
+    "upgrades": "Upgrade stories",
+    "upgradesHint": "How people upgraded or switched from other tools.",
+    "noUpgrades": "Nothing here yet.",
+    "allSignals": "All posts",
+    "methods": "Where the data comes from"
   },
   "creator": {
-    "title": "From Niko Veit (@coldniko)",
-    "intro": "Official Strata author posts, benchmarks, and ecosystem interactions — mirrored here for search, China, Japan, and global readers. Always link back to X for the live thread.",
-    "posts": "Posts & announcements",
-    "interactions": "Ecosystem interactions",
+    "title": "Niko Veit (@coldniko)",
+    "intro": "Latest posts from the author — X is the source of truth.",
+    "posts": "Latest posts",
+    "interactions": "Around the web",
     "onX": "Read on X",
     "friendLinks": "Friendly links",
-    "synced": "Feed synced",
-    "relatedSoftware": "Strata software on this site",
+    "synced": "Updated",
+    "relatedSoftware": "On this site",
     "install": "Install guide",
     "desktop": "Desktop app",
     "releases": "Release notes",
-    "models": "Model catalog",
-    "homeSection": "Creator pulse",
-    "homeSectionSub": "Latest from @coldniko — Strix Halo, local benchmarks, Qwen3.8-Flash-Next.",
-    "viewAll": "All creator updates"
+    "models": "Models",
+    "homeSection": "From the author",
+    "homeSectionSub": "Latest from @coldniko.",
+    "viewAll": "See all"
   },
   "links": {
     "title": "Friendly links",
-    "intro": "We link to the upstream engine, the author, and friends in the local-AI ecosystem. Partners may copy the snippets below to link back to stratat.com (reciprocal links welcome).",
+    "intro": "Sites we recommend to each other. Want to swap links? Get in touch.",
     "reciprocal": "Core & author",
     "friends": "Friends",
-    "jevcodeNote": "JevCode (jevcode.ai) hosts Jev docs — we link mutually as ecosystem friends; ask us to add your site in any language.",
-    "linkToUs": "Link to Strata Platform",
-    "linkToUsHint": "Markdown for CN / JP / EN audiences:"
+    "jevcodeNote": "JevCode (jevcode.ai) is a friend of this site. Want to exchange links? Contact us.",
+    "linkToUs": "Link to us",
+    "linkToUsHint": "Copy the text below and you're done:"
   },
   "footer": {
-    "engine": "Engine & software",
+    "engine": "Software",
     "install": "Install",
-    "desktop": "Desktop download",
+    "desktop": "Download",
     "creator": "Author",
-    "creatorFeed": "Creator feed",
+    "creatorFeed": "Author posts",
     "friends": "Friends",
-    "allLinks": "All friendly links",
+    "allLinks": "All links",
     "tagline": "Strata — local AI on your PC",
-    "benchmarks": "Hardware benchmarks"
+    "benchmarks": "Benchmarks"
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -194,57 +276,57 @@
     "email": "Email",
     "password": "Password",
     "submitLogin": "Sign in",
-    "submitRegister": "Register",
-    "apiHint": "Accounts sync with api.strata.com for download history and model bookmarks."
+    "submitRegister": "Create account",
+    "apiHint": "One account keeps your saves and downloads in sync."
   },
   "benchmarks": {
     "title": "Hardware benchmarks",
-    "intro": "Ordinary-lane medians for Qwen3.8 Flash Next. Local cost and break-even follow the hours, electricity, and API prices you set.",
-    "modelNote": "Qwen3.8 Flash Next · one stream · read, then write",
-    "priceNote": "Default API prices are $0.10 per million reading tokens and $0.64 per million writing tokens. At a 90/10 mix that blend matches the published API-value column. Change either price to match the API you actually pay.",
-    "methodology": "How the numbers move",
-    "method1": "Daily capacity is active hours times the blended rate. Time is sequential: reading share divided by read tok/s, plus writing share divided by write tok/s.",
-    "method2": "Energy per day is whole-node watts times hours times your electricity price.",
-    "method3": "Local cost per million tokens is energy plus hardware spread over the life you set, divided by daily capacity. A discrete GPU rig in this table is the card price plus a $1,200 host.",
-    "method4": "Break-even days are the rig price divided by API value per day minus energy per day. That is a comparison with the API prices above, not a promise of savings.",
-    "workload": "Your workload",
+    "intro": "Pick a GPU and see what it costs to run — and how long until it pays for itself.",
+    "modelNote": "Model: Qwen3.8 Flash Next (single card)",
+    "priceNote": "Prices are editable — enter what you actually pay for better numbers.",
+    "methodology": "How the numbers work",
+    "method1": "Daily output = speed × hours you run.",
+    "method2": "Power cost = watts × hours × electricity price.",
+    "method3": "Cost per day = electricity + hardware spread over its life.",
+    "method4": "Payback days = rig price ÷ money saved per day.",
+    "workload": "How you'll use it",
     "reading": "Reading",
     "writing": "Writing",
-    "dailyRuntime": "Daily runtime",
+    "dailyRuntime": "Hours per day",
     "electricity": "Electricity",
-    "hardwareLife": "Hardware life",
-    "apiReading": "API reading",
-    "apiWriting": "API writing",
+    "hardwareLife": "Keep it for",
+    "apiReading": "API reading price",
+    "apiWriting": "API writing price",
     "perMM": "$ / million tokens",
     "hoursUnit": "h/day",
     "perKwh": "$/kWh",
     "years": "years",
-    "listed": "{count} hardware profiles",
-    "dualNote": "Dual-GPU rows need chassis clearance, power headroom, and multi-GPU scheduling.",
+    "listed": "{count} GPUs",
+    "dualNote": "Dual cards need case room and enough power supply.",
     "colHardware": "Hardware",
-    "colMemory": "Memory",
-    "colReading": "Reading tok/s",
-    "colWriting": "Writing tok/s",
-    "colFit": "Fit",
+    "colMemory": "VRAM",
+    "colReading": "Read tok/s",
+    "colWriting": "Write tok/s",
+    "colFit": "Fits?",
     "colPower": "Power",
     "colCard": "Card",
-    "colRig": "Rig",
-    "colCapacity": "M tok/day",
-    "colLocal": "Local $/M",
-    "colEnergy": "Energy/day",
-    "colApi": "API value/day",
-    "colBreakEven": "Break-even",
-    "colEvidence": "Evidence",
-    "fitGood": "Good",
+    "colRig": "Full rig",
+    "colCapacity": "Output/day",
+    "colLocal": "Cost/M tok",
+    "colEnergy": "Power/day",
+    "colApi": "Saved/day",
+    "colBreakEven": "Payback",
+    "colEvidence": "Source",
+    "fitGood": "Roomy",
     "fitTight": "Tight",
-    "evidenceMedian": "Median",
+    "evidenceMedian": "Measured",
     "evidenceEstimate": "Estimate",
-    "pending": "Price pending",
-    "selected": "Selected rig",
-    "viewDetail": "Hardware page",
-    "evidenceLink": "View evidence",
+    "pending": "Price TBD",
+    "selected": "Selected hardware",
+    "viewDetail": "Details",
+    "evidenceLink": "See source",
     "reset": "Reset",
-    "daysShort": "d",
+    "daysShort": "days",
     "back": "All hardware"
   }
 }

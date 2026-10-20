@@ -7,8 +7,8 @@
     "home": "首页",
     "releases": "版本",
     "community": "社区",
-    "issues": "反馈",
-    "pulls": "贡献",
+    "issues": "问题",
+    "pulls": "改动",
     "models": "模型",
     "install": "安装",
     "download": "下载",
@@ -17,24 +17,32 @@
     "creator": "作者",
     "pulse": "动态",
     "dashboard": "我的",
-    "links": "友情链接",
+    "links": "友链",
     "benchmarks": "跑分",
     "more": "更多",
-    "changelog": "更新日志"
+    "changelog": "日志",
+    "topics": "场景"
+  },
+  "topics": {
+    "title": "场景",
+    "intro": "按要办的事来看：搜哪个名字、在自己电脑上跑 Qwen、哪些机器跑得下。",
+    "rigs": "跑分里的机器",
+    "emptyRigs": "这一页还没有对上的机器。",
+    "openBench": "看完整跑分"
   },
   "home": {
-    "heroTitle": "桌面上的 125B 级 AI",
-    "heroSub": "NVIDIA 或 AMD 显卡 · Windows / Linux · 免费开源。",
+    "heroTitle": "在自己的电脑上跑大模型",
+    "heroSub": "数据不出门。NVIDIA / AMD 显卡都能用，Windows 和 Linux 都支持，免费开源。",
     "ctaInstall": "一键安装",
     "ctaRelease": "{version} 更新了什么",
     "ctaGithub": "看源代码",
     "ctaCommunity": "去社区看看",
     "featureLocal": "数据不出本机",
-    "featureSpeed": "好显卡可达每秒 60+ 字",
-    "featureAgents": "能接上你常用的编程助手",
+    "featureSpeed": "好显卡每秒 60+ 字",
+    "featureAgents": "编程助手直接连",
     "featureLocalBody": "装好之后，模型和对话都留在这台电脑上。",
     "featureSpeedBody": "去跑分页算算电费和回本时间。",
-    "featureAgentsBody": "装好后填一个地址，编程助手就能用。",
+    "featureAgentsBody": "装好后填一个地址，Cursor、Claude Code 就能用。",
     "aiPromptTitle": "让 AI 帮你安装",
     "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
     "ctaBenchmarks": "看跑分"
@@ -49,19 +57,19 @@
     "older": "较旧版本"
   },
   "models": {
-    "title": "模型目录",
+    "title": "挑个模型",
     "vram": "显存",
     "ram": "内存",
     "size": "大小",
     "actions": "操作",
-    "downloadHint": "打开下载页面",
+    "downloadHint": "去下载",
     "bookmark": "收藏",
     "bookmarked": "已收藏",
     "loginToBookmark": "登录后可收藏",
     "trackedOpen": "正在打开下载页，会帮你记录。"
   },
   "dashboard": {
-    "title": "个人中心",
+    "title": "我的",
     "intro": "你的收藏和下载记录。",
     "loading": "加载中…",
     "loginRequired": "登录后就能看。",
@@ -82,9 +90,9 @@
     "title": "下载 Strata",
     "intro": "选你的系统，点一下就装好。",
     "synced": "更新于",
-    "windowsEngine": "Windows 安装包（官方）",
+    "windowsEngine": "Windows 安装包",
     "windowsEngineHint": "按你的显卡选一个下载。",
-    "macEngine": "Mac / Linux 安装包",
+    "macEngine": "Mac / Linux",
     "macEngineHint": "下载代码后跑一条命令。",
     "desktopApp": "Strata 桌面版",
     "desktopHint": "点几下就能装好、升级、打开。",
@@ -103,8 +111,8 @@
     "hubTitle": "Strata 社区",
     "hubIntro": "来自",
     "synced": "更新于",
-    "issues": "反馈",
-    "pulls": "贡献",
+    "issues": "问题",
+    "pulls": "改动",
     "labels": "话题",
     "items": "条",
     "topics": "个话题",
@@ -246,5 +254,80 @@
     "reset": "恢复默认",
     "daysShort": "天",
     "back": "全部硬件"
+  },
+  "seo": {
+    "suffix": "Strata",
+    "home": {
+      "title": "在自己的游戏电脑上跑 125B 级 AI 模型",
+      "description": "在消费级 NVIDIA 或 AMD 显卡上本地运行大型 AI 模型，支持 Windows、Linux 与 macOS，提供 OpenAI 兼容接口，免费且开源。"
+    },
+    "models": {
+      "title": "挑选适合本地推理的模型",
+      "description": "对比本地模型的量化体积、显存与内存需求，附各版本下载入口。"
+    },
+    "download": {
+      "title": "下载 Strata 引擎与桌面客户端",
+      "description": "下载适用于 Windows、Linux、macOS 的 Strata 推理引擎，以及 Windows 与 macOS 的 Strata Desktop 启动器。"
+    },
+    "install": {
+      "title": "一步步安装 Strata",
+      "description": "Windows 一键安装、Linux 与 macOS 命令行安装，以及图形化的 Strata Desktop 引导安装。"
+    },
+    "releases": {
+      "title": "Strata 版本更新日志",
+      "description": "Strata 引擎的每个版本、发布说明、下载量与升级历史。"
+    },
+    "community": {
+      "title": "Strata 社区 — 问题、改动与标签",
+      "description": "浏览 Strata 的 GitHub 社区：已反馈的问题、合并的改动与主题标签，为搜索而镜像。"
+    },
+    "issues": {
+      "title": "Strata 问题与排查",
+      "description": "全部已反馈的 Strata 问题——安装失败、硬件兼容性、功能需求与修复方案。"
+    },
+    "pulls": {
+      "title": "Strata 社区改动",
+      "description": "社区对 Strata 的贡献：性能优化、缺陷修复、文档补充与额外的跑分数据。"
+    },
+    "labels": {
+      "title": "按标签浏览 Strata",
+      "description": "通过 GitHub 标签筛选 Strata 问题与改动，快速找到硬件、安装与性能相关讨论。"
+    },
+    "pulse": {
+      "title": "本地 LLM 动态 — 信号与显卡价格",
+      "description": "每天汇总 X 上关于本地部署大模型、Strata 提及与社区显卡美元价格的信号。"
+    },
+    "creator": {
+      "title": "Strata — 作者的动态",
+      "description": "Strata 作者 Niko Veit（@coldniko）在 X 上的最新帖子。"
+    },
+    "changelog": {
+      "title": "Strata 更新记录",
+      "description": "Strata 的每一次更新：引擎版本、桌面端改动与平台修复，集中一处。"
+    },
+    "links": {
+      "title": "友链",
+      "description": "互相推荐的站点：作者的项目、JevCode 与其他本地 AI 工具。"
+    },
+    "topics": {
+      "title": "本地跑模型实用指南",
+      "description": "分步指南：如何选择模型名称、如何在自己电脑上跑 Qwen、以及真正跑得动的硬件配置。"
+    },
+    "benchmarks": {
+      "title": "本地大模型硬件跑分与成本",
+      "description": "消费级显卡运行 125B 级模型时的每秒 token、功耗与回本周期。"
+    },
+    "login": {
+      "title": "登录 Strata",
+      "description": "登录 Strata 账号，在多设备间同步收藏的模型与下载记录。"
+    },
+    "register": {
+      "title": "注册 Strata 账号",
+      "description": "创建免费的 Strata 账号，保存模型并追踪下载记录。"
+    },
+    "dashboard": {
+      "title": "我的 Strata 面板",
+      "description": "收藏的模型与追踪的下载记录，尽在一处。"
+    }
   }
 }

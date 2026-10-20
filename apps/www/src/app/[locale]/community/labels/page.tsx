@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCommunity } from "@/lib/community";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
   params,
@@ -9,7 +9,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(locale, "Labels", "Browse Strata issues and PRs by GitHub label.", "/community/labels");
+  return seoMetadata(locale, "labels", "/community/labels");
 }
 
 export default async function LabelsPage({

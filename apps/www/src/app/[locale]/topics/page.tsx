@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getLiveTopics, topicText } from "@/lib/topics";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
   params,
@@ -9,8 +9,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "topics" });
-  return siteMetadata(locale, t("title"), t("intro"), "/topics");
+  return seoMetadata(locale, "topics", "/topics");
 }
 
 export default async function TopicsPage({
@@ -21,7 +20,7 @@ export default async function TopicsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("topics");
-  const topics = getLiveTopics();
+  const topics = getLiveTopics(locale);
 
   return (
     <div className="container page">

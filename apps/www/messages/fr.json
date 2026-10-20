@@ -20,7 +20,15 @@
     "benchmarks": "Benchmarks",
     "dashboard": "Tableau de bord",
     "more": "Plus",
-    "changelog": "Journal"
+    "changelog": "Journal",
+    "topics": "Usages"
+  },
+  "topics": {
+    "title": "Usages",
+    "intro": "Quel nom chercher, faire tourner Qwen sur son PC, quelles machines suivent.",
+    "rigs": "Machines du banc",
+    "emptyRigs": "Aucune machine pour cette page.",
+    "openBench": "Voir tout le banc"
   },
   "home": {
     "heroTitle": "IA 125B sur votre bureau",
@@ -246,5 +254,80 @@
     "title": "Nouveautés",
     "intro": "Chaque mise à jour, notée ici.",
     "synced": "Mis à jour"
+  },
+  "seo": {
+    "suffix": "Strata",
+    "home": {
+      "title": "Exécuter un modèle IA de 125B sur votre PC de jeu",
+      "description": "Faites tourner un grand modèle IA en local sur du matériel grand public NVIDIA ou AMD. Windows, Linux et macOS, API compatible OpenAI, gratuit et open source."
+    },
+    "models": {
+      "title": "Choisir le bon modèle pour l’inférence locale",
+      "description": "Comparez les tailles quantifiées et les besoins en VRAM et RAM des modèles locaux, avec un lien de téléchargement par variante."
+    },
+    "download": {
+      "title": "Télécharger le moteur Strata et l’application de bureau",
+      "description": "Téléchargez le moteur d’inférence Strata pour Windows, Linux et macOS, ainsi que le lanceur Strata Desktop pour Windows et macOS."
+    },
+    "install": {
+      "title": "Installer Strata étape par étape",
+      "description": "Installation en un clic sous Windows, installation en ligne de commande sous Linux et macOS, et l’installateur guidé Strata Desktop."
+    },
+    "releases": {
+      "title": "Notes de version de Strata",
+      "description": "Chaque version du moteur Strata avec ses notes, son nombre de téléchargements et son historique de mise à niveau."
+    },
+    "community": {
+      "title": "Communauté Strata — tickets, pull requests et labels",
+      "description": "Parcourez la communauté GitHub de Strata : tickets signalés, pull requests acceptés et labels thématiques, miroirés pour la recherche."
+    },
+    "issues": {
+      "title": "Tickets Strata et dépannage",
+      "description": "Tous les tickets Strata signalés — échecs d’installation, compatibilité matérielle, demandes de fonctionnalités et correctifs."
+    },
+    "pulls": {
+      "title": "Pull requests Strata",
+      "description": "Les contributions de la communauté à Strata : optimisations de performance, correctifs, documentation et données de benchmark supplémentaires."
+    },
+    "labels": {
+      "title": "Parcourir Strata par label thématique",
+      "description": "Filtrez les tickets et pull requests Strata par label GitHub pour retrouver les discussions matériel, installation et performance."
+    },
+    "pulse": {
+      "title": "Pouls des LLM locaux — signaux et prix des GPU",
+      "description": "Les signaux quotidiens de X sur le déploiement local de LLM, les mentions de Strata et les prix GPU de la communauté en USD."
+    },
+    "creator": {
+      "title": "Strata — les publications de l’auteur",
+      "description": "Les dernières publications de Niko Veit (@coldniko), auteur de Strata, depuis X."
+    },
+    "changelog": {
+      "title": "Journal des modifications de Strata",
+      "description": "Toutes les mises à jour de Strata au même endroit : versions du moteur, changements de l’application de bureau et correctifs de plateforme."
+    },
+    "links": {
+      "title": "Liens amicaux",
+      "description": "Les sites qui recommandent Strata et se recommandent entre eux : les projets de l’auteur, JevCode et d’autres outils d’IA locale."
+    },
+    "topics": {
+      "title": "Guides pour exécuter des modèles en local",
+      "description": "Guides pas à pas : choisir un nom de modèle, exécuter Qwen sur son propre PC et sélectionner le matériel qui convient vraiment."
+    },
+    "benchmarks": {
+      "title": "Benchmarks matériels et coûts des LLM locaux",
+      "description": "Tokens par seconde, consommation et délai de rentabilité pour des GPU grand public exécutant un modèle de classe 125B."
+    },
+    "login": {
+      "title": "Se connecter à Strata",
+      "description": "Connectez-vous à votre compte Strata pour synchroniser vos modèles en favori et votre historique de téléchargements."
+    },
+    "register": {
+      "title": "Créer un compte Strata",
+      "description": "Créez un compte Strata gratuit pour enregistrer des modèles et suivre les téléchargements sur tous vos appareils."
+    },
+    "dashboard": {
+      "title": "Votre tableau de bord Strata",
+      "description": "Vos modèles enregistrés et vos téléchargements suivis au même endroit."
+    }
   }
 }

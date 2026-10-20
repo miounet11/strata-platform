@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { getLiveTopics, getTopic, rigsForTopic, topicText } from "@/lib/topics";
-import { siteMetadata } from "@/lib/seo";
+import { getLiveTopics, getTopic, hasTopic, rigsForTopic, topicText } from "@/lib/topics";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export function generateStaticParams() {
   return getLiveTopics().map((topic) => ({ slug: topic.slug }));
@@ -15,10 +15,10 @@ export async function generateMetadata({
 }) {
   const { locale, slug } = await params;
   const topic = getTopic(slug);
-  if (!topic || topic.status !== "live") return {};
+  if (!topic || topic.status !== "live" || !hasTopic(topic, locale)) return {};
   const title = topicText(topic.title, locale);
   const description = topicText(topic.body, locale).slice(0, 180);
-  return siteMetadata(locale, title, description, `/topics/${topic.slug}`);
+  return seoMetadata(locale, "topics", `/topics/${topic.slug}`, true, title, description);
 }
 
 function TopicHref({ href, children }: { href: string; children: string }) {
@@ -40,7 +40,7 @@ export default async function TopicPage({
   const { locale, slug } = await params;
   setRequestLocale(locale);
   const topic = getTopic(slug);
-  if (!topic || topic.status !== "live") notFound();
+  if (!topic || topic.status !== "live" || !hasTopic(topic, locale)) notFound();
   const t = await getTranslations("topics");
   const title = topicText(topic.title, locale);
   const body = topicText(topic.body, locale);

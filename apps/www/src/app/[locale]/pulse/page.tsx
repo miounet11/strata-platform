@@ -16,7 +16,7 @@ import {
 } from "@/lib/intelligence";
 import { formatAge } from "@/lib/time";
 import { formatNumber } from "@/lib/locale";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export const revalidate = 1800;
 
@@ -26,12 +26,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(
-    locale,
-    "Pulse",
-    "X signals on local LLM deploy, Strata, and community GPU price mentions.",
-    "/pulse",
-  );
+  return seoMetadata(locale, "pulse", "/pulse");
 }
 
 export default async function PulsePage({

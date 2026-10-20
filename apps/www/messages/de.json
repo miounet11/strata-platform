@@ -20,7 +20,15 @@
     "benchmarks": "Benchmarks",
     "dashboard": "Übersicht",
     "more": "Mehr",
-    "changelog": "Änderungen"
+    "changelog": "Änderungen",
+    "topics": "Einsatz"
+  },
+  "topics": {
+    "title": "Einsatz",
+    "intro": "Welcher Name, Qwen auf dem eigenen PC, und welche Rechner passen.",
+    "rigs": "Rechner aus den Benchmarks",
+    "emptyRigs": "Noch keine passenden Rechner.",
+    "openBench": "Ganze Tabelle"
   },
   "home": {
     "heroTitle": "125B-KI auf dem Schreibtisch",
@@ -246,5 +254,80 @@
     "title": "Änderungen",
     "intro": "Jede Änderung, hier festgehalten.",
     "synced": "Aktualisiert"
+  },
+  "seo": {
+    "suffix": "Strata",
+    "home": {
+      "title": "Ein 125B-KI-Modell auf dem eigenen Gaming-PC ausführen",
+      "description": "Große KI-Modelle lokal auf handelsüblicher NVIDIA- oder AMD-Hardware ausführen. Windows, Linux und macOS, OpenAI-kompatible API, kostenlos und Open Source."
+    },
+    "models": {
+      "title": "Das passende Modell für lokale Inferenz wählen",
+      "description": "Quantisierte Größen sowie VRAM- und RAM-Anforderungen lokaler Modelle vergleichen — inklusive Download-Link je Variante."
+    },
+    "download": {
+      "title": "Strata-Engine und Desktop-App herunterladen",
+      "description": "Die Strata-Inferenz-Engine für Windows, Linux und macOS sowie den Strata-Desktop-Launcher für Windows und macOS herunterladen."
+    },
+    "install": {
+      "title": "Strata Schritt für Schritt installieren",
+      "description": "Ein-Klick-Setup unter Windows, Installation per Kommandozeile unter Linux und macOS sowie der geführte Strata-Desktop-Installer."
+    },
+    "releases": {
+      "title": "Strata-Release-Notes",
+      "description": "Jedes Strata-Engine-Release mit Notes, Downloadzahlen und Upgrade-Verlauf."
+    },
+    "community": {
+      "title": "Strata-Community — Issues, Pull Requests und Labels",
+      "description": "Die Strata-GitHub-Community durchsuchen: gemeldete Issues, beigesteuerte Pull Requests und Themen-Labels, für die Suche gespiegelt."
+    },
+    "issues": {
+      "title": "Strata-Issues und Fehlerbehebung",
+      "description": "Alle gemeldeten Strata-Issues — Installationsfehler, Hardware-Kompatibilität, Feature-Wünsche und Fixes."
+    },
+    "pulls": {
+      "title": "Strata-Pull-Requests",
+      "description": "Beiträge aus der Community zu Strata: Performance-Arbeit, Bugfixes, Dokumentation und zusätzliche Benchmark-Daten."
+    },
+    "labels": {
+      "title": "Strata nach Themen-Label durchsuchen",
+      "description": "Strata-Issues und Pull Requests nach GitHub-Label filtern, um Hardware-, Installations- und Performance-Diskussionen zu finden."
+    },
+    "pulse": {
+      "title": "Pulse für lokale LLMs — Signale und GPU-Preise",
+      "description": "Tägliche Signale von X zu lokalem LLM-Deployment, Strata-Erwähnungen und GPU-Preisen der Community in USD."
+    },
+    "creator": {
+      "title": "Strata — Beiträge des Autors",
+      "description": "Die neuesten Beiträge von Niko Veit (@coldniko), dem Autor von Strata, von X."
+    },
+    "changelog": {
+      "title": "Strata-Changelog",
+      "description": "Alle Strata-Updates an einem Ort: Engine-Releases, Änderungen der Desktop-App und Plattformkorrekturen."
+    },
+    "links": {
+      "title": "Freundliche Links",
+      "description": "Seiten, die Strata und einander empfehlen: die Projekte des Autors, JevCode und weitere Local-AI-Werkzeuge."
+    },
+    "topics": {
+      "title": "Anleitungen für lokale Modelle",
+      "description": "Schritt-für-Schritt-Anleitungen: Modellnamen wählen, Qwen auf dem eigenen PC ausführen und passende Hardware auswählen."
+    },
+    "benchmarks": {
+      "title": "Hardware-Benchmarks und Kosten für lokale LLMs",
+      "description": "Tokens pro Sekunde, Stromverbrauch und Amortisationsdauer für Consumer-GPUs mit einem 125B-Klassen-Modell."
+    },
+    "login": {
+      "title": "Bei Strata anmelden",
+      "description": "Beim Strata-Konto anmelden, um Modell-Lesezeichen und Download-Verlauf zu synchronisieren."
+    },
+    "register": {
+      "title": "Strata-Konto erstellen",
+      "description": "Ein kostenloses Strata-Konto anlegen, um Modelle zu speichern und Downloads geräteübergreifend zu verfolgen."
+    },
+    "dashboard": {
+      "title": "Strata-Dashboard",
+      "description": "Gespeicherte Modelle und verfolgte Downloads an einem Ort."
+    }
   }
 }

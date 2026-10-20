@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AuthForm } from "@/components/AuthForm";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
   params,
@@ -8,7 +8,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(locale, "Sign in", "Strata account for downloads and bookmarks.", "/login", false);
+  return seoMetadata(locale, "login", "/login", false);
 }
 
 export default async function LoginPage({

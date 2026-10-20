@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCreatorPulse, postExcerpt, postHeadline } from "@/lib/creator";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export const revalidate = 1800;
 
@@ -11,12 +11,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(
-    locale,
-    "From Niko Veit",
-    "Posts and ecosystem interactions from @coldniko — Strata creator. CN, JP, and global audiences.",
-    "/creator",
-  );
+  return seoMetadata(locale, "creator", "/creator");
 }
 
 export default async function CreatorPage({

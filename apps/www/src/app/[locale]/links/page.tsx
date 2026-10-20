@@ -1,12 +1,9 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import linksData from "@/data/friendly-links.json";
-import { siteMetadata } from "@/lib/seo";
-
-type LocaleKey = "en" | "zh" | "ja";
+import { seoMetadata } from "@/lib/seo-messages";
 
 function loc(locale: string, record: Record<string, string>): string {
-  const key = (["en", "zh", "ja"].includes(locale) ? locale : "en") as LocaleKey;
-  return record[key] ?? record.en;
+  return record[locale] ?? record.en ?? "";
 }
 
 export async function generateMetadata({
@@ -15,7 +12,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(locale, "Friendly links", "Reciprocal links — Strata, creator, JevCode, Clavue, and partners.", "/links");
+  return seoMetadata(locale, "links", "/links");
 }
 
 export default async function LinksPage({
@@ -66,9 +63,10 @@ export default async function LinksPage({
       <section style={{ marginTop: "2rem" }}>
         <h2>{t("linkToUs")}</h2>
         <p>{t("linkToUsHint")}</p>
-        <pre className="copy-block">{linksData.linkToUs.markdown}</pre>
-        <pre className="copy-block">{linksData.linkToUs.markdownZh}</pre>
-        <pre className="copy-block">{linksData.linkToUs.markdownJa}</pre>
+        <pre className="copy-block">
+          {linksData.linkToUs.markdown[locale as keyof typeof linksData.linkToUs.markdown] ??
+            linksData.linkToUs.markdown.en}
+        </pre>
       </section>
     </div>
   );

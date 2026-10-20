@@ -14,6 +14,8 @@ export type TopicLink = {
 export type Topic = {
   slug: string;
   status: "live" | "brief";
+  /** Locales this topic was written for. Topics are not translated 1:1. */
+  locales?: string[];
   filter?: TopicFilter | null;
   title?: Record<string, string>;
   body?: Record<string, string>;
@@ -32,12 +34,20 @@ export function getTopics(): Topic[] {
   return topics;
 }
 
-export function getLiveTopics(): Topic[] {
-  return topics.filter((topic) => topic.status === "live");
+export function getLiveTopics(locale?: string): Topic[] {
+  return topics.filter(
+    (topic) =>
+      topic.status === "live" && (!locale || !topic.locales || topic.locales.includes(locale)),
+  );
 }
 
 export function getTopic(slug: string): Topic | undefined {
   return topics.find((topic) => topic.slug === slug);
+}
+
+/** A topic only exists for the locales it was written for. */
+export function hasTopic(topic: Topic, locale: string): boolean {
+  return !topic.locales || topic.locales.includes(locale);
 }
 
 export function topicText(record: Record<string, string> | undefined, locale: string): string {

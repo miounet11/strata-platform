@@ -20,7 +20,15 @@
     "benchmarks": "Benchmarks",
     "dashboard": "Panel",
     "more": "Más",
-    "changelog": "Cambios"
+    "changelog": "Cambios",
+    "topics": "Usos"
+  },
+  "topics": {
+    "title": "Usos",
+    "intro": "Qué nombre buscar, correr Qwen en tu PC y qué equipos caben.",
+    "rigs": "Equipos del banco",
+    "emptyRigs": "Ningún equipo coincide todavía.",
+    "openBench": "Ver la tabla"
   },
   "home": {
     "heroTitle": "IA 125B en tu escritorio",
@@ -246,5 +254,80 @@
     "title": "Novedades",
     "intro": "Cada actualización, anotada aquí.",
     "synced": "Actualizado"
+  },
+  "seo": {
+    "suffix": "Strata",
+    "home": {
+      "title": "Ejecuta un modelo de IA de 125B en tu propio PC gaming",
+      "description": "Ejecuta un modelo de IA grande en local con hardware NVIDIA o AMD de consumo. Windows, Linux y macOS, API compatible con OpenAI, gratis y de código abierto."
+    },
+    "models": {
+      "title": "Elige el modelo adecuado para inferencia local",
+      "description": "Compara tamaños cuantizados y requisitos de VRAM y RAM de modelos locales, con enlace de descarga para cada variante."
+    },
+    "download": {
+      "title": "Descarga el motor Strata y la app de escritorio",
+      "description": "Descarga el motor de inferencia Strata para Windows, Linux y macOS, además del lanzador Strata Desktop para Windows y macOS."
+    },
+    "install": {
+      "title": "Instala Strata paso a paso",
+      "description": "Instalación de un clic en Windows, instalación por línea de comandos en Linux y macOS, y el instalador guiado de Strata Desktop."
+    },
+    "releases": {
+      "title": "Notas de la versión de Strata",
+      "description": "Cada versión del motor Strata con sus notas, número de descargas e historial de actualizaciones."
+    },
+    "community": {
+      "title": "Comunidad Strata — incidencias, pull requests y etiquetas",
+      "description": "Explora la comunidad GitHub de Strata: incidencias reportadas, pull requests fusionados y etiquetas temáticas, replicados para la búsqueda."
+    },
+    "issues": {
+      "title": "Incidencias de Strata y resolución de problemas",
+      "description": "Todas las incidencias de Strata reportadas: fallos de instalación, compatibilidad de hardware, peticiones de funciones y correcciones."
+    },
+    "pulls": {
+      "title": "Pull requests de Strata",
+      "description": "Aportaciones de la comunidad a Strata: trabajo de rendimiento, correcciones de errores, documentación y datos de benchmark adicionales."
+    },
+    "labels": {
+      "title": "Explora Strata por etiqueta temática",
+      "description": "Filtra incidencias y pull requests de Strata por etiqueta de GitHub para encontrar debates sobre hardware, instalación y rendimiento."
+    },
+    "pulse": {
+      "title": "Pulso de los LLM locales: señales y precios de GPU",
+      "description": "Señales diarias de X sobre despliegue local de LLM, menciones de Strata y precios de GPU de la comunidad en USD."
+    },
+    "creator": {
+      "title": "Strata: publicaciones del autor",
+      "description": "Las últimas publicaciones de Niko Veit (@coldniko), autor de Strata, desde X."
+    },
+    "changelog": {
+      "title": "Registro de cambios de Strata",
+      "description": "Todas las actualizaciones de Strata en un solo lugar: versiones del motor, cambios de la app de escritorio y correcciones de plataforma."
+    },
+    "links": {
+      "title": "Enlaces amigos",
+      "description": "Sitios que recomiendan Strata y se recomiendan entre sí: los proyectos del autor, JevCode y otras herramientas de IA local."
+    },
+    "topics": {
+      "title": "Guías para ejecutar modelos en local",
+      "description": "Guías paso a paso: elegir el nombre del modelo, ejecutar Qwen en tu propio PC y elegir el hardware que realmente sirve."
+    },
+    "benchmarks": {
+      "title": "Benchmarks de hardware y coste de los LLM locales",
+      "description": "Tokens por segundo, consumo y plazo de recuperación de GPU de consumo ejecutando un modelo de clase 125B."
+    },
+    "login": {
+      "title": "Inicia sesión en Strata",
+      "description": "Inicia sesión en tu cuenta de Strata para sincronizar los modelos guardados y el historial de descargas."
+    },
+    "register": {
+      "title": "Crea una cuenta de Strata",
+      "description": "Crea una cuenta de Strata gratuita para guardar modelos y seguir las descargas entre dispositivos."
+    },
+    "dashboard": {
+      "title": "Tu panel de Strata",
+      "description": "Tus modelos guardados y las descargas que sigues, en un solo lugar."
+    }
   }
 }

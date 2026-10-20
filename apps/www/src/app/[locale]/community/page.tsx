@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCommunity } from "@/lib/community";
-import { siteMetadata } from "@/lib/seo";
+import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
   params,
@@ -9,12 +9,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return siteMetadata(
-    locale,
-    "Community hub",
-    "Strata GitHub issues, pull requests, and labels — mirrored for search and local AI docs.",
-    "/community",
-  );
+  return seoMetadata(locale, "community", "/community");
 }
 
 export default async function CommunityPage({
