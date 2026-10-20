@@ -7,7 +7,8 @@ export function clusterConfig() {
     sshPass: process.env.CLUSTER_SSH_PASS ?? "",
     ttsUrl: process.env.CLUSTER_TTS_URL ?? "",
     luxTtsUrl: process.env.CLUSTER_LUX_TTS_URL ?? "",
-    imageModel: process.env.CLUSTER_IMAGE_MODEL ?? "qwen-image-21",
+    imageModel: process.env.CLUSTER_IMAGE_MODEL ?? "z-image-turbo",
+    imageSvc: process.env.CLUSTER_IMAGE_SVC ?? "",
   };
 }
 
@@ -35,18 +36,25 @@ function sshExec(remoteCmd, timeoutMs = 180000) {
   return r.stdout;
 }
 
-export function clusterImagePodIp() {
+/** The image worker is a ClusterIP service with several replicas, not a single pod. */
+export function clusterImageSvcUrl() {
+  const { imageSvc } = clusterConfig();
+  if (imageSvc) return imageSvc.replace(/\/$/, "");
   const out = sshExec(
-    `kubectl get pods -o wide 2>/dev/null | grep qwen-image-21-a | awk '{print $6}' | head -1`,
+    `kubectl get svc z-image-turbo -o jsonpath='{.spec.clusterIP}:{.spec.ports[0].port}' 2>/dev/null`,
     30000,
   ).trim();
-  if (!out) throw new Error("qwen-image pod IP not found on cluster");
-  return out;
+  if (!out || out.includes("<none>")) throw new Error("z-image-turbo service not found on cluster");
+  return `http://${out}`;
 }
 
-export async function generateImageB64(prompt, { size = "1024x576", model } = {}) {
+/**
+ * Returns PNG/WebP bytes. The server answers with a `url` on its own origin rather than inline
+ * base64, so fetch that URL back through the same host before returning.
+ */
+export async function generateImage(prompt, { size = "1024x576", model } = {}) {
   const cfg = clusterConfig();
-  const ip = clusterImagePodIp();
+  const svc = clusterImageSvcUrl();
   const payload = JSON.stringify({
     model: model ?? cfg.imageModel,
     prompt,
@@ -54,13 +62,21 @@ export async function generateImageB64(prompt, { size = "1024x576", model } = {}
     n: 1,
   }).replace(/'/g, `'\\''`);
   const out = sshExec(
-    `curl -s -m 180 -X POST http://${ip}:8000/v1/images/generations -H 'Content-Type: application/json' -d '${payload}'`,
-    190000,
+    `curl -s -m 240 -X POST ${svc}/v1/images/generations -H 'Content-Type: application/json' -d '${payload}'`,
+    260000,
   );
   const json = JSON.parse(out);
-  const b64 = json?.data?.[0]?.b64_json;
-  if (!b64) throw new Error(`no image in response: ${out.slice(0, 200)}`);
-  return b64;
+  const inline = json?.data?.[0]?.b64_json;
+  if (inline) return Buffer.from(inline, "base64");
+  const url = json?.data?.[0]?.url;
+  if (!url) throw new Error(`no image in response: ${out.slice(0, 200)}`);
+  const b64 = sshExec(`curl -s -m 120 '${url}' | base64 -w0`, 140000).trim();
+  if (!b64) throw new Error(`could not fetch image from ${url}`);
+  return Buffer.from(b64, "base64");
+}
+
+export async function generateImageB64(prompt, opts) {
+  return (await generateImage(prompt, opts)).toString("base64");
 }
 
 export async function generateTtsBuffer(text, { model = "qwen3-tts-acted", voice = "alloy" } = {}) {

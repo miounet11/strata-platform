@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-10-07T00:27:24.785Z",
+  "syncedAt": "2026-10-20T12:28:24.581Z",
   "assets": {
     "tts-home-en": {
       "type": "tts",
@@ -296,6 +296,465 @@
         "en": "0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; ST"
       },
       "prompt": "GitHub issue illustration, technical: 0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; STRATA_SH_STREAM=0 rem, GPU local AI, dark teal, no text"
+    },
+    "signal-gh-issue-138": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-138.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Multi-GPU Fork"
+      },
+      "prompt": "News card illustration: Multi-GPU Fork, GPU/local AI, no text"
+    },
+    "signal-gh-issue-932": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-932.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Dual GPU support"
+      },
+      "prompt": "News card illustration: Dual GPU support, GPU/local AI, no text"
+    },
+    "signal-gh-issue-675": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-675.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Feature request: `logprobs` / `top_logprobs` on `/v1/chat/completions` (typed de"
+      },
+      "prompt": "News card illustration: Feature request: `logprobs` / `top_logprobs` on `/v1/chat/completions` (typed decisions from one for, GPU/local AI, no text"
+    },
+    "signal-gh-issue-776": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-776.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "--batch on a 100%-resident layer split: engine dies at \"captured the batch windo"
+      },
+      "prompt": "News card illustration: --batch on a 100%-resident layer split: engine dies at \"captured the batch window over slots 0,1\" (z, GPU/local AI, no text"
+    },
+    "signal-gh-issue-922": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-922.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "RTX 5070 Ti 16GB / Windows / IQ3_S: calibration ~14 tok/s and ~9–10 tok/s in con"
+      },
+      "prompt": "News card illustration: RTX 5070 Ti 16GB / Windows / IQ3_S: calibration ~14 tok/s and ~9–10 tok/s in controlled runs, GPU/local AI, no text"
+    },
+    "signal-gh-issue-967": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-967.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Unsloth ud-q4_k_xl - no vision?"
+      },
+      "prompt": "News card illustration: Unsloth ud-q4_k_xl - no vision?, GPU/local AI, no text"
+    },
+    "signal-gh-issue-935": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-935.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "The models are subpar."
+      },
+      "prompt": "News card illustration: The models are subpar., GPU/local AI, no text"
+    },
+    "signal-gh-issue-841": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-841.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "not stable start with 3+ cards"
+      },
+      "prompt": "News card illustration: not stable start with 3+ cards, GPU/local AI, no text"
+    },
+    "signal-gh-issue-728": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-728.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Infinite loop issue"
+      },
+      "prompt": "News card illustration: Infinite loop issue, GPU/local AI, no text"
+    },
+    "signal-gh-issue-804": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-804.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Tool call written inside `<think>` (no `</think>`) is returned as `reasoning_con"
+      },
+      "prompt": "News card illustration: Tool call written inside `<think>` (no `</think>`) is returned as `reasoning_content`: no `tool_call, GPU/local AI, no text"
+    },
+    "signal-gh-issue-642": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-642.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "A dual-GPU fork for 32 GB PCs (resident mode on a layer split, pipelined windows"
+      },
+      "prompt": "News card illustration: A dual-GPU fork for 32 GB PCs (resident mode on a layer split, pipelined windows), GPU/local AI, no text"
+    },
+    "signal-gh-issue-914": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-914.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "strata-vision helper leaks /tmp/strata-vision-* temp dirs (unbounded growth -> O"
+      },
+      "prompt": "News card illustration: strata-vision helper leaks /tmp/strata-vision-* temp dirs (unbounded growth -> OOM on tmpfs /tmp), GPU/local AI, no text"
+    },
+    "signal-gh-issue-847": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-847.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Allow system ram to be used instead of SSD when available."
+      },
+      "prompt": "News card illustration: Allow system ram to be used instead of SSD when available., GPU/local AI, no text"
+    },
+    "signal-gh-issue-606": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-606.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "After a 36,689-token request at 155k, every later request answers one repeated t"
+      },
+      "prompt": "News card illustration: After a 36,689-token request at 155k, every later request answers one repeated token until the engin, GPU/local AI, no text"
+    },
+    "signal-gh-issue-679": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-679.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Feature Request: Load/Offload/Swap mmproj dynamically from RAM to VRAM when used"
+      },
+      "prompt": "News card illustration: Feature Request: Load/Offload/Swap mmproj dynamically from RAM to VRAM when used, GPU/local AI, no text"
+    },
+    "signal-gh-issue-872": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-872.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Session RESTARTS COMPUTER after 25-30 mins (gfx1100)"
+      },
+      "prompt": "News card illustration: Session RESTARTS COMPUTER after 25-30 mins (gfx1100), GPU/local AI, no text"
+    },
+    "signal-gh-issue-884": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-884.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "HIP gfx1030, 2x RX 6900 XT: verify hangs after a long prompt when MMQ prompt pat"
+      },
+      "prompt": "News card illustration: HIP gfx1030, 2x RX 6900 XT: verify hangs after a long prompt when MMQ prompt path, adaptive expert s, GPU/local AI, no text"
+    },
+    "signal-gh-issue-816": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-816.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; ST"
+      },
+      "prompt": "News card illustration: 0.1.39: decode on an RX 6800 (gfx1030, Windows) is 12-22% slower than 0.1.38; STRATA_SH_STREAM=0 rem, GPU/local AI, no text"
+    },
+    "signal-gh-issue-1178": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-1178.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "serve: Special tokens (<|im_end|>) emitted during model thinking cause tasks to "
+      },
+      "prompt": "News card illustration: serve: Special tokens (<|im_end|>) emitted during model thinking cause tasks to terminate early, GPU/local AI, no text"
+    },
+    "signal-gh-issue-771": {
+      "type": "image",
+      "path": "/media/enriched/signal-gh-issue-771.webp",
+      "page": "/pulse",
+      "slot": "signal-art",
+      "alt": {
+        "en": "Linux expert arena (0.1.39): MADV_HUGEPAGE + defrag=madvise makes the arena's fa"
+      },
+      "prompt": "News card illustration: Linux expert arena (0.1.39): MADV_HUGEPAGE + defrag=madvise makes the arena's faults 20x slower (25 , GPU/local AI, no text"
+    },
+    "issue-679": {
+      "type": "image",
+      "path": "/media/enriched/issue-679.webp",
+      "page": "/issues/679",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Feature Request: Load/Offload/Swap mmproj dynamically from RAM to VRAM when used"
+      },
+      "prompt": "GitHub issue illustration, technical: Feature Request: Load/Offload/Swap mmproj dynamically from RAM to VRAM when used, GPU local AI, dark teal, no text"
+    },
+    "issue-847": {
+      "type": "image",
+      "path": "/media/enriched/issue-847.webp",
+      "page": "/issues/847",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Allow system ram to be used instead of SSD when available."
+      },
+      "prompt": "GitHub issue illustration, technical: Allow system ram to be used instead of SSD when available., GPU local AI, dark teal, no text"
+    },
+    "issue-451": {
+      "type": "image",
+      "path": "/media/enriched/issue-451.webp",
+      "page": "/issues/451",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "Support Openai Responses api"
+      },
+      "prompt": "GitHub issue illustration, technical: Support Openai Responses api, GPU local AI, dark teal, no text"
+    },
+    "issue-642": {
+      "type": "image",
+      "path": "/media/enriched/issue-642.webp",
+      "page": "/issues/642",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "A dual-GPU fork for 32 GB PCs (resident mode on a layer split, pipelined windows"
+      },
+      "prompt": "GitHub issue illustration, technical: A dual-GPU fork for 32 GB PCs (resident mode on a layer split, pipelined windows), GPU local AI, dark teal, no text"
+    },
+    "issue-654": {
+      "type": "image",
+      "path": "/media/enriched/issue-654.webp",
+      "page": "/issues/654",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "HIP (gfx1200) RuntimeError Exception Code: 0xC0000005"
+      },
+      "prompt": "GitHub issue illustration, technical: HIP (gfx1200) RuntimeError Exception Code: 0xC0000005, GPU local AI, dark teal, no text"
+    },
+    "issue-496": {
+      "type": "image",
+      "path": "/media/enriched/issue-496.webp",
+      "page": "/issues/496",
+      "slot": "issue-hero",
+      "alt": {
+        "en": "RuntimeError(\"the engine exited before it was ready\" + (f\" (see {log})\" if log e"
+      },
+      "prompt": "GitHub issue illustration, technical: RuntimeError(\"the engine exited before it was ready\" + (f\" (see {log})\" if log else \"\")), GPU local AI, dark teal, no text"
+    },
+    "bench-hero": {
+      "type": "image",
+      "path": "/media/enriched/bench-hero.webp",
+      "page": "/benchmarks",
+      "slot": "hero",
+      "alt": {
+        "en": "GPUs on a benchmark bench with power and thermal probes",
+        "zh": "基准测试台架上的显卡，接有功耗与温度探头"
+      },
+      "prompt": "Wide shot of four consumer graphics cards mounted in a test rig on a dark bench, power meters and thermal probes attached, blue LED glow, dark navy and teal palette, cinematic lighting, ultra clean pr"
+    },
+    "bench-tokens": {
+      "type": "image",
+      "path": "/media/enriched/bench-tokens.webp",
+      "page": "/benchmarks",
+      "slot": "detail",
+      "alt": {
+        "en": "A GPU at full load with a holographic token stream",
+        "zh": "满载运行的显卡与悬浮的 token 流"
+      },
+      "prompt": "Close-up of a GPU running inference at full load, fans spinning, faint holographic token stream rising from the heatsink, dark navy and teal palette, cinematic lighting, ultra clean product photograph"
+    },
+    "bench-power": {
+      "type": "image",
+      "path": "/media/enriched/bench-power.webp",
+      "page": "/benchmarks",
+      "slot": "detail",
+      "alt": {
+        "en": "Power meter next to a running gaming PC",
+        "zh": "运行中的游戏电脑旁的功耗表"
+      },
+      "prompt": "Wall power meter and electricity bill beside a running gaming PC, warm room light, cost-of-ownership mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow dept"
+    },
+    "bench-payback": {
+      "type": "image",
+      "path": "/media/enriched/bench-payback.webp",
+      "page": "/benchmarks",
+      "slot": "detail",
+      "alt": {
+        "en": "Concept image of GPU cost payback",
+        "zh": "显卡成本回收概念图"
+      },
+      "prompt": "Abstract rising curve of stacked coins merging into a GPU silhouette, financial payback concept, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth of field"
+    },
+    "community-hero": {
+      "type": "image",
+      "path": "/media/enriched/community-hero.webp",
+      "page": "/community",
+      "slot": "hero",
+      "alt": {
+        "en": "Developer desk with a code review on screen",
+        "zh": "正在进行代码评审的开发者桌面"
+      },
+      "prompt": "Overhead view of a developer desk: laptop showing a code review thread, mechanical keyboard, coffee, warm rim light, collaborative mood, dark navy and teal palette, cinematic lighting, ultra clean pro"
+    },
+    "community-labels": {
+      "type": "image",
+      "path": "/media/enriched/community-labels.webp",
+      "page": "/community",
+      "slot": "detail",
+      "alt": {
+        "en": "Glowing node network representing topic labels",
+        "zh": "代表话题标签的发光节点网络"
+      },
+      "prompt": "Abstract network of glowing nodes connected by thin lines, each cluster a different hue, topic-label metaphor, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow "
+    },
+    "issues-hero": {
+      "type": "image",
+      "path": "/media/enriched/issues-hero.webp",
+      "page": "/issues",
+      "slot": "hero",
+      "alt": {
+        "en": "Monitor showing an issue triage queue",
+        "zh": "显示问题分类队列的显示器"
+      },
+      "prompt": "Support engineer's monitor showing a long triage queue in a dark room, focused blue light, problem-solving mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallo"
+    },
+    "pulls-hero": {
+      "type": "image",
+      "path": "/media/enriched/pulls-hero.webp",
+      "page": "/pulls",
+      "slot": "hero",
+      "alt": {
+        "en": "Two developers reviewing a diff together",
+        "zh": "两位开发者共同审阅代码差异"
+      },
+      "prompt": "Two developers pairing over a diff view on a large display, dark studio, collaborative warm accents, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth of f"
+    },
+    "releases-hero": {
+      "type": "image",
+      "path": "/media/enriched/releases-hero.webp",
+      "page": "/releases",
+      "slot": "hero",
+      "alt": {
+        "en": "Release timeline concept with floating version cards",
+        "zh": "悬浮版本卡片的发布时间线概念图"
+      },
+      "prompt": "Stack of glowing release artifacts floating above a desk like cards in a timeline, version ribbon motif, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth "
+    },
+    "changelog-hero": {
+      "type": "image",
+      "path": "/media/enriched/changelog-hero.webp",
+      "page": "/changelog",
+      "slot": "hero",
+      "alt": {
+        "en": "Light timeline on a dark wall marking milestones",
+        "zh": "暗色墙面上标记里程碑的光带时间线"
+      },
+      "prompt": "Long horizontal timeline etched in light across a dark wall, milestone markers, update history mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth of f"
+    },
+    "topics-hero": {
+      "type": "image",
+      "path": "/media/enriched/topics-hero.webp",
+      "page": "/topics",
+      "slot": "hero",
+      "alt": {
+        "en": "Notebook and laptop with a handwritten architecture sketch",
+        "zh": "笔记本与手绘架构草图"
+      },
+      "prompt": "Open notebook and laptop on a wooden desk, handwritten architecture sketch beside a terminal window, guide mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallo"
+    },
+    "topics-rigs": {
+      "type": "image",
+      "path": "/media/enriched/topics-rigs.webp",
+      "page": "/topics",
+      "slot": "detail",
+      "alt": {
+        "en": "Three gaming PCs lined up for a buying guide",
+        "zh": "选购指南中的三台不同规格电脑"
+      },
+      "prompt": "Three gaming PCs of different sizes lined up on a bench, each with a small spec card, buying-guide mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth "
+    },
+    "download-hero": {
+      "type": "image",
+      "path": "/media/enriched/download-hero.webp",
+      "page": "/download",
+      "slot": "hero",
+      "alt": {
+        "en": "Laptop showing a download in progress",
+        "zh": "显示下载进度的笔记本电脑"
+      },
+      "prompt": "Laptop with a download progress ring glowing on screen, installer window motif, dark desk, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth of field, prof"
+    },
+    "install-hero": {
+      "type": "image",
+      "path": "/media/enriched/install-hero.webp",
+      "page": "/install",
+      "slot": "detail",
+      "alt": {
+        "en": "First-run setup screen on a monitor",
+        "zh": "显示器上的首次安装引导界面"
+      },
+      "prompt": "First-run setup screen on a monitor with a clean progress indicator, friendly blue light, onboarding mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow dept"
+    },
+    "models-hero": {
+      "type": "image",
+      "path": "/media/enriched/models-hero.webp",
+      "page": "/models",
+      "slot": "detail",
+      "alt": {
+        "en": "Grid of model cards floating like a library",
+        "zh": "如数据图书馆般悬浮的模型卡片"
+      },
+      "prompt": "Grid of glowing model cards floating in dark space like a data library, quantization badges as light dots, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow dept"
+    },
+    "pulse-hero": {
+      "type": "image",
+      "path": "/media/enriched/pulse-hero.webp",
+      "page": "/pulse",
+      "slot": "detail",
+      "alt": {
+        "en": "Particles of conversation over a dark skyline",
+        "zh": "暗色城市天际线上的对话粒子流"
+      },
+      "prompt": "Abstract wave of social conversation rendered as glowing particles over a dark city skyline, signal mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth"
+    },
+    "creator-hero": {
+      "type": "image",
+      "path": "/media/enriched/creator-hero.webp",
+      "page": "/creator",
+      "slot": "hero",
+      "alt": {
+        "en": "Writer's desk with screen and microphone at night",
+        "zh": "夜间带屏幕与麦克风的作者工作台"
+      },
+      "prompt": "Writer's desk at night with a glowing screen and microphone, personal broadcasting mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth of field, profes"
+    },
+    "links-hero": {
+      "type": "image",
+      "path": "/media/enriched/links-hero.webp",
+      "page": "/links",
+      "slot": "hero",
+      "alt": {
+        "en": "Constellation of linked sites connected by light",
+        "zh": "以光线相连的友链星座图"
+      },
+      "prompt": "Constellation of small glowing website windows connected by light threads, friendly network mood, dark navy and teal palette, cinematic lighting, ultra clean product photography, shallow depth of fiel"
     }
-  }
+  },
+  "cluster": "192.168.2.100"
 }

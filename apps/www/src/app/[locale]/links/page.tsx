@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import linksData from "@/data/friendly-links.json";
+import { EnrichedImage } from "@/components/EnrichedBlock";
 import { seoMetadata } from "@/lib/seo-messages";
 
 function loc(locale: string, record: Record<string, string>): string {
@@ -28,6 +29,7 @@ export default async function LinksPage({
     <div className="container page">
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
+      <EnrichedImage id="links-hero" locale={locale} className="page-visual" />
 
       <section style={{ marginTop: "2rem" }}>
         <h2>{t("reciprocal")}</h2>

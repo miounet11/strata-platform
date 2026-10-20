@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BenchmarkBoard } from "@/components/BenchmarkBoard";
+import { EnrichedImage } from "@/components/EnrichedBlock";
 import { getBenchmarks } from "@/lib/benchmarks";
 import { seoMetadata } from "@/lib/seo-messages";
 
@@ -36,6 +37,7 @@ export default async function BenchmarksPage({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
+      <EnrichedImage id="bench-hero" locale={locale} className="page-visual" />
       <p className="meta">
         {t("modelNote")}
         {" · "}

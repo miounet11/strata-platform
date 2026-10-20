@@ -21,6 +21,17 @@ function fmt(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MiB`;
 }
 
+/**
+ * A release ships each accelerator twice: the one-shot installer (`Strata-0.2.1-windows-cuda13.exe`)
+ * and the bare engine archive (`strata-engine-…`). The page lists the installer; the archives stay
+ * reachable from the release page, so showing both would just look like duplicate buttons.
+ * `-update` builds are patchers, not an install choice.
+ */
+function preferred<T extends { name: string }>(assets: T[]): T[] {
+  const oneShot = assets.filter((a) => /^Strata[-.]/i.test(a.name) && !/-update\./i.test(a.name));
+  return oneShot.length > 0 ? oneShot : assets;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -55,8 +66,7 @@ export default async function DownloadPage({
         <h2 style={{ marginTop: 0 }}>{t("windowsEngine")}</h2>
         <p style={{ color: "var(--muted)" }}>{t("windowsEngineHint")}</p>
         <div className="hero-actions">
-          {engine.assets
-            .filter((a) => a.platform === "windows")
+          {preferred(engine.assets.filter((a) => a.platform === "windows"))
             .sort((a, b) => engineVariantRank(a.name, a.variant) - engineVariantRank(b.name, b.variant))
             .map((a) => (
               <a key={a.name} className="btn btn-primary btn-lg" href={a.downloadUrl} rel="noopener noreferrer">
@@ -77,8 +87,7 @@ export default async function DownloadPage({
         <h2 style={{ marginTop: 0 }}>{t("macEngine")}</h2>
         <p style={{ color: "var(--muted)" }}>{t("macEngineHint")}</p>
         <div className="hero-actions">
-          {engine.assets
-            .filter((a) => a.platform === "linux" || a.platform === "macos")
+          {preferred(engine.assets.filter((a) => a.platform === "linux" || a.platform === "macos"))
             .sort(
               (a, b) =>
                 engineVariantRank(a.name, a.variant) - engineVariantRank(b.name, b.variant) ||

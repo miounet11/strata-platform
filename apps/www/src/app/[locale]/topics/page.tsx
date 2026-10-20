@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getLiveTopics, topicText } from "@/lib/topics";
+import { EnrichedImage } from "@/components/EnrichedBlock";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
@@ -26,6 +27,7 @@ export default async function TopicsPage({
     <div className="container page">
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
+      <EnrichedImage id="topics-hero" locale={locale} className="page-visual" />
       <ul className="grid-3" style={{ listStyle: "none", padding: 0 }}>
         {topics.map((topic) => (
           <li key={topic.slug} className="card">

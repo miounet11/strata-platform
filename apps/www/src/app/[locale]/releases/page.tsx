@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getReleases, releaseLead } from "@/lib/releases";
+import { EnrichedImage } from "@/components/EnrichedBlock";
 import { siteMetadata } from "@/lib/seo";
 
 export const revalidate = 1800;
@@ -33,6 +34,7 @@ export default async function ReleasesPage({
         {releases[0] ? `${t("latest")} ${releases[0].tag} · ` : ""}
         {releases.length} versions
       </p>
+      <EnrichedImage id="releases-hero" locale={locale} className="page-visual" />
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1.5rem" }}>
         {releases.map((release, index) => (
           <article key={release.tag} className="card">

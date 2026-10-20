@@ -8,7 +8,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   clusterConfig,
-  generateImageB64,
+  generateImage,
   generateTtsBuffer,
 } from "./cluster-client.mjs";
 
@@ -60,19 +60,21 @@ for (const item of briefs.items) {
   console.log(`[enrich] ${item.id} (${item.type})`);
   try {
     if (item.type === "image") {
-      if (!clusterConfig().sshPass && !process.env.CLUSTER_SSH_KEY) {
-        console.warn("[enrich] skip image — set CLUSTER_SSH_PASS or SSH key");
+      if (!clusterConfig().host) {
+        console.warn("[enrich] skip image — set CLUSTER_HOST (and CLUSTER_SSH_PASS or an SSH key)");
         continue;
       }
-      const b64 = await generateImageB64(item.prompt, {
+      // The worker returns WebP; keep the bytes as-is instead of claiming a .png extension.
+      const buf = await generateImage(item.prompt, {
         size: briefs.defaults?.imageSize,
         model: briefs.defaults?.imageModel,
       });
-      const pngPath = join(OUT_DIR, `${item.id}.png`);
-      writeFileSync(pngPath, Buffer.from(b64, "base64"));
+      const webp = buf.subarray(0, 4).toString("ascii") === "RIFF";
+      const pngPath = join(OUT_DIR, `${item.id}.${webp ? "webp" : "png"}`);
+      writeFileSync(pngPath, buf);
       manifest.assets[item.id] = {
         type: "image",
-        path: `/media/enriched/${item.id}.png`,
+        path: `/media/enriched/${item.id}.${webp ? "webp" : "png"}`,
         page: item.page,
         slot: item.slot,
         alt: item.alt ?? {},

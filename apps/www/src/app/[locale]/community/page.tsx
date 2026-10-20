@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCommunity } from "@/lib/community";
+import { EnrichedImage } from "@/components/EnrichedBlock";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
@@ -32,6 +33,7 @@ export default async function CommunityPage({
         </a>
         . {t("synced")} {syncedAt.slice(0, 10)}.
       </p>
+      <EnrichedImage id="community-hero" locale={locale} className="page-visual" />
       <div className="grid-3">
         <Link href="/issues" className="card">
           <h3>{t("issues")}</h3>

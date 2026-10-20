@@ -19,9 +19,11 @@
     "freshness:watch": "node scripts/freshness-watch.mjs",
     "content:grow": "node scripts/content-grow.mjs",
     "enrich:assets": "node scripts/enrichment/generate-assets.mjs",
+    "enrich:verify": "node scripts/enrichment/validate-images.mjs",
     "enrich:loop": "node scripts/enrichment/run-enrich-loop.mjs",
     "enrich:briefs": "node scripts/enrichment/sync-briefs-from-content.mjs",
-    "indexnow": "node scripts/indexnow-submit.mjs"
+    "indexnow": "node scripts/indexnow-submit.mjs",
+    "radar:import": "node scripts/import-radar-briefs.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -1,32 +1,8 @@
-import { mediaById, mediaForPage } from "@/lib/media";
+import { mediaById } from "@/lib/media";
 
-export function EnrichedImage({
-  id,
-  page,
-  slot,
-  locale,
-  className,
-}: {
-  id?: string;
-  page?: string;
-  slot?: string;
-  locale: string;
-  className?: string;
-}) {
-  const asset = id ? mediaById(id) : mediaForPage(page ?? "", slot ?? "").find((a) => a.type === "image");
-  if (!asset?.path) return null;
-  const alt = asset.alt?.[locale] ?? asset.alt?.en ?? "";
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={asset.path}
-      alt={alt}
-      className={className}
-      loading="lazy"
-      style={{ width: "100%", borderRadius: 12, border: "1px solid var(--border)" }}
-    />
-  );
-}
+// The image itself is a client component (failure placeholder, decode hints); re-export so
+// existing `@/components/EnrichedBlock` imports keep working.
+export { EnrichedImage } from "./EnrichedImage";
 
 export function EnrichedAudio({ id, locale }: { id: string; locale: string }) {
   const asset = mediaById(id);

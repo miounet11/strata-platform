@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { changelogLead, getChangelog } from "@/lib/changelog";
+import { EnrichedImage } from "@/components/EnrichedBlock";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export const revalidate = 1800;
@@ -42,6 +43,7 @@ export default async function ChangelogPage({
           GitHub Atom
         </a>
       </p>
+      <EnrichedImage id="changelog-hero" locale={locale} className="page-visual" />
       <p className="meta">
         {t("synced")} {syncedAt.slice(0, 16).replace("T", " ")} UTC
       </p>
