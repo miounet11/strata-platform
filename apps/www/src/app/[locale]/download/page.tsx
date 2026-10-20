@@ -8,6 +8,15 @@ export const revalidate = 1800;
 
 type DesktopAsset = { name: string; platform: string; downloadUrl: string; sizeBytes: number };
 
+/** Our client builds live in this repo, published by .github/workflows/desktop-build.yml. */
+const DESKTOP_REPO = "miounet11/strata-platform";
+
+const PLATFORM_LABEL: Record<string, string> = {
+  windows: "Windows",
+  macos: "macOS",
+  linux: "Linux",
+};
+
 function fmt(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MiB`;
 }
@@ -76,13 +85,13 @@ export default async function DownloadPage({
           <div className="hero-actions">
             {desktopAssets.map((a) => (
               <a key={a.name} className="btn btn-primary" href={a.downloadUrl}>
-                {a.platform === "macos" ? "macOS" : "Windows"} — {a.name} ({fmt(a.sizeBytes)})
+                {PLATFORM_LABEL[a.platform] ?? a.platform} — {a.name} ({fmt(a.sizeBytes)})
               </a>
             ))}
           </div>
         ) : (
           <div className="hero-actions">
-            <a className="btn" href="https://github.com/Niko1221/Strata/archive/refs/heads/main.zip">
+            <a className="btn" href={`https://github.com/${DESKTOP_REPO}/releases`}>
               {t("desktopFallbackZip")}
             </a>
           </div>

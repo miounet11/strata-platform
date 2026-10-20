@@ -8,7 +8,8 @@ const OUT = join(
   "../apps/www/src/data/downloads.json",
 );
 
-const DESKTOP_REPO = process.env.DESKTOP_RELEASE_REPO ?? "Niko1221/Strata";
+// Our own client builds, published by .github/workflows/desktop-build.yml.
+const DESKTOP_REPO = process.env.DESKTOP_RELEASE_REPO ?? "miounet11/strata-platform";
 const DESKTOP_TAG = process.env.DESKTOP_RELEASE_TAG ?? "";
 
 async function latestEngine() {
@@ -36,30 +37,34 @@ async function latestEngine() {
 }
 
 async function desktopLauncher() {
-  const repo = process.env.STRATAT_DESKTOP_REPO;
-  if (!repo) {
-    return {
-      tag: null,
-      note: "Set STRATAT_DESKTOP_REPO after first GitHub desktop release",
-      assets: [],
-    };
-  }
   const url = DESKTOP_TAG
-    ? `https://api.github.com/repos/${repo}/releases/tags/${DESKTOP_TAG}`
-    : `https://api.github.com/repos/${repo}/releases/latest`;
+    ? `https://api.github.com/repos/${DESKTOP_REPO}/releases/tags/${DESKTOP_TAG}`
+    : `https://api.github.com/repos/${DESKTOP_REPO}/releases/latest`;
   const res = await fetch(url, {
     headers: { Accept: "application/vnd.github+json", "User-Agent": "stratat-downloads" },
   });
-  if (!res.ok) return { tag: null, assets: [] };
+  if (!res.ok) {
+    return {
+      tag: null,
+      repo: DESKTOP_REPO,
+      note: `No Stratat desktop release yet in ${DESKTOP_REPO}`,
+      assets: [],
+    };
+  }
   const r = await res.json();
   return {
     tag: r.tag_name,
     url: r.html_url,
+    repo: DESKTOP_REPO,
     assets: (r.assets ?? [])
-      .filter((a) => /\.(msi|exe|dmg|app\.tar\.gz|zip)$/i.test(a.name))
+      .filter((a) => /\.(msi|exe|dmg|app\.tar\.gz|AppImage|zip)$/i.test(a.name))
       .map((a) => ({
         name: a.name,
-        platform: /\.dmg|app\.tar/i.test(a.name) ? "macos" : "windows",
+        platform: /\.dmg|app\.tar/i.test(a.name)
+          ? "macos"
+          : /AppImage|\.deb|\.rpm/i.test(a.name)
+            ? "linux"
+            : "windows",
         downloadUrl: a.browser_download_url,
         sizeBytes: a.size,
       })),
