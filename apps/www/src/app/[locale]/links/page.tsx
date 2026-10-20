@@ -28,9 +28,9 @@ export default async function LinksPage({
   const t = await getTranslations("links");
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("title")}</h1>
-      <p style={{ color: "var(--muted)", maxWidth: "42rem" }}>{t("intro")}</p>
+      <p className="page-intro">{t("intro")}</p>
 
       <section style={{ marginTop: "2rem" }}>
         <h2>{t("reciprocal")}</h2>
@@ -40,7 +40,7 @@ export default async function LinksPage({
               <a href={item.url} rel={item.rel === "author" ? "me noopener noreferrer" : "noopener noreferrer"}>
                 <strong>{item.name}</strong>
               </a>
-              <p style={{ color: "var(--muted)", fontSize: "0.9rem", margin: "0.5rem 0 0" }}>
+              <p className="meta" style={{ margin: "0.5rem 0 0" }}>
                 {loc(locale, item.description)}
               </p>
             </li>
@@ -56,11 +56,11 @@ export default async function LinksPage({
               <a href={item.url} rel="friend noopener noreferrer">
                 {item.name}
               </a>
-              <span style={{ color: "var(--muted)" }}> — {loc(locale, item.description)}</span>
+              <span className="meta"> — {loc(locale, item.description)}</span>
             </li>
           ))}
         </ul>
-        <p style={{ color: "var(--muted)", fontSize: "0.9rem", marginTop: "1rem" }}>{t("jevcodeNote")}</p>
+        <p className="meta" style={{ marginTop: "1rem" }}>{t("jevcodeNote")}</p>
       </section>
 
       <section style={{ marginTop: "2rem" }}>

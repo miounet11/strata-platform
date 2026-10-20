@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BenchmarkBoard } from "@/components/BenchmarkBoard";
 import { getRig, getRigs } from "@/lib/benchmarks";
+import { formatNumber } from "@/lib/locale";
 import { siteMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -38,7 +39,7 @@ export default async function BenchmarkRigPage({
   const t = await getTranslations("benchmarks");
 
   return (
-    <div className="container container-wide" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container container-wide page">
       <p style={{ color: "var(--muted)" }}>
         <Link href="/benchmarks">{t("back")}</Link>
       </p>
@@ -46,10 +47,10 @@ export default async function BenchmarkRigPage({
       <p style={{ color: "var(--muted)" }}>
         {rig.memory} GB · {rig.form}
         {rig.cardPrice != null
-          ? ` · $${rig.cardPrice.toLocaleString(locale)} ${t("colCard")}`
+          ? ` · $${formatNumber(rig.cardPrice, locale)} ${t("colCard")}`
           : ""}
         {rig.rigTotal != null
-          ? ` · $${rig.rigTotal.toLocaleString(locale)} ${t("colRig")}`
+          ? ` · $${formatNumber(rig.rigTotal, locale)} ${t("colRig")}`
           : ` · ${t("pending")}`}
       </p>
       <BenchmarkBoard focusId={rig.id} />

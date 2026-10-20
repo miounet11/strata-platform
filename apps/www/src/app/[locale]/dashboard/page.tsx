@@ -21,9 +21,9 @@ export default async function DashboardPage({
   const t = await getTranslations("dashboard");
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("title")}</h1>
-      <p style={{ color: "var(--muted)", maxWidth: "40rem" }}>{t("intro")}</p>
+      <p className="page-intro">{t("intro")}</p>
       <DashboardPanel />
     </div>
   );

@@ -34,15 +34,15 @@ export default async function ChangelogPage({
   const { items, syncedAt, feedUrl } = getChangelog();
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("title")}</h1>
-      <p style={{ color: "var(--muted)" }}>
+      <p className="page-intro">
         {t("intro")}{" "}
         <a href={feedUrl} rel="noopener noreferrer">
           GitHub Atom
         </a>
       </p>
-      <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
+      <p className="meta">
         {t("synced")} {syncedAt.slice(0, 16).replace("T", " ")} UTC
       </p>
       <ul style={{ listStyle: "none", padding: 0, marginTop: "1.5rem" }}>

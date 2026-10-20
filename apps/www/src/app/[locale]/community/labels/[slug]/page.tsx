@@ -37,7 +37,7 @@ export default async function LabelDetailPage({
   const t = await getTranslations("community");
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <p style={{ color: "var(--muted)" }}>
         <Link href="/community/labels">{t("labels")}</Link> / {label.name}
       </p>

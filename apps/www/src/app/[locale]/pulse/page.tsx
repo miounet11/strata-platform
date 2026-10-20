@@ -15,6 +15,7 @@ import {
   worthReading,
 } from "@/lib/intelligence";
 import { formatAge } from "@/lib/time";
+import { formatNumber } from "@/lib/locale";
 import { siteMetadata } from "@/lib/seo";
 
 export const revalidate = 1800;
@@ -52,11 +53,11 @@ export default async function PulsePage({
   const quotes = latestGpuQuotes(25);
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("title")}</h1>
       <EnrichedImage id="pulse-signals" locale={locale} />
-      <p style={{ color: "var(--muted)", maxWidth: "46rem" }}>{t("intro")}</p>
-      <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
+      <p className="page-intro">{t("intro")}</p>
+      <p className="meta">
         {t("synced")} {syncedAt.slice(0, 16).replace("T", " ")} UTC
         {newest ? ` · ${t("newest")} ${formatAge(newest, locale)}` : ""} · {intake?.provider ?? "cache"}
         {intake?.plan ? ` · ${intake.plan}` : ""} · {t("disclaimer")}
@@ -81,7 +82,7 @@ export default async function PulsePage({
       <FreshSignals items={fresh} locale={locale} />
 
       <h2 style={{ marginTop: "2rem" }}>{t("xLatest")}</h2>
-      <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{t("xLatestHint")}</p>
+      <p className="meta">{t("xLatestHint")}</p>
       {xFeed.length === 0 ? (
         <p style={{ color: "var(--muted)" }}>{t("noX")}</p>
       ) : (
@@ -95,7 +96,7 @@ export default async function PulsePage({
       </p>
 
       <h2 style={{ marginTop: "2.5rem" }}>{t("comparisons")}</h2>
-      <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{t("comparisonsHint")}</p>
+      <p className="meta">{t("comparisonsHint")}</p>
       {comparisons.length === 0 ? (
         <p style={{ color: "var(--muted)" }}>{t("noComparisons")}</p>
       ) : (
@@ -103,7 +104,7 @@ export default async function PulsePage({
       )}
 
       <h2 style={{ marginTop: "2.5rem" }}>{t("upgrades")}</h2>
-      <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{t("upgradesHint")}</p>
+      <p className="meta">{t("upgradesHint")}</p>
       {upgrades.length === 0 ? (
         <p style={{ color: "var(--muted)" }}>{t("noUpgrades")}</p>
       ) : (
@@ -114,27 +115,27 @@ export default async function PulsePage({
       {quotes.length === 0 ? (
         <p style={{ color: "var(--muted)" }}>{t("noQuotes")}</p>
       ) : (
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.92rem" }}>
+        <div className="table-scroll">
+          <table className="table">
             <thead>
-              <tr style={{ textAlign: "left", borderBottom: "1px solid var(--border)" }}>
-                <th style={{ padding: "0.5rem" }}>{t("model")}</th>
-                <th style={{ padding: "0.5rem" }}>{t("price")}</th>
-                <th style={{ padding: "0.5rem" }}>{t("asOf")}</th>
-                <th style={{ padding: "0.5rem" }}>{t("source")}</th>
+              <tr>
+                <th>{t("model")}</th>
+                <th className="num">{t("price")}</th>
+                <th>{t("asOf")}</th>
+                <th>{t("source")}</th>
               </tr>
             </thead>
             <tbody>
               {quotes.map((q) => (
-                <tr key={q.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                  <td style={{ padding: "0.5rem" }}>{q.model}</td>
-                  <td style={{ padding: "0.5rem" }}>
+                <tr key={q.id}>
+                  <td>{q.model}</td>
+                  <td className="num">
                     {q.currency === "CNY" ? "¥" : "$"}
-                    {q.amount.toLocaleString(locale)}
-                    <span style={{ color: "var(--muted)", fontSize: "0.8rem" }}> ({q.confidence})</span>
+                    {formatNumber(q.amount, locale)}
+                    <span className="meta"> ({q.confidence})</span>
                   </td>
-                  <td style={{ padding: "0.5rem" }}>{q.asOf.slice(0, 10)}</td>
-                  <td style={{ padding: "0.5rem" }}>
+                  <td>{q.asOf.slice(0, 10)}</td>
+                  <td>
                     <a href={q.sourceUrl} rel="noopener noreferrer">
                       @{q.sourceAuthor}
                     </a>

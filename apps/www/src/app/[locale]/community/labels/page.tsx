@@ -23,7 +23,7 @@ export default async function LabelsPage({
   const { labels } = getCommunity();
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("labelsTitle")}</h1>
       <p style={{ color: "var(--muted)" }}>
         <Link href="/community">{t("hub")}</Link>

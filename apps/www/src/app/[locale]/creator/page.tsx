@@ -39,10 +39,10 @@ export default async function CreatorPage({
   };
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }} />
       <h1>{t("title")}</h1>
-      <p style={{ color: "var(--muted)", maxWidth: "44rem" }}>{t("intro")}</p>
+      <p className="page-intro">{t("intro")}</p>
       <div className="hero-actions" style={{ marginTop: "1rem" }}>
         <a className="btn btn-primary" href={profile.xUrl} rel="me noopener noreferrer">
           @coldniko
@@ -57,7 +57,7 @@ export default async function CreatorPage({
           {t("friendLinks")}
         </Link>
       </div>
-      <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: "1rem" }}>
+      <p className="meta" style={{ marginTop: "1rem" }}>
         {t("synced")} {syncedAt.slice(0, 16).replace("T", " ")} UTC
       </p>
 
@@ -70,11 +70,11 @@ export default async function CreatorPage({
                 {postHeadline(post.title)}
               </Link>
               {postExcerpt(post.title, post.body) ? (
-                <p style={{ color: "var(--muted)", fontSize: "0.9rem", margin: "0.5rem 0" }}>
+                <p className="meta" style={{ margin: "0.5rem 0" }}>
                   {postExcerpt(post.title, post.body)}
                 </p>
               ) : null}
-              <div style={{ fontSize: "0.82rem", color: "var(--muted)", marginTop: "0.5rem" }}>
+              <div className="meta" style={{ marginTop: "0.5rem" }}>
                 {post.publishedAt.slice(0, 10)} ·{" "}
                 {post.tags.map((tag) => (
                   <span key={tag} className="badge" style={{ marginRight: "0.25rem" }}>

@@ -36,21 +36,27 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   }
 
   return (
-    <form className="form" onSubmit={onSubmit}>
-      <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>{t("apiHint")}</p>
+    <form className="form" style={{ marginTop: "1.5rem" }} onSubmit={onSubmit}>
       <label>
         {t("email")}
-        <input name="email" type="email" required autoComplete="email" />
+        <input name="email" type="email" required autoComplete="email" placeholder="you@example.com" />
       </label>
       <label>
         {t("password")}
-        <input name="password" type="password" required minLength={8} autoComplete={mode === "login" ? "current-password" : "new-password"} />
+        <input
+          name="password"
+          type="password"
+          required
+          minLength={8}
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
+          placeholder={mode === "login" ? "" : "8+ characters"}
+        />
       </label>
-      <button type="submit" className="btn btn-primary">
+      <button type="submit" className="btn btn-primary btn-lg">
         {mode === "login" ? t("submitLogin") : t("submitRegister")}
       </button>
-      {message ? <p style={{ color: "var(--accent)" }}>{message}</p> : null}
-      {error ? <p style={{ color: "var(--danger)" }}>{error}</p> : null}
+      {message ? <p style={{ color: "var(--accent)", margin: 0 }}>{message}</p> : null}
+      {error ? <p style={{ color: "var(--danger)", margin: 0 }}>{error}</p> : null}
     </form>
   );
 }

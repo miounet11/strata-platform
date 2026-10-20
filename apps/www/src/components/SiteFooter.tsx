@@ -14,14 +14,12 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="container">
-        <div className="grid-3" style={{ marginBottom: "1.5rem" }}>
+        <div className="footer-grid">
           <div>
             <strong>{t("engine")}</strong>
-            <ul style={{ listStyle: "none", padding: 0, margin: "0.5rem 0 0", lineHeight: 1.7 }}>
+            <ul>
               <li>
-                <a href={UPSTREAM} rel="noopener noreferrer">
-                  Niko1221/Strata
-                </a>
+                <Link href="/download">{t("desktop")}</Link>
               </li>
               <li>
                 <Link href="/install">{t("install")}</Link>
@@ -30,13 +28,15 @@ export function SiteFooter() {
                 <Link href="/benchmarks">{t("benchmarks")}</Link>
               </li>
               <li>
-                <Link href="/download">{t("desktop")}</Link>
+                <a href={UPSTREAM} rel="noopener noreferrer">
+                  GitHub · Niko1221/Strata
+                </a>
               </li>
             </ul>
           </div>
           <div>
             <strong>{t("creator")}</strong>
-            <ul style={{ listStyle: "none", padding: 0, margin: "0.5rem 0 0", lineHeight: 1.7 }}>
+            <ul>
               <li>
                 <Link href="/creator">{t("creatorFeed")}</Link>
               </li>
@@ -49,7 +49,7 @@ export function SiteFooter() {
           </div>
           <div>
             <strong>{t("friends")}</strong>
-            <ul style={{ listStyle: "none", padding: 0, margin: "0.5rem 0 0", lineHeight: 1.7 }}>
+            <ul>
               {friendlyLinks.friends.map((f) => (
                 <li key={f.url}>
                   <a href={f.url} rel="friend noopener noreferrer">

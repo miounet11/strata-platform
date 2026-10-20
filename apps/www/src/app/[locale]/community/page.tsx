@@ -28,32 +28,38 @@ export default async function CommunityPage({
   const { counts, syncedAt, repo } = getCommunity();
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("hubTitle")}</h1>
-      <p style={{ color: "var(--muted)", maxWidth: "42rem" }}>
+      <p className="page-intro">
         {t("hubIntro")}{" "}
         <a href={repo} rel="noopener noreferrer">
           github.com/Niko1221/Strata
         </a>
         . {t("synced")} {syncedAt.slice(0, 10)}.
       </p>
-      <div className="grid-3" style={{ marginTop: "1.5rem" }}>
-        <Link href="/issues" className="card" style={{ display: "block", color: "inherit" }}>
+      <div className="grid-3">
+        <Link href="/issues" className="card">
           <h3>{t("issues")}</h3>
-          <p>{counts.issues} {t("items")}</p>
+          <p>
+            {counts.issues} {t("items")}
+          </p>
         </Link>
-        <Link href="/pulls" className="card" style={{ display: "block", color: "inherit" }}>
+        <Link href="/pulls" className="card">
           <h3>{t("pulls")}</h3>
-          <p>{counts.pulls} {t("items")}</p>
+          <p>
+            {counts.pulls} {t("items")}
+          </p>
         </Link>
-        <Link href="/community/labels" className="card" style={{ display: "block", color: "inherit" }}>
+        <Link href="/community/labels" className="card">
           <h3>{t("labels")}</h3>
-          <p>{counts.labels} {t("topics")}</p>
+          <p>
+            {counts.labels} {t("topics")}
+          </p>
         </Link>
       </div>
-      <section style={{ marginTop: "2rem" }}>
+      <section className="section">
         <h2>{t("whyMirror")}</h2>
-        <ul style={{ color: "var(--muted)", lineHeight: 1.7 }}>
+        <ul style={{ color: "var(--muted)", lineHeight: 1.8 }}>
           <li>{t("why1")}</li>
           <li>{t("why2")}</li>
           <li>{t("why3")}</li>

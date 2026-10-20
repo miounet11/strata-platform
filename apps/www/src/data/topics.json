@@ -1,0 +1,73 @@
+{
+  "topics": [
+    {
+      "slug": "niko-strata",
+      "status": "live",
+      "filter": null,
+      "title": {
+        "en": "Niko Strata",
+        "zh": "Niko Strata"
+      },
+      "body": {
+        "en": "Strata here is the local inference engine at Niko1221/Strata. It runs Qwen3.8-Flash-Next on a Windows or Linux PC with an NVIDIA or AMD GPU. The same word is also used for rock layers and for some legal writing. If you want this project, search Niko Strata or Strata local.",
+        "zh": "这里的 Strata 是 Niko1221/Strata 这个本地推理引擎，在 Windows 或 Linux 上用 NVIDIA 或 AMD 显卡跑 Qwen3.8-Flash-Next。这个英文词也指岩层，法律文章里也会出现。要找这个项目，搜 Niko Strata 或 Strata local。"
+      },
+      "links": [
+        { "href": "/download", "label": { "en": "Download", "zh": "下载" } },
+        { "href": "/install", "label": { "en": "Install", "zh": "安装" } },
+        { "href": "https://github.com/Niko1221/Strata", "label": { "en": "Niko1221/Strata", "zh": "Niko1221/Strata" } }
+      ]
+    },
+    {
+      "slug": "local-qwen",
+      "status": "live",
+      "filter": null,
+      "title": {
+        "en": "Run Qwen on your PC",
+        "zh": "在自己的电脑上跑 Qwen"
+      },
+      "body": {
+        "en": "Qwen3.8-Flash-Next is the model these pages cover. The weights stay on your machine. Pick a quant on the models page, then follow install. The smallest quants ask for about 12 GB of VRAM and 48 GB of RAM.",
+        "zh": "这些页面讲的模型是 Qwen3.8-Flash-Next。权重留在你自己的电脑上。先在模型页选量化版本，再按安装页来。最小的量化大约要 12 GB 显存和 48 GB 内存。"
+      },
+      "links": [
+        { "href": "/models", "label": { "en": "Models", "zh": "模型" } },
+        { "href": "/install", "label": { "en": "Install", "zh": "安装" } }
+      ]
+    },
+    {
+      "slug": "sixteen-gb",
+      "status": "live",
+      "filter": { "memoryMax": 16 },
+      "title": {
+        "en": "16 GB and under",
+        "zh": "16 GB 及以下"
+      },
+      "body": {
+        "en": "These benchmark rows have 16 GB of memory or less. A tight fit may need a smaller quant. Open a row for the measured read and write speeds. The list comes from the benchmark file. It is not a promise that every 16 GB card runs every quant.",
+        "zh": "下面这些跑分行的显存或统一内存不超过 16 GB。偏紧的机器往往要更小的量化。点进去看实测的读取和生成速度。名单来自跑分数据，不是说每张 16 GB 卡都能跑所有量化。"
+      },
+      "links": [
+        { "href": "/benchmarks", "label": { "en": "All benchmarks", "zh": "全部跑分" } },
+        { "href": "/models", "label": { "en": "Models", "zh": "模型" } }
+      ]
+    },
+    {
+      "slug": "amd",
+      "status": "live",
+      "filter": { "vendor": "amd" },
+      "title": {
+        "en": "AMD and Radeon",
+        "zh": "AMD 与 Radeon"
+      },
+      "body": {
+        "en": "AMD rows from the same benchmark file: discrete Radeon cards and the Ryzen AI Max machine. Install covers the HIP build. Speeds are on each machine's page.",
+        "zh": "同一份跑分里的 AMD：独立 Radeon，以及 Ryzen AI Max 那台。安装页写了 HIP 构建。速度在每台机器自己的页面上。"
+      },
+      "links": [
+        { "href": "/install", "label": { "en": "Install", "zh": "安装" } },
+        { "href": "/benchmarks", "label": { "en": "All benchmarks", "zh": "全部跑分" } }
+      ]
+    }
+  ]
+}

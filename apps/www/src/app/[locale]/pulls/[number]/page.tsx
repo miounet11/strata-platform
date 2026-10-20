@@ -44,7 +44,7 @@ export default async function PullDetailPage({
   };
 
   return (
-    <article className="container" style={{ padding: "2rem 0 3rem" }}>
+    <article className="container page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <p style={{ color: "var(--muted)" }}>
         <Link href="/pulls">{t("pulls")}</Link> / #{pr.number}

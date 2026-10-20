@@ -36,7 +36,7 @@ export function EnrichedAudio({ id, locale }: { id: string; locale: string }) {
     <figure style={{ margin: "1rem 0" }}>
       <audio controls preload="none" src={asset.path} style={{ width: "100%" }} />
       {asset.text ? (
-        <figcaption style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: 6 }}>{asset.text}</figcaption>
+        <figcaption className="meta" style={{ marginTop: 6 }}>{asset.text}</figcaption>
       ) : null}
     </figure>
   );

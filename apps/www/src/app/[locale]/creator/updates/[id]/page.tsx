@@ -36,7 +36,7 @@ export default async function CreatorUpdatePage({
   const t = await getTranslations("creator");
 
   return (
-    <article className="container" style={{ padding: "2rem 0 3rem" }}>
+    <article className="container page">
       <p style={{ color: "var(--muted)" }}>
         <Link href="/creator">{t("title")}</Link> / {post.publishedAt.slice(0, 10)}
       </p>

@@ -51,7 +51,7 @@ export function ModelActions({
         {t("bookmark")}
       </button>
       {msg ? (
-        <span style={{ fontSize: "0.85rem", color: "var(--muted)", alignSelf: "center" }}>{msg}</span>
+        <span className="meta">{msg}</span>
       ) : null}
     </div>
   );

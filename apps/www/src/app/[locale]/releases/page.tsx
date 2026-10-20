@@ -27,13 +27,13 @@ export default async function ReleasesPage({
   const { releases } = releasesData;
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("title")}</h1>
-      <p style={{ color: "var(--muted)" }}>
-        Synced {releasesData.syncedAt.slice(0, 10)} · {releases.length} versions
-        {releases[0] ? ` · ${t("latest")} ${releases[0].tag}` : ""}
+      <p className="page-intro">
+        {releases[0] ? `${t("latest")} ${releases[0].tag} · ` : ""}
+        {releases.length} versions
       </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", marginTop: "1.5rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1.5rem" }}>
         {releases.map((release, index) => (
           <article key={release.tag} className="card">
             <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
@@ -41,12 +41,12 @@ export default async function ReleasesPage({
                 <Link href={`/releases/${release.tag}`}>{release.name}</Link>{" "}
                 {index === 0 ? <span className="badge">{t("latest")}</span> : null}
               </h2>
-              <time dateTime={release.publishedAt} style={{ color: "var(--muted)", fontSize: "0.88rem" }}>
+              <time dateTime={release.publishedAt} className="meta">
                 {release.publishedAt?.slice(0, 10)}
               </time>
             </div>
             <p style={{ color: "var(--muted)" }}>{releaseLead(release.body ?? "")}</p>
-            <p style={{ margin: "0.75rem 0 0" }}>
+            <p className="meta" style={{ margin: "0.75rem 0 0" }}>
               <Link href={`/releases/${release.tag}`}>{t("notes")}</Link>
               {" · "}
               <a href={release.url} rel="noopener noreferrer">

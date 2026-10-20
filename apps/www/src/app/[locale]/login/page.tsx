@@ -21,8 +21,9 @@ export default async function LoginPage({
   const t = await getTranslations("auth");
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("loginTitle")}</h1>
+      <p className="page-intro">{t("apiHint")}</p>
       <AuthForm mode="login" />
     </div>
   );

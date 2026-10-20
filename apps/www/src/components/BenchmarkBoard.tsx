@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { resolveLocale } from "@/lib/locale";
 import {
   computeEconomics,
   defaultWorkload,
@@ -353,7 +354,7 @@ function formatTok(n: number, locale: string) {
 
 function num(n: number | null, digits: number, locale: string) {
   if (n == null || !Number.isFinite(n)) return "—";
-  return n.toLocaleString(locale, {
+  return n.toLocaleString(resolveLocale(locale), {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   });

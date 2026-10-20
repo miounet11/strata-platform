@@ -31,18 +31,18 @@ export default async function IssuesListPage({
   );
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("issuesTitle")}</h1>
-      <p style={{ color: "var(--muted)" }}>
+      <p className="page-intro">
         <Link href="/community">{t("hub")}</Link> · {issues.length} {t("items")}
       </p>
-      <ul style={{ listStyle: "none", padding: 0, margin: "1.5rem 0 0", display: "flex", flexDirection: "column", gap: "0.65rem" }}>
+      <ul className="list-plain" style={{ display: "flex", flexDirection: "column", gap: "0.65rem" }}>
         {sorted.map((issue) => (
           <li key={issue.number} className="card" style={{ padding: "0.85rem 1rem" }}>
             <Link href={`/issues/${issue.number}`} style={{ color: "inherit", fontWeight: 600 }}>
-              #{issue.number} {issue.title}
+              {issue.title}
             </Link>
-            <div style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: "0.35rem" }}>
+            <div className="meta" style={{ marginTop: "0.35rem" }}>
               <span className="badge">{issue.state}</span> · @{issue.author} · {issue.comments}{" "}
               {t("comments")} · {issue.updatedAt.slice(0, 10)}
             </div>

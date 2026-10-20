@@ -7,6 +7,7 @@ import { getCreatorPulse } from "@/lib/creator";
 import { getDownloads } from "@/lib/downloads";
 import { newestXAt } from "@/lib/intelligence";
 import { getReleases } from "@/lib/releases";
+import { getLiveTopics } from "@/lib/topics";
 
 export const revalidate = 1800;
 
@@ -27,6 +28,7 @@ const staticPaths = [
   "/changelog",
   "/links",
   "/benchmarks",
+  "/topics",
 ];
 
 function stamp(iso?: string | null) {
@@ -55,6 +57,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...community.labels.map((label) => `/community/labels/${label.slug}`),
     ...creator.posts.map((post) => `/creator/updates/${post.id}`),
     ...getRigs().map((rig) => `/benchmarks/${rig.id}`),
+    ...getLiveTopics().map((topic) => `/topics/${topic.slug}`),
     ...releases.releases.map((release) => `/releases/${release.tag}`),
   ];
 

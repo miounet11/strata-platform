@@ -31,18 +31,18 @@ export default async function PullsListPage({
   );
 
   return (
-    <div className="container" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container page">
       <h1>{t("pullsTitle")}</h1>
-      <p style={{ color: "var(--muted)" }}>
+      <p className="page-intro">
         <Link href="/community">{t("hub")}</Link> · {pulls.length} {t("items")}
       </p>
-      <ul style={{ listStyle: "none", padding: 0, margin: "1.5rem 0 0", display: "flex", flexDirection: "column", gap: "0.65rem" }}>
+      <ul className="list-plain" style={{ display: "flex", flexDirection: "column", gap: "0.65rem" }}>
         {sorted.map((pr) => (
           <li key={pr.number} className="card" style={{ padding: "0.85rem 1rem" }}>
             <Link href={`/pulls/${pr.number}`} style={{ color: "inherit", fontWeight: 600 }}>
-              #{pr.number} {pr.title}
+              {pr.title}
             </Link>
-            <div style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: "0.35rem" }}>
+            <div className="meta" style={{ marginTop: "0.35rem" }}>
               <span className="badge">{pr.state}{pr.draft ? " draft" : ""}</span> · @{pr.author} ·{" "}
               {pr.comments} {t("comments")} · {pr.updatedAt.slice(0, 10)}
             </div>

@@ -33,20 +33,19 @@ export default async function BenchmarksPage({
   };
 
   return (
-    <div className="container container-wide" style={{ padding: "2rem 0 3rem" }}>
+    <div className="container container-wide page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <h1>{t("title")}</h1>
-      <p className="lead" style={{ color: "var(--muted)", maxWidth: "46rem" }}>
-        {t("intro")}
-      </p>
-      <p style={{ color: "var(--muted)" }}>
+      <p className="page-intro">{t("intro")}</p>
+      <p className="meta">
         {t("modelNote")}
         {" · "}
         <a href={data.source.url} rel="noopener noreferrer">
           {data.source.name}
         </a>
+        {" · "}
+        {t("priceNote")}
       </p>
-      <p style={{ color: "var(--muted)" }}>{t("priceNote")}</p>
       <BenchmarkBoard />
       <Methodology />
     </div>

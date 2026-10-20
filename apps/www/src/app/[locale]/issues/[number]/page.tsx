@@ -45,7 +45,7 @@ export default async function IssueDetailPage({
   };
 
   return (
-    <article className="container" style={{ padding: "2rem 0 3rem" }}>
+    <article className="container page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <p style={{ color: "var(--muted)" }}>
         <Link href="/issues">{t("issues")}</Link> / #{issue.number}

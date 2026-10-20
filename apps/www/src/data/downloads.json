@@ -1,33 +1,41 @@
 {
-  "syncedAt": "2026-10-08T05:58:11.581Z",
+  "syncedAt": "2026-10-14T13:06:39.445Z",
   "siteUrl": "https://www.stratat.com",
   "engine": {
-    "tag": "v0.1.40.3",
-    "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.40.3",
+    "tag": "v0.1.44.1",
+    "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.44.1",
     "assets": [
+      {
+        "id": "SHA256",
+        "name": "SHA256.txt",
+        "platform": "other",
+        "variant": "nvidia",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.44.1/SHA256.txt",
+        "sizeBytes": 278
+      },
       {
         "id": "strata-windows-x64-cuda12",
         "name": "strata-windows-x64-cuda12.zip",
         "platform": "windows",
         "variant": "nvidia-legacy",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.40.3/strata-windows-x64-cuda12.zip",
-        "sizeBytes": 197411923
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.44.1/strata-windows-x64-cuda12.zip",
+        "sizeBytes": 225716859
       },
       {
         "id": "strata-windows-x64-hip",
         "name": "strata-windows-x64-hip.zip",
         "platform": "windows",
         "variant": "amd",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.40.3/strata-windows-x64-hip.zip",
-        "sizeBytes": 628195410
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.44.1/strata-windows-x64-hip.zip",
+        "sizeBytes": 633588636
       },
       {
         "id": "strata-windows-x64",
         "name": "strata-windows-x64.zip",
         "platform": "windows",
         "variant": "nvidia",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.40.3/strata-windows-x64.zip",
-        "sizeBytes": 135495187
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.44.1/strata-windows-x64.zip",
+        "sizeBytes": 155480443
       }
     ]
   },
