@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCreatorPulse, postExcerpt, postHeadline } from "@/lib/creator";
 import { seoMetadata } from "@/lib/seo-messages";
+import { EnrichedImage } from "@/components/EnrichedBlock";
 
 export const revalidate = 1800;
 
@@ -38,6 +39,7 @@ export default async function CreatorPage({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }} />
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
+      <EnrichedImage id="creator-hero" locale={locale} className="page-visual" />
       <div className="hero-actions" style={{ marginTop: "1rem" }}>
         <a className="btn btn-primary" href={profile.xUrl} rel="me noopener noreferrer">
           @coldniko
