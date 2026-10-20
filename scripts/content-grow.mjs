@@ -24,9 +24,15 @@ const steps = [
   ["node", ["scripts/sync-changelog-rss.mjs"]],
 ];
 
-if (process.env.CLUSTER_SSH_PASS || process.env.ENRICH_FORCE === "1") {
+// The image worker lives on a private-network cluster (192.168.2.100); the production VPS is
+// public and cannot reach it. Enrichment therefore runs where the cluster is reachable, and
+// the VPS only consumes the committed assets. `CLUSTER_HOST` — not the old password var — is
+// what actually gates the call.
+const canEnrich = Boolean(process.env.CLUSTER_HOST) && process.env.ENRICH_SKIP !== "1";
+if (canEnrich || process.env.ENRICH_FORCE === "1") {
   steps.push(["node", ["scripts/enrichment/sync-briefs-from-content.mjs"]]);
   steps.push(["node", ["scripts/enrichment/generate-assets.mjs"]]);
+  steps.push(["node", ["scripts/enrichment/validate-images.mjs"]]);
 }
 
 console.log(`[content-grow] start ${new Date().toISOString()}`);
