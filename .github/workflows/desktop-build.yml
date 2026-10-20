@@ -29,9 +29,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The tag is what users see on the release; Cargo.toml is what lands in the binary.
+      # A mismatch ships a build whose updater will keep offering itself again.
+      - name: Check tag matches the client version
+        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        shell: bash
+        run: |
+          tag_version="${GITHUB_REF_NAME#desktop-v}"
+          cargo_version=$(sed -n 's/^version = "\(.*\)"$/\1/p' "${{ env.DESKTOP_DIR }}/src-tauri/Cargo.toml" | head -1)
+          if [ "$tag_version" != "$cargo_version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME implies $tag_version but Cargo.toml says $cargo_version"
+            exit 1
+          fi
+          echo "version $cargo_version matches the tag"
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      # Build inputs the bundle ships but does not commit: the private Node runtime and the
+      # harness/control folders. Without them `tauri build` fails on missing resource paths.
+      - name: Stage bundled runtime
+        working-directory: ${{ env.DESKTOP_DIR }}
+        shell: bash
+        run: |
+          case "${{ matrix.target }}" in
+            x86_64-pc-windows-msvc) node_target=win-x64 ;;
+            aarch64-apple-darwin)   node_target=darwin-arm64 ;;
+            x86_64-apple-darwin)    node_target=darwin-x64 ;;
+            x86_64-unknown-linux-gnu) node_target=linux-x64 ;;
+          esac
+          bash scripts/fetch-node.sh --target "$node_target"
+          for d in harness control engine-bundle; do
+            mkdir -p "src-tauri/resources/$d"
+            [ -f "src-tauri/resources/$d/.gitignore" ] || printf '*\n!.gitignore\n' > "src-tauri/resources/$d/.gitignore"
+          done
 
       # The host UI is built first: tauri.conf.json points frontendDist at ../../host/dist.
       - name: Install and build the host UI
@@ -48,7 +80,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf \
+            libgtk-3-dev libayatana-appindicator3-dev
 
       - name: Install Tauri CLI
         working-directory: ${{ env.DESKTOP_DIR }}

@@ -7,6 +7,13 @@ import type { FastifyRequest } from "fastify";
 import { z } from "zod";
 import type { Db } from "./db/client.js";
 import { downloadEvents, modelBookmarks, users } from "./db/schema.js";
+import { readFileSync } from "node:fs";
+
+/** One source of truth: the package version, overridable by the release build. */
+const API_VERSION =
+  process.env.STRATAT_VERSION ??
+  (JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string })
+    .version;
 
 const authBody = z.object({
   email: z.string().email(),
@@ -38,7 +45,7 @@ export function buildApp(db: Db, jwtSecret: string, corsOrigin: string) {
 
   app.register(cors, { origin: corsOrigin, credentials: true });
 
-  app.get("/health", async () => ({ ok: true, service: "strata-api" }));
+  app.get("/health", async () => ({ ok: true, service: "stratat-api", version: API_VERSION }));
 
   app.post("/v1/auth/register", async (req, reply) => {
     const parsed = authBody.safeParse(req.body);
@@ -111,7 +118,7 @@ export function buildApp(db: Db, jwtSecret: string, corsOrigin: string) {
 
   app.get("/v1/releases/latest", async () => {
     const res = await fetch("https://api.github.com/repos/Niko1221/Strata/releases/latest", {
-      headers: { Accept: "application/vnd.github+json", "User-Agent": "strata-api" },
+      headers: { Accept: "application/vnd.github+json", "User-Agent": "stratat-api" },
     });
     if (!res.ok) return { error: "upstream unavailable" };
     const r = (await res.json()) as {

@@ -77,12 +77,13 @@ async function desktopLauncher() {
     url: r.html_url,
     repo: DESKTOP_REPO,
     assets: (r.assets ?? [])
-      .filter((a) => /\.(msi|exe|dmg|app\.tar\.gz|AppImage|zip)$/i.test(a.name))
+      // `Stratat.app.tar.gz` and `*.sig` are the updater's payload; people install the dmg/exe.
+      .filter((a) => /\.(msi|exe|dmg|AppImage|deb|rpm)$/i.test(a.name))
       .map((a) => ({
         name: a.name,
-        platform: /\.dmg|app\.tar/i.test(a.name)
+        platform: /\.dmg$/i.test(a.name)
           ? "macos"
-          : /AppImage|\.deb|\.rpm/i.test(a.name)
+          : /AppImage|\.deb|\.rpm$/i.test(a.name)
             ? "linux"
             : "windows",
         downloadUrl: a.browser_download_url,
