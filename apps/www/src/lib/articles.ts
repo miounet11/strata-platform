@@ -79,6 +79,19 @@ export function localesForSlug(slug: string): string[] {
     .map((a) => a.locale);
 }
 
+/**
+ * The language switcher runs in the browser and cannot read the content directory, so the
+ * build bakes the slug → locales map into a small JSON module. Without it the switcher offers
+ * every language for every guide, and six of the seven links 404.
+ */
+export function guideLocaleMap(): Record<string, string[]> {
+  const map: Record<string, string[]> = {};
+  for (const article of getLiveArticles()) {
+    (map[article.slug] ??= []).push(article.locale);
+  }
+  return map;
+}
+
 export function articleLocales(): string[] {
   return [...new Set(readAll().map((a) => a.locale))];
 }

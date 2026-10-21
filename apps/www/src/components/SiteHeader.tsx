@@ -25,10 +25,17 @@ const more = [
   ["/login", "login"],
 ] as const;
 
-export function SiteHeader() {
+export function SiteHeader({ guideLocales }: { guideLocales?: Record<string, string[]> }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const active = resolveLocale(useLocale());
+
+  // A guide exists only in the locales that published it; offering the rest would 404.
+  const guideSlug = pathname.match(/^\/guides\/([^/]+)$/)?.[1];
+  const published = guideSlug ? guideLocales?.[guideSlug] : undefined;
+  const locales: readonly string[] = published?.length
+    ? published
+    : (localesForTopicPath(pathname) ?? routing.locales);
 
   function isCurrent(href: string) {
     if (href === "/") return pathname === "/";
@@ -69,14 +76,14 @@ export function SiteHeader() {
         <details className="nav-locale">
           <summary aria-label="Language">{active.toUpperCase()}</summary>
           <ul>
-            {(localesForTopicPath(pathname) ?? routing.locales).map((code) => (
+            {locales.map((code) => (
               <li key={code}>
                 <Link
                   href={pathname}
                   locale={code}
                   aria-current={code === active ? "page" : undefined}
                 >
-                  {localeNames[code]}
+                  {localeNames[code as keyof typeof localeNames] ?? code}
                 </Link>
               </li>
             ))}
