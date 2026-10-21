@@ -76,11 +76,13 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      # libappindicator3-dev and libayatana-appindicator3-dev conflict on Ubuntu 22.04
+      # (the former is the deprecated name of the latter), so install only the ayatana one.
       - name: Install Linux deps
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf \
+          sudo apt-get install -y libwebkit2gtk-4.1-dev librsvg2-dev patchelf \
             libgtk-3-dev libayatana-appindicator3-dev
 
       - name: Install Tauri CLI
@@ -89,17 +91,63 @@ jobs:
 
       # The updater private key never lives in the repo: it is a repository secret.
       # Losing it means shipped builds can no longer verify our updates.
+      # Signing is opt-in: `signingIdentity` in tauri.conf.json names a certificate that only
+      # exists on the release Mac. On CI it must come from a secret, or be skipped entirely.
+      - name: Configure macOS signing
+        if: runner.os == 'macOS' && env.APPLE_SIGNING_IDENTITY != ''
+        shell: bash
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          echo "Signing as: $APPLE_SIGNING_IDENTITY"
+          node -e '
+            const fs = require("fs");
+            const p = "src-tauri/tauri.conf.json";
+            const c = JSON.parse(fs.readFileSync(p, "utf8"));
+            c.bundle.macOS = { ...(c.bundle.macOS ?? {}), signingIdentity: process.env.APPLE_SIGNING_IDENTITY };
+            fs.writeFileSync(p, JSON.stringify(c, null, 2) + "\n");
+          '
+
+      # Without the secret, drop the identity so tauri bundles an unsigned app instead of
+      # failing on a certificate that is not in the runner's keychain.
+      - name: Skip macOS signing when no identity is configured
+        if: runner.os == 'macOS' && env.APPLE_SIGNING_IDENTITY == ''
+        shell: bash
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          echo "::notice::APPLE_SIGNING_IDENTITY not set — building an unsigned macOS app"
+          node -e '
+            const fs = require("fs");
+            const p = "src-tauri/tauri.conf.json";
+            const c = JSON.parse(fs.readFileSync(p, "utf8"));
+            if (c.bundle.macOS) delete c.bundle.macOS.signingIdentity;
+            fs.writeFileSync(p, JSON.stringify(c, null, 2) + "\n");
+          '
+
       - name: Build the app
         working-directory: ${{ env.DESKTOP_DIR }}
         env:
           CI: true
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        run: npx tauri build --target ${{ matrix.target }}
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            # No updater key means no signed update payload. Build the installer anyway so the
+            # release still ships, and say so loudly instead of failing on a missing secret.
+            echo "::warning::TAURI_SIGNING_PRIVATE_KEY is not set — building without updater signatures"
+            npx tauri build --target ${{ matrix.target }} --config '{"bundle":{"createUpdaterArtifacts":false}}'
+          else
+            npx tauri build --target ${{ matrix.target }}
+          fi
 
       - name: Assert the updater manifest was produced
         shell: bash
         run: |
+          if [ -z "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" ]; then
+            echo "::notice::skipping updater manifest check (no signing key configured)"
+            exit 0
+          fi
           found=$(find "${{ env.DESKTOP_DIR }}/src-tauri/target" -name 'latest.json' -print -quit)
           if [ -z "$found" ]; then
             echo "::error::tauri did not emit latest.json — check bundle.createUpdaterArtifacts and TAURI_SIGNING_PRIVATE_KEY"
