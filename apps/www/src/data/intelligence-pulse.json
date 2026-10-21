@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-10-07T14:58:58.698Z",
+  "syncedAt": "2026-10-20T13:17:09.621Z",
   "meta": {
     "sourcesFile": "/Volumes/MobileDrive/devpc/stratat/scripts/intake/sources.json",
     "stats": {
@@ -10,15 +10,15 @@
       "cheapX": 0,
       "gateway": 0,
       "rsshub": 0,
-      "users": 0,
-      "searches": 0,
+      "users": 3,
+      "searches": 2,
       "community": 12
     },
     "intake": {
       "plan": "budget:general+users+release",
-      "newestAt": "2026-10-07T14:37:30.000Z",
-      "provider": "x-api:live",
-      "fresh": 9,
+      "newestAt": "2026-10-08T08:00:00.000Z",
+      "provider": "cache",
+      "fresh": 0,
       "jobs": 5,
       "gatewaySkipped": false
     },
@@ -35,6 +35,34 @@
     ]
   },
   "signals": [
+    {
+      "id": "x-seed-project-maya-deep-dive",
+      "type": "signal",
+      "title": "Project Maya deep dive: running GLM-5.3-Flash (321B MoE) on your own NVIDIA GPUs, built on Strata",
+      "body": "Site analysis · Project Maya (mw00/project-maya) is a Strata-derived engine rewrite that targets zai-org/GLM-5.3-Flash, a 321B-parameter MoE (about 18B active per token) with up to 1M-token context.\n\nHow the port works, per the project's own study (docs/GLM5-FLASH.md, written against engine 0.1.27): roughly two thirds of Strata's machinery carries over unchanged because GLM-5.3-Flash is the same kind of model as Qwen3.8-Flash-Next — a 3:1 linear-attention/sparse-attention hybrid MoE with hyper-connections and an MTP layer. The reworked third is the mixer (KDA instead of GDN), the full-attention mixer (MLA instead of plain QKV), the router scoring, and the model packaging.\n\nMemory is the whole game: the engine keeps the most-used experts in VRAM, the next tier in pinned RAM, and the rest on NVMe SSD, moving them as the conversation needs — nothing leaves the machine. On 2x Tesla V100 32GB the Maya-S quant decodes at up to 40 tokens/s with prefill up to 560 tokens/s; a single V100 still reaches ~19 tokens/s.\n\nThe quants are calibrated, not squeezed: Maya-S (96.5 GB) keeps 97.9% of the FP8 model's zero-shot accuracy and matches its next token 83% of the time; Maya-M (116 GB) adds IQ3_XXS down projections and IQ3_S in the most sensitive layers for 23% lower KL divergence and 86% token agreement, calibrated toward tool calls and front-end code.\n\nMulti-GPU is pipeline (layer) parallelism, not tensor parallelism — a token crosses cards once per verify window, no NVLink needed. Recent v1.0.x releases added a comparable --bench mode, Turing long-prompt fixes, and Maya-M. Full analysis: https://github.com/mw00/project-maya",
+      "url": "https://github.com/mw00/project-maya",
+      "publishedAt": "2026-10-08T08:00:00.000Z",
+      "author": "coldniko",
+      "source": "creator-x",
+      "locales": [
+        "en",
+        "zh",
+        "ja"
+      ],
+      "tags": [
+        "models",
+        "hardware",
+        "benchmark",
+        "release",
+        "strata",
+        "gpu",
+        "upgrade"
+      ],
+      "topics": [
+        "strata",
+        "models"
+      ]
+    },
     {
       "id": "x-2107842761953018179",
       "type": "signal",
@@ -5183,6 +5211,258 @@
       }
     },
     {
+      "id": "gh-issue-3198",
+      "type": "signal",
+      "title": "[Engine] Return the ability to run local models with --host 0.0.0.0 WITHOUT api keys",
+      "body": "[Engine] Return the ability to run local models with --host 0.0.0.0 WITHOUT api keys",
+      "url": "https://github.com/Niko1221/Strata/issues/3198",
+      "publishedAt": "2026-10-20T13:09:20Z",
+      "author": "EternalNooblet",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-3330",
+      "type": "signal",
+      "title": "[Other] Opinion: Strata app should be separate repo from Strata Engine",
+      "body": "[Other] Opinion: Strata app should be separate repo from Strata Engine",
+      "url": "https://github.com/Niko1221/Strata/issues/3330",
+      "publishedAt": "2026-10-20T12:56:27Z",
+      "author": "Interpause",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-3201",
+      "type": "signal",
+      "title": "[Engine] NUMA-split CPU expert pool: +10 to +14 % decode on a dual-socket Xeon, measured, opt-in",
+      "body": "[Engine] NUMA-split CPU expert pool: +10 to +14 % decode on a dual-socket Xeon, measured, opt-in",
+      "url": "https://github.com/Niko1221/Strata/issues/3201",
+      "publishedAt": "2026-10-20T10:36:13Z",
+      "author": "baptisterajaut",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-2464",
+      "type": "signal",
+      "title": "[Engine] Qwen3.6-35B-A3B decode falls with context (V100: 109 to 14.6 tok/s at 114K on 0.2.0-beta); llama.cpp holds ~90",
+      "body": "[Engine] Qwen3.6-35B-A3B decode falls with context (V100: 109 to 14.6 tok/s at 114K on 0.2.0-beta); llama.cpp holds ~90",
+      "url": "https://github.com/Niko1221/Strata/issues/2464",
+      "publishedAt": "2026-10-20T00:23:03Z",
+      "author": "christopherrobertbrooks-tech",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-3021",
+      "type": "signal",
+      "title": "[Bug]: gfx1100 2x RX 7900 XT layer split + --resident-experts (0.1.45,Q2_0):16K–100K prompt prefill stalls (watchdog #29), GPU reset / device lost",
+      "body": "[Bug]: gfx1100 2x RX 7900 XT layer split + --resident-experts (0.1.45,Q2_0):16K–100K prompt prefill stalls (watchdog #29), GPU reset / device lost",
+      "url": "https://github.com/Niko1221/Strata/issues/3021",
+      "publishedAt": "2026-10-19T21:26:06Z",
+      "author": "Wuqiyang312",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-2883",
+      "type": "signal",
+      "title": "[Other] gfx906 / MI50: reproducible Linux releases and community validation",
+      "body": "[Other] gfx906 / MI50: reproducible Linux releases and community validation",
+      "url": "https://github.com/Niko1221/Strata/issues/2883",
+      "publishedAt": "2026-10-19T21:15:18Z",
+      "author": "romeo5353535353-ui",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-2671",
+      "type": "signal",
+      "title": "[Engine] --expert-cache above the setup default kills the engine on Metal (Apple Silicon)",
+      "body": "[Engine] --expert-cache above the setup default kills the engine on Metal (Apple Silicon)",
+      "url": "https://github.com/Niko1221/Strata/issues/2671",
+      "publishedAt": "2026-10-19T19:50:38Z",
+      "author": "ailabjeremy-ctrl",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-2971",
+      "type": "signal",
+      "title": "[GUI] Web app: page overflows sideways on phones when a tool call appears",
+      "body": "[GUI] Web app: page overflows sideways on phones when a tool call appears",
+      "url": "https://github.com/Niko1221/Strata/issues/2971",
+      "publishedAt": "2026-10-19T16:05:00Z",
+      "author": "TitanMamo",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-2936",
+      "type": "signal",
+      "title": "[sm_86 / RTX 3090] 0.1.43→0.1.44 decode regression = commit 661ff29 (STRATA_ADAPT_OVERLAP default flipped ON→OFF); =1 restores 0.1.43; 0.1.45 breakdown forthcoming",
+      "body": "[sm_86 / RTX 3090] 0.1.43→0.1.44 decode regression = commit 661ff29 (STRATA_ADAPT_OVERLAP default flipped ON→OFF); =1 restores 0.1.43; 0.1.45 breakdown forthcoming",
+      "url": "https://github.com/Niko1221/Strata/issues/2936",
+      "publishedAt": "2026-10-19T15:53:49Z",
+      "author": "oven1231231234",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-2453",
+      "type": "signal",
+      "title": "Windows/NVIDIA performance regression: v0.1.42 ~69 tok/s vs v0.1.44.1 ~55–58 tok/s on RTX 5060 Ti",
+      "body": "Windows/NVIDIA performance regression: v0.1.42 ~69 tok/s vs v0.1.44.1 ~55–58 tok/s on RTX 5060 Ti",
+      "url": "https://github.com/Niko1221/Strata/issues/2453",
+      "publishedAt": "2026-10-19T15:51:51Z",
+      "author": "Celica4101",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-2633",
+      "type": "signal",
+      "title": "Qwen3.6-35B-A3B is not working",
+      "body": "Qwen3.6-35B-A3B is not working",
+      "url": "https://github.com/Niko1221/Strata/issues/2633",
+      "publishedAt": "2026-10-19T15:40:40Z",
+      "author": "Al-E-xXx",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
+      "id": "gh-issue-2500",
+      "type": "signal",
+      "title": "Long generation ratchets to !×256 at the default 20,000 spin bound — 2× Arc Pro B60 (xe), 4,331 host-served experts, engine 0.1.44",
+      "body": "Long generation ratchets to !×256 at the default 20,000 spin bound — 2× Arc Pro B60 (xe), 4,331 host-served experts, engine 0.1.44",
+      "url": "https://github.com/Niko1221/Strata/issues/2500",
+      "publishedAt": "2026-10-19T15:38:07Z",
+      "author": "MaineTim",
+      "source": "github-community",
+      "locales": [
+        "en"
+      ],
+      "tags": [
+        "strata",
+        "community"
+      ],
+      "topics": [
+        "strata",
+        "local-deploy"
+      ]
+    },
+    {
       "id": "gh-issue-579",
       "type": "signal",
       "title": "AMD/HIP RX 9070 XT (gfx1201) stalls during batched prompt ingestion on ROCm 10.0",
@@ -7680,6 +7960,34 @@
     }
   ],
   "upgradeNotes": [
+    {
+      "id": "x-seed-project-maya-deep-dive",
+      "type": "signal",
+      "title": "Project Maya deep dive: running GLM-5.3-Flash (321B MoE) on your own NVIDIA GPUs, built on Strata",
+      "body": "Site analysis · Project Maya (mw00/project-maya) is a Strata-derived engine rewrite that targets zai-org/GLM-5.3-Flash, a 321B-parameter MoE (about 18B active per token) with up to 1M-token context.\n\nHow the port works, per the project's own study (docs/GLM5-FLASH.md, written against engine 0.1.27): roughly two thirds of Strata's machinery carries over unchanged because GLM-5.3-Flash is the same kind of model as Qwen3.8-Flash-Next — a 3:1 linear-attention/sparse-attention hybrid MoE with hyper-connections and an MTP layer. The reworked third is the mixer (KDA instead of GDN), the full-attention mixer (MLA instead of plain QKV), the router scoring, and the model packaging.\n\nMemory is the whole game: the engine keeps the most-used experts in VRAM, the next tier in pinned RAM, and the rest on NVMe SSD, moving them as the conversation needs — nothing leaves the machine. On 2x Tesla V100 32GB the Maya-S quant decodes at up to 40 tokens/s with prefill up to 560 tokens/s; a single V100 still reaches ~19 tokens/s.\n\nThe quants are calibrated, not squeezed: Maya-S (96.5 GB) keeps 97.9% of the FP8 model's zero-shot accuracy and matches its next token 83% of the time; Maya-M (116 GB) adds IQ3_XXS down projections and IQ3_S in the most sensitive layers for 23% lower KL divergence and 86% token agreement, calibrated toward tool calls and front-end code.\n\nMulti-GPU is pipeline (layer) parallelism, not tensor parallelism — a token crosses cards once per verify window, no NVLink needed. Recent v1.0.x releases added a comparable --bench mode, Turing long-prompt fixes, and Maya-M. Full analysis: https://github.com/mw00/project-maya",
+      "url": "https://github.com/mw00/project-maya",
+      "publishedAt": "2026-10-08T08:00:00.000Z",
+      "author": "coldniko",
+      "source": "creator-x",
+      "locales": [
+        "en",
+        "zh",
+        "ja"
+      ],
+      "tags": [
+        "models",
+        "hardware",
+        "benchmark",
+        "release",
+        "strata",
+        "gpu",
+        "upgrade"
+      ],
+      "topics": [
+        "strata",
+        "models"
+      ]
+    },
     {
       "id": "x-2107842643539427681",
       "type": "signal",

@@ -32,6 +32,7 @@ const hubs = [
   "/models",
   "/install",
   "/links",
+  "/topics",
 ];
 
 function loadJson(rel) {
@@ -96,6 +97,11 @@ function collectFull() {
 
   const benchmarks = loadJson("apps/www/src/data/benchmarks.json");
   for (const rig of benchmarks?.rigs ?? []) addLocales(urls, `/benchmarks/${rig.id}`);
+
+  const topics = loadJson("apps/www/src/data/topics.json");
+  for (const topic of topics?.topics ?? []) {
+    if (topic?.status === "live" && topic.slug) addLocales(urls, `/topics/${topic.slug}`);
+  }
 
   const community = loadJson("apps/www/src/data/community.json");
   const issues = [...(community?.issues ?? [])].sort((a, b) =>

@@ -1,6 +1,401 @@
 {
-  "syncedAt": "2026-10-14T13:07:45.358Z",
+  "syncedAt": "2026-10-20T13:13:57.405Z",
   "releases": [
+    {
+      "tag": "v0.2.1",
+      "name": "Strata 0.2.1",
+      "publishedAt": "2026-10-20T08:19:38Z",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.2.1",
+      "prerelease": false,
+      "body": "**Update 0.2.1.1 (2026-10-20): Windows Terminal fix.** On Windows with long paths off (the default), the Terminal could not install an AMD engine: \"The engine could not be installed. local file operation failed (FileNotFoundError)\". The engine is now unpacked into a much shorter folder and with paths Windows accepts at any length, and a path that is still too long gets a plain message. If you use the Terminal on Windows, install it again once with `irm https://github.com/Niko1221/Strata/releases/latest/download/install.ps1 | iex` (your models and settings stay); it installs Terminal 0.1.46.1, and `strata launch` works again. (`strata update` downloads 0.1.46.1 too, but the Terminal on your PATH keeps starting the old version; that is fixed in the next release.) A new install gets it straight away. The app and the engines are unchanged.\r\n\r\n\r\n\r\n---\r\n\r\n**0.2.1: a task board in the app, pictures on the Mac and on Intel Arc cards, `strata bench run` with a fixed standard benchmark, faster downloads, Docker images, and your own engine settings are no longer overwritten.** It also fixes the crashes, stuck downloads and GPU-choice bugs reported on 0.2.0-beta. Each new default below says what it was measured on and whether the answers are identical to 0.2.0. The engine packages are version 0.1.46 (0.2.0 had 0.1.45.3) and the update feed has sequence number 102. Update with `strata update` (Terminal), Settings > Update (app), or `UPDATE.bat` / `./update.sh` (source installs).\r\n\r\n## Which file to download\r\n\r\n| System | Your graphics card | File |\r\n| --- | --- | --- |\r\n| Windows 10 / 11 | NVIDIA RTX, driver 580 or newer | `Strata-0.2.1-windows-cuda13.exe` |\r\n| | NVIDIA, older card or driver older than 580 | `Strata-0.2.1-windows-cuda12.exe` |\r\n| | AMD Radeon RX 9000 series or Radeon AI PRO R9700 | `Strata-0.2.1-windows-hip.exe` |\r\n| | AMD Radeon RX 7000 series or Ryzen AI Max (Strix Halo) | `Strata-0.2.1-windows-hip-rdna3.exe` |\r\n| Linux | NVIDIA RTX, driver 580 or newer | `Strata-0.2.1-linux-nvidia-cuda13.AppImage` |\r\n| | NVIDIA, older card or driver older than 580 | `Strata-0.2.1-linux-nvidia-cuda12.AppImage` |\r\n| | AMD Radeon RX 9000 series or Radeon AI PRO R9700 | `Strata-0.2.1-linux-amd-rx9070.AppImage` |\r\n| | AMD Radeon RX 7000 series | `Strata-0.2.1-linux-amd-rx7900.AppImage` |\r\n| | AMD Ryzen AI Max (Strix Halo) | `Strata-0.2.1-linux-amd-strixhalo.AppImage` |\r\n| Mac | Apple silicon, macOS 15 or newer | `Strata-0.2.1-mac.dmg` (signed and notarised by Apple) |\r\n\r\nThe Terminal installs with one line and picks its engine by itself (`curl -fsSL https://github.com/Niko1221/Strata/releases/latest/download/install.sh | sh`, or `irm https://github.com/Niko1221/Strata/releases/latest/download/install.ps1 | iex` on Windows). The other files in this release are the engine and Terminal packages, the signed update feed and the in-app update files; you do not need to download them. Docker images are separate (below).\r\n\r\n## What is new\r\n\r\n- **A task board in the app.** On the Tasks screen, a Schedule | Board switch shows your scheduled tasks and loops as a board: what is running, what is waiting for your approval (from every chat), and what failed. Each run has one plain line, only the newest problem of a task is shown, and a problem can be dismissed. The sidebar shows how many tasks need you. All eight app languages are translated.\r\n- **Pictures on the Mac.** The Mac app and Terminal now read pictures by default. The reader runs on the Mac's GPU (Metal), built into `strata-vision` and signed with the app. Measured on an M4 Mac: a 260-token picture 0.45 s on the GPU reader against 50.7 s on the CPU, a 972-token picture 2.4 s against 194 s; the GPU reader takes about 1.2 GB of memory. On the 972-token picture 8 of 972 picture tokens differ from the CPU reader (cosine down to 0.48, in the text area); the answers were correct. `--vision cpu` is still there and warns that it takes about 50 seconds per picture.\r\n- **Pictures on Intel Arc cards.** Alchemist cards (A-series) read pictures by default through the CPU reader; Battlemage (B-series) stays opt-in (see Known limits). A new GPU picture reader for SYCL (`--vision gpu`) takes 0.16 s per picture on an A750 against 1.73 s on the CPU (its picture embeddings equal the CPU reader's to a cosine of 0.9959 to 0.9999). Ten varied pictures and a multi-picture chat all passed on the A750.\r\n- **`strata bench run` runs the standard benchmark.** The default suite is `standard-v1`: fixed request files (34 of them, with a checksum list) in the Terminal archive, a scorer, a validator and a report that leaves out personal data. The Terminal archive now carries its commit, because a run without one does not count. The protocol text in `docs/BENCHMARK_PROTOCOL.md` is still a draft. See `docs/COMMUNITY_BENCHMARKS.md` for how to send a result.\r\n- **Faster downloads.** Big model files come over 16 connections with several pieces per request (0.2.0 used 8 connections and a new connection for every piece). On the test PC, from Hugging Face, three interleaved pairs: 68.6 / 65.9 / 70.6 MB/s before, 74.4 / 74.8 / 74.9 MB/s now (+9%; the line itself tops out near 75 to 85 MB/s). The fetch of the draft layer (MTP) went from 25.0 / 28.1 / 37.6 MB/s to 47.4 / 50.5 / 52.2 MB/s, and its file list from 28 s to 4.6 s. ModelScope downloads, whose server reports no file length, now use several connections too. The files are the same and are still checked against their pinned SHA-256.\r\n- **Docker images.** Ready-made images for `ghcr.io/niko1221/strata:0.2.1-<flavor>`: `cuda13`, `cuda12`, `rocm-gfx120x` (RX 9000, R9700), `rocm-gfx110x` (RX 7000) and `rocm-gfx1151` (Strix Halo). They are built from the signed release packages by the repository's workflow. The start-up test passed on an RTX A4000 (cuda13 and cuda12) and on a Radeon AI PRO R9700 (rocm-gfx120x); the gfx110x and gfx1151 images were built but not run on a card. There is no Intel image yet. See `docs/DOCKER.md`. The workflow starts after this release is published, because it reads the release's own files, so the images appear a few hours later.\r\n- **Your own engine settings stay.** The app and setup used to rewrite the run config on every Load. Options you set by hand (`--vram-reserve-mib`, control vectors, any option setup does not choose itself) are now kept in `user_args`, and what you set wins over what the app generates. See Fixes.\r\n- **Draft layer (MTP) switch.** Settings > Expert has a Draft layer (MTP) on/off per model, and `strata launch --mtp on|off` does the same. A picture-off choice and a custom context size stick across loads.\r\n- **Fit checks count the draft layer.** With MTP on, the draft layer takes about 1 GB of graphics memory; the model fit check and the expert-cache sizing now count it.\r\n- **The model page shows the engine's own pick for your PC** (the memory tiers of 0.2.0), with Gyro-M named as the other choice at 40 GB.\r\n- **The chat footer speed is the writing speed.** It divides output tokens by decode time, so a tool-call turn no longer shows \"632 tok/s\" when the engine ran at 50 to 75.\r\n- **A wrong download says so.** An installer for another make of graphics card (an AMD build on an NVIDIA PC) tells you in plain words which file to get and does not unpack its engine. An installed engine with no model loaded is no longer reported as \"No Strata engine\".\r\n- **Terminal.** A model that is already on disk says \"already downloaded\". `strata monitor` finds a running `strata launch` without `--url`.\r\n- **The standard AMD packages carry the hipBLASLt tuning tables** and the engine start picks the one for the card (see New defaults for when it is used).\r\n\r\n## New defaults, with what we measured\r\n\r\nSpeed numbers are medians of interleaved pairs on the same box, a fresh engine per run; \"pairs faster\" counts the pairs the new default won. Each default has an off switch.\r\n\r\n- **Mini PCs with a Radeon 780M (gfx1103), Linux: the matrix-core prompt set is on.** Measured on a Ryzen 7 8745",
+      "assets": [
+        {
+          "name": "install-manifest.txt",
+          "size": 419,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/install-manifest.txt"
+        },
+        {
+          "name": "install.ps1",
+          "size": 7840,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/install.ps1"
+        },
+        {
+          "name": "install.sh",
+          "size": 6864,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/install.sh"
+        },
+        {
+          "name": "latest.json",
+          "size": 2187,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/latest.json"
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "size": 3297,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/SHA256SUMS.txt"
+        },
+        {
+          "name": "Strata-0.2.1-linux-amd-rx7900.AppImage",
+          "size": 518892024,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-amd-rx7900.AppImage"
+        },
+        {
+          "name": "Strata-0.2.1-linux-amd-rx9070.AppImage",
+          "size": 685853176,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-amd-rx9070.AppImage"
+        },
+        {
+          "name": "Strata-0.2.1-linux-amd-strixhalo.AppImage",
+          "size": 452581880,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-amd-strixhalo.AppImage"
+        },
+        {
+          "name": "Strata-0.2.1-linux-nvidia-cuda12.AppImage",
+          "size": 1006520824,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-nvidia-cuda12.AppImage"
+        },
+        {
+          "name": "Strata-0.2.1-linux-nvidia-cuda13.AppImage",
+          "size": 887634424,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-nvidia-cuda13.AppImage"
+        },
+        {
+          "name": "Strata-0.2.1-linux-update.AppImage",
+          "size": 290040312,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-linux-update.AppImage"
+        },
+        {
+          "name": "Strata-0.2.1-mac.dmg",
+          "size": 166033207,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-mac.dmg"
+        },
+        {
+          "name": "Strata-0.2.1-windows-cuda12.exe",
+          "size": 765987022,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-windows-cuda12.exe"
+        },
+        {
+          "name": "Strata-0.2.1-windows-cuda13.exe",
+          "size": 640534168,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-windows-cuda13.exe"
+        },
+        {
+          "name": "Strata-0.2.1-windows-hip-rdna3.exe",
+          "size": 229187807,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-windows-hip-rdna3.exe"
+        },
+        {
+          "name": "Strata-0.2.1-windows-hip.exe",
+          "size": 549478194,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-windows-hip.exe"
+        },
+        {
+          "name": "Strata-0.2.1-windows-update.exe",
+          "size": 111376441,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-windows-update.exe"
+        },
+        {
+          "name": "strata-control-0.1.46-linux-x86_64.tar.gz",
+          "size": 98567975,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46-linux-x86_64.tar.gz"
+        },
+        {
+          "name": "strata-control-0.1.46-macos-arm64.tar.gz",
+          "size": 49838509,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46-macos-arm64.tar.gz"
+        },
+        {
+          "name": "strata-control-0.1.46-windows-x86_64.zip",
+          "size": 72113252,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46-windows-x86_64.zip"
+        },
+        {
+          "name": "strata-control-0.1.46.1-linux-x86_64.tar.gz",
+          "size": 98571330,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.1-linux-x86_64.tar.gz"
+        },
+        {
+          "name": "strata-control-0.1.46.1-macos-arm64.tar.gz",
+          "size": 49841700,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.1-macos-arm64.tar.gz"
+        },
+        {
+          "name": "strata-control-0.1.46.1-windows-x86_64.zip",
+          "size": 72126142,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.1-windows-x86_64.zip"
+        },
+        {
+          "name": "strata-engine-0.1.46-linux-x86_64-cuda-cuda12.tar.gz",
+          "size": 738816999,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-cuda-cuda12.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-linux-x86_64-cuda-cuda13.tar.gz",
+          "size": 604965163,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-cuda-cuda13.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-linux-x86_64-hip-halo.tar.gz",
+          "size": 168581071,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-hip-halo.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-linux-x86_64-hip-rx7900.tar.gz",
+          "size": 241466491,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-hip-rx7900.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-linux-x86_64-hip-rx9070.tar.gz",
+          "size": 402910184,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-linux-x86_64-hip-rx9070.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-macos-arm64-metal.tar.gz",
+          "size": 5079311,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-macos-arm64-metal.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-windows-x86_64-cuda-cuda12.tar.gz",
+          "size": 818369048,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-windows-x86_64-cuda-cuda12.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-windows-x86_64-cuda-cuda13.tar.gz",
+          "size": 579792118,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-windows-x86_64-cuda-cuda13.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-windows-x86_64-hip-rdna3.tar.gz",
+          "size": 240813256,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-windows-x86_64-hip-rdna3.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.46-windows-x86_64-hip-rx9070.tar.gz",
+          "size": 562198572,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-windows-x86_64-hip-rx9070.tar.gz"
+        },
+        {
+          "name": "strata-feed.json",
+          "size": 10247,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-feed.json"
+        },
+        {
+          "name": "strata-feed.json.sig",
+          "size": 151,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-feed.json.sig"
+        },
+        {
+          "name": "Strata.app.tar.gz",
+          "size": 165921339,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata.app.tar.gz"
+        }
+      ]
+    },
+    {
+      "tag": "v0.2.0-beta",
+      "name": "Strata 0.2.0-beta",
+      "publishedAt": "2026-10-19T13:52:01Z",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.2.0-beta",
+      "prerelease": false,
+      "body": "**0.2.0: Strata is now an app, a Terminal and an engine; installers that carry the engine; pictures on by default on NVIDIA and AMD cards; faster defaults for NVIDIA 12-16 GB cards, AMD RX 9000 / R9700 on Linux and Intel Arc.** Each new default below says whether the answers are identical to 0.1.45 (the identity gate) or change slightly, with the measured difference. Engine package version 0.1.45.3. Update with `strata update` (Terminal), Settings > Update (app), or `UPDATE.bat` / `./update.sh` (source installs).\r\n\r\n## Which file to download\r\n\r\n| System | Your graphics card | File |\r\n| --- | --- | --- |\r\n| Windows 10 / 11 | NVIDIA RTX, driver 580 or newer | `Strata-0.2.0-beta-windows-cuda13.exe` |\r\n| | NVIDIA, older card or driver older than 580 | `Strata-0.2.0-beta-windows-cuda12.exe` |\r\n| | AMD Radeon RX 9000 series or Radeon AI PRO R9700 | `Strata-0.2.0-beta-windows-hip.exe` |\r\n| | AMD Radeon RX 7000 series or Ryzen AI Max (Strix Halo) | `Strata-0.2.0-beta-windows-hip-rdna3.exe` |\r\n| Linux | NVIDIA RTX, driver 580 or newer | `Strata-0.2.0-beta-linux-nvidia-cuda13.AppImage` |\r\n| | NVIDIA, older card or driver older than 580 | `Strata-0.2.0-beta-linux-nvidia-cuda12.AppImage` |\r\n| | AMD Radeon RX 9000 series or Radeon AI PRO R9700 | `Strata-0.2.0-beta-linux-amd-rx9070.AppImage` |\r\n| | AMD Radeon RX 7000 series | `Strata-0.2.0-beta-linux-amd-rx7900.AppImage` |\r\n| | AMD Ryzen AI Max (Strix Halo) | `Strata-0.2.0-beta-linux-amd-strixhalo.AppImage` |\r\n| Mac | Apple silicon, macOS 15 or newer | `Strata-0.2.0-beta-mac.dmg` (signed and notarised by Apple) |\r\n\r\nThe Terminal installs with one line (below) and picks its engine by itself. The other files in this release are the\r\nengine and Terminal packages, the signed update feed and the in-app update files; you do not need to download them.\r\n\r\n## Added after the first upload\r\n\r\nTwo installers and two engines were added to this release later: `Strata-0.2.0-beta-windows-hip-rdna3.exe` (Windows, RX 7000 series and Ryzen AI Max; GPU code for gfx1100, gfx1101, gfx1102 and gfx1151; ROCm 10.2.0a20260930) and `Strata-0.2.0-beta-linux-amd-strixhalo.AppImage` (Linux, Ryzen AI Max; gfx1151; ROCm 7.14.1). The signed update feed is now sequence 101 and lists the two engine packages; `latest.json` and every other file are unchanged. Any other app installer works too: install it, then press **Update engine** in Settings (or run `strata update` in the Terminal) and the matching engine downloads.\r\n\r\n## What is new\r\n\r\n**Three parts that share one engine.**\r\n\r\n- **The Strata app** for Windows (installer), Linux (AppImage) and Mac (Apple silicon, macOS 15 or newer, `.dmg`). Chat with a coding agent that asks before it acts (Manual) or works freely (Bypass), web search, `/loop`, pictures pasted or dropped into the chat, a Models page, a Storage page, a choice of which graphics cards a model uses, two models on two GPUs, sharing with other devices (needs an API key first) and setup of your coding apps.\r\n- **The Terminal**, one line to install (`curl -fsSL https://github.com/Niko1221/Strata/releases/latest/download/install.sh | sh`, `irm https://github.com/Niko1221/Strata/releases/latest/download/install.ps1 | iex` on Windows). `strata launch` is the guided flow (choose a model, tune it, serve it, watch it) and also runs without screens from flags; `strata connect` writes and checks the setup of OpenCode, Codex CLI, Claude Code, oh-my-pi, pi, Hermes Agent and OpenClaw; `strata models`, `strata update`, `strata doctor` and `strata bench run` are there too. The monitor `strata launch` opens has seven views, `1`-`7`, the seventh is Connect. See `docs/TERMINAL_LAUNCH.md`.\r\n- **The engine**, the part that talks to your card, is a separate package per platform and card. The installers carry one, so a new install starts a model without a download. Later engines come from a feed that is signed (Ed25519) and checked file by file, test-started before the switch and rolled back on any failure; models and saved tunings are never replaced. Update with `strata update` or Settings > Update. See `packaging/UPDATES.md` and `SECURITY.md`.\r\n- **A missing engine is a warning.** `strata launch` and the app say in plain words what is missing and what to do next, and still download the model.\r\n- Starting a model and serving never download anything; downloads are one explicit step.\r\n\r\n**Pictures are on by default on NVIDIA and AMD cards.** The picture reader runs on the CPU for a card under 24 GB (a few seconds per picture, nothing taken from the card) and on the graphics card from 24 GB. NVIDIA, AMD and Intel follow the same rule; `--vision gpu` / `--vision cpu` / off still choose per model. AMD now has a GPU reader with an automatic CPU fallback (the server prints one line when the GPU reader cannot start). Measured on a Radeon AI PRO R9700: a 260-token picture 57 ms on the GPU reader against 3.13 s on the CPU, a 972-token picture 0.40 s against 14.1 s; the GPU reader keeps 1,470 MiB of VRAM. On a Radeon 780M 0.40 s against 2.42 s. Gyro and the NVFP4 models read pictures too (Gyro needs engine 0.1.45.1 or newer). The Mac app has no picture reader yet.\r\n\r\n**Models.** Qwen3.6-35B-A3B has its three sizes in the app's catalog; the NVFP4 models have clear names. The app and\r\n`strata launch` now suggest a model by RAM and graphics memory together: 40 GB, Swift 1.5 IQ2_XS (or Gyro-M, slower);\r\n48 GB, IQ3_XXS; 64 GB or more, IQ3_S (the original or Swift 1.5). With less memory, low-RAM mode starts by itself and the\r\nmodel runs slower.\r\n\r\n**Downloads are faster and checked.** Big files come over 8 connections at once (on the test PC 40 MB/s with one\r\nconnection, 77 MB/s with eight) and continue where they stopped. Every model file has a fixed SHA-256 and size, and a\r\ndownload stops if the pinned version is gone from Hugging Face. Once a model is downloaded, Strata runs without internet.\r\nWhat Strata downloads and when is in `docs/SAFETY.md`.\r\n\r\n**The app's chat.** A finished page, document or picture opens in the sidebar by itself (the Open button opens it in your\r\nbrowser or default app). A chat without a chosen folder uses `Documents/Strata/Workspace`, so its files open and show in\r\ntheir folder. The first message no longer fails while the assistant's tools start, and sending with no model loaded says so.\r\n\r\n## New defaults, with what we measured\r\n\r\nEvery speed number below is a median of interleaved pairs against the previous default on the same box (a fresh engine per run); \"pairs faster\" counts the pairs the new default won. Each default has an off switch.\r\n\r\n- **NVIDIA RTX 30 / A-series (sm_86) and Pascal (sm_60): decode.** A per-architecture table of nine (sm_86) and seven (sm_60) switches, picked by removing one at a time and keeping only those that cost speed when removed. RTX 3060 12 GB 60.36 to 66.52 tok/s (+10.2%, 8 of 8 pairs), RTX A4000 16 GB 51.16 to 57.82 (+13.0%, 8 of 8), Tesla P100 16 GB 36.56 to 41.76 (+14.2%, 8 of 8). Same answers: the fixed-flag identity gate (10 prompts, 4K and 20K exact prompt checks) is identical on all three. `STRATA_SM86_PERF=0` / `STRATA_SM60_PERF=0` turn the table off. We left a prompt chunk above 8192 off on NVIDIA (not bit-exact on CUDA) and `STRATA_ROUTE_PRIOR=0.5` opt-in (KL 0.0126 against a run-to-run floor of 0.0012).\r\n- **AMD RX 9000 / R9700 (gfx12), Linux: prompt reading.** The WMMA prompt attention and the fused Q2_0 prompt experts are on. On an R9700 32 GB, Q2_0: a 4K prompt 1,151 to 2,286 tok/s and a 20K prompt 1,384 to 2,751 (1.99x, 5 of 5 pairs). IQ3_XXS: 4K 1,369 to 1,436 (1.05x), 20K 1,576 to 1,997 (1.27x). Decode is untouched (0.999 like for like, same tokens). The text changes slightly: teacher-forced KL 0.0003 (28 prompts) and 0.0015 (long documents), task suites equal; with both on: HumanEval 155/164, reasoning 27/30, agent 6/6, needles 6/6, tool calls 5/5. `STRATA_HIP_WMMA=0` and `STRATA_PF_FUSED=0` turn them off. On Windows they stay opt-in until tested there.\r\n- **Intel Arc A-series (Alchemist): ",
+      "assets": [
+        {
+          "name": "install-manifest.txt",
+          "size": 419,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/install-manifest.txt"
+        },
+        {
+          "name": "install.ps1",
+          "size": 7840,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/install.ps1"
+        },
+        {
+          "name": "install.sh",
+          "size": 6864,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/install.sh"
+        },
+        {
+          "name": "latest.json",
+          "size": 2164,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/latest.json"
+        },
+        {
+          "name": "SHA256SUMS.txt",
+          "size": 3377,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/SHA256SUMS.txt"
+        },
+        {
+          "name": "Strata-0.2.0-beta-linux-amd-rx7900.AppImage",
+          "size": 656767480,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-linux-amd-rx7900.AppImage"
+        },
+        {
+          "name": "Strata-0.2.0-beta-linux-amd-rx9070.AppImage",
+          "size": 766523896,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-linux-amd-rx9070.AppImage"
+        },
+        {
+          "name": "Strata-0.2.0-beta-linux-amd-strixhalo.AppImage",
+          "size": 451582456,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-linux-amd-strixhalo.AppImage"
+        },
+        {
+          "name": "Strata-0.2.0-beta-linux-nvidia-cuda12.AppImage",
+          "size": 1107937784,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-linux-nvidia-cuda12.AppImage"
+        },
+        {
+          "name": "Strata-0.2.0-beta-linux-nvidia-cuda13.AppImage",
+          "size": 886614520,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-linux-nvidia-cuda13.AppImage"
+        },
+        {
+          "name": "Strata-0.2.0-beta-linux-update.AppImage",
+          "size": 289049080,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-linux-update.AppImage"
+        },
+        {
+          "name": "Strata-0.2.0-beta-mac.dmg",
+          "size": 162093339,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-mac.dmg"
+        },
+        {
+          "name": "Strata-0.2.0-beta-windows-cuda12.exe",
+          "size": 765086776,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-windows-cuda12.exe"
+        },
+        {
+          "name": "Strata-0.2.0-beta-windows-cuda13.exe",
+          "size": 639694704,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-windows-cuda13.exe"
+        },
+        {
+          "name": "Strata-0.2.0-beta-windows-hip-rdna3.exe",
+          "size": 233454998,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-windows-hip-rdna3.exe"
+        },
+        {
+          "name": "Strata-0.2.0-beta-windows-hip.exe",
+          "size": 548640474,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-windows-hip.exe"
+        },
+        {
+          "name": "Strata-0.2.0-beta-windows-update.exe",
+          "size": 110527236,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata-0.2.0-beta-windows-update.exe"
+        },
+        {
+          "name": "strata-control-0.1.45.3-linux-x86_64.tar.gz",
+          "size": 98490945,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-control-0.1.45.3-linux-x86_64.tar.gz"
+        },
+        {
+          "name": "strata-control-0.1.45.3-macos-arm64.tar.gz",
+          "size": 49759708,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-control-0.1.45.3-macos-arm64.tar.gz"
+        },
+        {
+          "name": "strata-control-0.1.45.3-windows-x86_64.zip",
+          "size": 72019100,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-control-0.1.45.3-windows-x86_64.zip"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-linux-x86_64-cuda-cuda12.tar.gz",
+          "size": 849276719,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-linux-x86_64-cuda-cuda12.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-linux-x86_64-cuda-cuda13.tar.gz",
+          "size": 604968295,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-linux-x86_64-cuda-cuda13.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-linux-x86_64-hip-halo.tar.gz",
+          "size": 168570950,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-linux-x86_64-hip-halo.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-linux-x86_64-hip-rx7900.tar.gz",
+          "size": 396868074,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-linux-x86_64-hip-rx7900.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-linux-x86_64-hip-rx9070.tar.gz",
+          "size": 494736353,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-linux-x86_64-hip-rx9070.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-macos-arm64-metal.tar.gz",
+          "size": 2353518,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-macos-arm64-metal.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-windows-x86_64-cuda-cuda12.tar.gz",
+          "size": 818382624,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-windows-x86_64-cuda-cuda12.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-windows-x86_64-cuda-cuda13.tar.gz",
+          "size": 579788606,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-windows-x86_64-cuda-cuda13.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-windows-x86_64-hip-rdna3.tar.gz",
+          "size": 266317348,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-windows-x86_64-hip-rdna3.tar.gz"
+        },
+        {
+          "name": "strata-engine-0.1.45.3-windows-x86_64-hip-rx9070.tar.gz",
+          "size": 562190684,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-engine-0.1.45.3-windows-x86_64-hip-rx9070.tar.gz"
+        },
+        {
+          "name": "strata-feed.json",
+          "size": 10449,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-feed.json"
+        },
+        {
+          "name": "strata-feed.json.sig",
+          "size": 151,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/strata-feed.json.sig"
+        },
+        {
+          "name": "Strata.app.tar.gz",
+          "size": 161899369,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.0-beta/Strata.app.tar.gz"
+        }
+      ]
+    },
+    {
+      "tag": "v0.1.45",
+      "name": "Strata 0.1.45",
+      "publishedAt": "2026-10-17T06:53:17Z",
+      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.45",
+      "prerelease": false,
+      "body": "**0.1.45: Qwen3.6-35B-A3B reads pictures, serves several requests at once and runs up to 40% faster; switches for multi-user servers; Mac and setup fixes.** Answers of the Qwen3.8-Flash-Next models are the same as in 0.1.44.1 (byte-identical in our identity tests on every GPU machine we tested: CUDA sm_60 / sm_86, HIP gfx1201, Intel A750, Mac M4). Update with `UPDATE.bat` (Linux: `./update.sh`); setup replaces the engine with 0.1.45.\n\n## Qwen3.6-35B-A3B\n\n- **Pictures.** Setup asks \"Do you want images?\" for Qwen3.6, downloads the pinned `mmproj` (0.9 GB) and writes `--vision`. It is the same projector family as Flash-Next's, so the same image encoder reads it. Checked against llama.cpp on the same pictures, same prompt ids, teacher-forced on llama.cpp's own answer: first token the same in 5 of 6 cases (the sixth, two pictures in one request, differs at a near tie), mean KL 0.0005 to 0.035 against 0.002 to 0.056 between llama.cpp's own CPU and GPU runs. Answers on the test pictures are the same text llama.cpp gives.\n- **Several requests at once** (`--parallel N` at setup, `\"parallel\": N` in the config, up to 8). Every window carries one token of each conversation, so the dense weights and every expert two conversations share are read once. Every slot decodes the tokens it decodes alone (10 prompts x 128 greedy, 2 / 4 / 8 slots, slots reused, a 2.5K-token prompt read beside decoding slots). An R9700 32 GB with every expert in VRAM, 128 new tokens per request, five interleaved pairs against llama.cpp's `llama-server -np N -fa on`: 1 / 2 / 4 / 8 requests 83.9 / 173.5 / 252 / 325 tok/s against 73.8 / 107 / 165 / 208 (1.14x to 1.61x, 5 of 5 pairs each). `--batch-mtp` (opt-in) lets every slot verify draft tokens: one request 1.6x, two 1.2x, four 1.1x.\n- **Setup offers it, with the price.** Where every expert stays in VRAM, setup suggests up to 3-4 slots. On a card that does not hold every expert the slots take VRAM from the expert cache: a request alone runs 4-11% slower, and next to one request at a time WITH the draft layer, N together are only 1.0-1.15x faster (RTX 3060 12 GB at 8K context, 4 requests: 1.15x, alone -4%; RTX A4000 / Tesla P100 16 GB at 32K, 2 requests: 1.0x, alone -7 to -11%). Setup says that, offers the count the card can spare at the chosen context (12 GB: 4 slots at 8K, none at 32K; 16 GB: 2 at 32K), asks \"How many requests at once?\" (Enter keeps one at a time) and keeps any number you give. It is worth it for several users or agents at once, not for one chat.\n- **Faster.** New decode kernels with the old kernels' bits (checked on the real activations: 0 mismatches in 18,360 comparisons), a prompt delta rule that loads one token ahead, and a bigger prompt chunk by default (4096 / 2048 / 1024 tokens, whatever fits; `--prefill 512` brings the old one back). R9700 32 GB, UD-Q4_K_XL: decode 83.2 to 117.8 tok/s (1.42x, 5 of 5 pairs; llama.cpp 82), 4K prompt 3,453 to 6,220 tok/s (1.80x), with `--mtp 2` 167.7 to 183.7. UD-Q6_K_XL: decode 80.4 to 106.9. RTX 3060 12 GB (CPU-bound in the hybrid mode): decode +2%, prompt +3%. **Text from the old chunk size differs a little** on long prompts (mean KL 0.004 against chunk 512, the same size as the llama.cpp CPU-GPU floor); prompts shorter than the chunk are unchanged.\n- **Checked on:** R9700 32 GB (UD-Q4_K_XL, UD-Q6_K_XL, Q8_0), RTX 3060 12 GB, Tesla P100 16 GB and RTX A4000 16 GB (UD-Q4_K_XL and UD-Q6_K_XL), with `--batch` 2 / 4 / 8, `--batch-mtp`, sampled requests and pictures: every slot equals its run alone. Not run: Windows hardware (the Windows zips contain the engine and start; Qwen3.6 on Windows AMD got a fix, see below, but is untested), Intel Arc (SYCL still refuses the family), the RTX 5070.\n- A start whose buffers do not fit now says so with the numbers instead of a bare allocation failure.\n\n## Multi-user servers: opt-in switches (#2364, thanks havok2-htwo)\n\nEverything here is **opt-in; defaults are unchanged**. For a server with several cards and many users:\n\n- `--batch` above 8 on a layer split (16 slots on 4 cards = 4 groups of 4).\n- `STRATA_SLOT_COPY_DIRECT=1` and `STRATA_SLOT_COPY_BATCHSYNC=1` (admission copy device to device), `STRATA_CKPT_POOL=1`, `STRATA_CKPT_THREADS=1` (checkpoints), `STRATA_ADMIT_MERGE_FIRST=1`, `STRATA_PIPE_BYIELD_NODRAIN=1`, `STRATA_BATCH_SELF_COMMIT=1`, `STRATA_QSA_SLOTS=1`, `STRATA_HANDOFF_PIPE=P`, the server's `STRATA_ADMIT_SHORT_FIRST=<tokens>`, and `STRATA_TRACE` for admission phases.\n- CUDA only, a build option: `-DSTRATA_MMQ_TAB=ON` with `STRATA_MMQ_DIRECT=1` and `STRATA_MMQ_GROUP_SORT=1` (pointer-table MMQ, resident experts read in place). It is off in the release builds and costs 36-38 MiB per GPU.\n- Measured on 4x R9700 (HIP, IQ3_S with every expert in VRAM, layer split, three interleaved rounds): 16 users 207 to 324 tok/s (1.56x, 3 of 3 rounds), time to first token p50 20.6 s to 2.0 s; 8 users 1.20x; 16 users with 1.2K-token prompts 1.41x; one user unchanged. The slot count alone gives about 40% of the 16-user gain, the copy and checkpoint switches the rest. Every slot of a 16 and a 32 slot batch decodes the tokens it decodes alone. On small cards (2 cards, 16 GB) the gain is smaller and the memory cost real; see docs/BATCHING.md.\n- **`STRATA_SLOT_CKPT_MOVE=1` is experimental: do not use it.** With it, `tools/batch_groups_cache_test.py` fails (the slot reuse pattern changes); all other switches pass it.\n\n## Faster, from your pull requests\n\nWe went through every open pull request with a speed claim, built each on the cards we have and ran the answer check against 0.1.44.1 before changing a default. What is on by default now gives the same answers as before (10 prompts and 4K / 20K exact prompt checks, identical on RTX 3060, Tesla P100, R9700 and Arc A750); each has an environment switch to turn it off. Everything that changes a number or is not faster everywhere is **opt-in**.\n\n- **Long prompts on AMD (#1749 vlupilin, #1943 2jztricks).** The top-k kernel for very long contexts and an exact scorer for long prefill: on an R9700 a 131K-token prompt reads 8.7% faster, 230K 16%, 500K 79%; answers identical.\n- **Intel Arc (#2340 leadgtr7, #2207 aslater3).** Q6_K decode no longer limited by ALU work and wide kernels in large-register mode: on an Arc Pro B70 decode is 3.5% (short prompt) to 4.2% (4K prompt) faster, same answers; the A750 kernel timings improve 1.7x at 4 columns.\n- **A resident-RAM copy keeps the prompt path's lend region (#1896 elightcap).** With room in the RAM budget, decode went 7% and prompt reading 2.5% faster on an RTX 3060 (5 of 5 pairs).\n- **NVIDIA prefill and CPU (#1368 sergqwer, #1107 brenoperucchi, #2016 libratechw, #1949 maxious).** Small, each 0.6-1.4% on an RTX 3060 / RTX A4000, and the AVX2 dot kernels keep their accumulators in registers (2-9% on the router micro-benchmark).\n- **Server (#1542, #1557, #1852, #1891, #1163, #1164).** Tool-call and logit-bias parsing, prompt tokenisation from the last shared prefix and conversation-cache copies cost fewer milliseconds per request; no engine change.\n- **Opt-in, measured:** `STRATA_HIP_WMMA=1` on an R9700 (+44% prompt, +3.7% decode), the five decode switches of the CUDA series (+7% at 30K context on RTX 3060 and A4000), `STRATA_EXCHANGE_ROTATE=1` (+5% decode on a 3060 with the resident RAM copy; do not use it with the resident copy under `--expert-cache 1500` yet: the engine did not start on one 3060 box), `STRATA_PCIE_BALANCE=1` (+5.6% on two A4000, slightly slower on single 3060 / P100), plus the Turing (sm_75) kernel series behind `STRATA_SM75_PERF=1`. We have no sm_75 card: those paths build, run bit-for-bit on a 3060 in emulation, and carry the author's speed numbers only. All switches are in `docs/DETAILS.md` and the backend pages.\n- **Not for you yet:** `STRATA_SIDE_MIXER=2` and `STRATA_SH_STREAM=1` are slower on gfx1201 (0.41x and 0.44x decode); `STRATA_QSA_WARP=1` crashes a Tesla P100. Leave them off.\n- **Moved to 0.1.46:** the Volta/Pascal series. Together it made defau",
+      "assets": [
+        {
+          "name": "SHA256.txt",
+          "size": 278,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.45/SHA256.txt"
+        },
+        {
+          "name": "strata-windows-x64-cuda12.zip",
+          "size": 242782835,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.45/strata-windows-x64-cuda12.zip"
+        },
+        {
+          "name": "strata-windows-x64-hip.zip",
+          "size": 643211025,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.45/strata-windows-x64-hip.zip"
+        },
+        {
+          "name": "strata-windows-x64.zip",
+          "size": 165243142,
+          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.45/strata-windows-x64.zip"
+        }
+      ]
+    },
     {
       "tag": "v0.1.44.1",
       "name": "Strata 0.1.44.1",
@@ -558,51 +953,6 @@
           "name": "strata-windows-x64.zip",
           "size": 96897026,
           "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.24/strata-windows-x64.zip"
-        }
-      ]
-    },
-    {
-      "tag": "v0.1.23",
-      "name": "Strata v0.1.23",
-      "publishedAt": "2026-09-29T11:50:09Z",
-      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.23",
-      "prerelease": false,
-      "body": "**Faster decoding, llama.cpp-compatible server endpoints, and fixes for images, 8 GB cards and multi-GPU.**\n\n**Faster answers:** the verify window's per-token kernels (router, norms, RoPE, the shared-expert cast, the combine) run once for the whole window instead of once per token - bit-identical output (#109, thanks @q8atnight). On an RTX 5080 + RTX 3090 decoding went 81 → 89 tokens/s on a story and 105 → 118 on code.\n\n**Server (for other apps):**\n- `GET /models`, `/v1/models`, `/props` and `/slots` in llama.cpp's format, so clients like Pi find the model, its context and its image support (#122, thanks @hendrikp; fixes #117).\n- Replies carry `usage.prompt_tokens_details.cached_tokens` (how much of the prompt the conversation cache reused) and llama.cpp's `timings` (prompt and answer speed, draft counts), and `GET /v1/status` gives a small summary (#107, thanks @architectds; the draft counts from #83, thanks @mikicvi).\n- Image parts in tool and assistant messages are kept (#113, thanks @Yunado).\n- The web app works behind a reverse proxy under a path prefix (#82, thanks @mikicvi); the Monitor's live speed is a rate over the last seconds (#104, thanks @xyzzing).\n\n**Fixes:**\n- **Image questions honor the sampling settings** (temperature, top_p, top_k, penalties, seed). They always decoded greedily before, which could make the model loop on pictures (#75, thanks @jleaders).\n- **8 GB cards** with no room left for the expert cache start again: the prompt is read in smaller chunks, and if even those don't fit, it says what frees VRAM (#85).\n- **Two GPUs with an 8K context** (fp16 KV): the second card's prompt attention failed to launch; fixed.\n- Setup: a size that needs more RAM than the PC has is now a warning and a question instead of a stop (#125, thanks @FatheredPuma81).\n- Windows: when the model loads very slowly because Strata was started by Task Scheduler, a hint says how to fix the task (#126, thanks @Zauberio; see \"Running it at startup\" in docs/DETAILS.md).\n- Loading: the experts and the draft layer are read in large blocks on Windows (#89, thanks @dannychirkov); a GGUF with a duplicate tensor name is refused with its name (#91), and a missing or short model shard is named (#92, thanks @Avicennasis); RTX 30-class cards are accepted by the device check (#81, thanks @mikicvi); a CPU-only configure with tests works again (#93).\n- `--dump-routing` also records the live server's routing (#118, thanks @maedoc).\n\n**Checked before the release:** byte-identical to 0.1.22 on all five published quants (Windows), on Linux, and on one and two GPUs (RTX 5080 + RTX 3090), plus a live server test of every endpoint above and image requests.\n\n**Updating:** get the latest files (`git pull`, or download and unzip anywhere), then run `START-HERE.bat` (Linux: `./setup.sh`). Setup installs engine 0.1.23.\n\nThe ready-made Strata engine for Windows (RTX 30 / 40 / 50: sm_86, sm_89, sm_120 + PTX), CUDA 13.0.\n\nYou don't need to download this yourself: `START-HERE.bat` fetches it (and NVIDIA's cuBLAS from pip), so no compiler or CUDA Toolkit is needed, only an NVIDIA driver 580 or newer.\n\nContents: `strata.exe` (the engine), `strata-vision.exe` (the optional image encoder), `BUILD.json`.",
-      "assets": [
-        {
-          "name": "strata-windows-x64.zip",
-          "size": 96741647,
-          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.23/strata-windows-x64.zip"
-        }
-      ]
-    },
-    {
-      "tag": "v0.1.22",
-      "name": "Strata v0.1.22",
-      "publishedAt": "2026-09-29T09:41:22Z",
-      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.22",
-      "prerelease": false,
-      "body": "**Faster prompts, and several GPUs without typing any flags.**\n\n**Prompts are read faster** (RTX 5070, Q2_0): a 32K-token prompt 1,213 → 1,646 tokens/s, a 128K prompt with KV streaming 1,144 → 1,596 tokens/s (time to first token 116 s → 83 s). Where it came from:\n- the sparse attention over a prompt runs on tensor cores (4x faster at FP32-level accuracy; needle tests pass at every depth);\n- the n-gram table rows are read from disk by several threads, on Windows and Linux (on Linux the reads were one at a time: a 16K prompt read 3x faster in our test);\n- the selection, indexer, short-conv and GDN kernels of the prompt path, the embedding gather, the draft layer's prompt pass and the expert streaming of the IQ quants no longer wait on the host (these are bit-identical: with `STRATA_PROMPT_ATTN_OLD=1` every output is byte-identical to 0.1.21);\n- the expert-cache slots the prompt path borrows are given back in one batch.\nOutput speed is unchanged.\n\n**Two or three GPUs** (#112, #77, #95, #36; thanks @megakilo, @sal7g86, @pdsmike):\n- `START-HERE.bat` / `./setup.sh` lists your NVIDIA cards, says which ones Strata can use (and why not, e.g. older than the RTX 30 series), and asks which to use, with the two best together recommended.\n- A model you installed on one card asks once, at its next start, whether to use both from now on.\n- `--gpus 0,1`, `--gpus all` or `--gpu 0,1` work at any start and are remembered; `--gpu N` runs one card for that start.\n- Fixed: 0.1.21's `--setup --gpus 0,1` stopped at the end with \"there is no GPU [0, 1]\"; `--gpus` on an installed model started on one card; an update unzipped next to a split install stopped at step 1.\n- Images, the experimental speed projection (control vectors), KV streaming and mid-prompt checkpoints now work across cards; `--calibrate` measures the split; the Monitor shows every card (total VRAM, power and load, each card's own reading underneath).\n- The engine is compiled for every chosen card's generation when you build it yourself.\n- Tested on an RTX 5080 + RTX 3090 (+ a 2080 Ti, which is refused with its reason). Linux uses the same setup code, but we could not test several GPUs on Linux; reports welcome.\n\n**Also:**\n- Setup compiles with Visual Studio 2022 even when Visual Studio 2026 is installed too (CUDA 13 refuses 2026).\n- The streaming detokenizer no longer slows down as a reply grows (it cost 4 ms per token after 16K tokens).\n\n**Updating:** get the latest files (`git pull`, or download and unzip anywhere), then run `START-HERE.bat` (Linux: `./setup.sh`). Setup installs engine 0.1.22.\n\nThe ready-made Strata engine for Windows (RTX 30 / 40 / 50: sm_86, sm_89, sm_120 + PTX), CUDA 13.0.\n\nYou don't need to download this yourself: `START-HERE.bat` fetches it (and NVIDIA's cuBLAS from pip), so no compiler or CUDA Toolkit is needed, only an NVIDIA driver 580 or newer.\n\nContents: `strata.exe` (the engine), `strata-vision.exe` (the optional image encoder), `BUILD.json`.",
-      "assets": [
-        {
-          "name": "strata-windows-x64.zip",
-          "size": 96634917,
-          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.22/strata-windows-x64.zip"
-        }
-      ]
-    },
-    {
-      "tag": "v0.1.21",
-      "name": "Strata v0.1.21",
-      "publishedAt": "2026-09-29T04:33:29Z",
-      "url": "https://github.com/Niko1221/Strata/releases/tag/v0.1.21",
-      "prerelease": false,
-      "body": "**One model across two or three NVIDIA cards (experimental).**\n\n- **Layer split across GPUs:**\n  - Setup: `START-HERE.bat --setup --gpus 0,2` (Linux: `./setup.sh --setup --gpus 0,2`), or `\"gpu\": [0, 2]` in a run config.\n  - Each card runs a range of the model's layers and keeps the experts of those layers in its own VRAM; the last card also runs the output head and the draft layer.\n  - Prompts flow through the cards in a pipeline: the next card reads chunk c while the first reads chunk c+1.\n  - Conversation checkpoints, adaptive expert swaps and the PCIe share work per card.\n  - No NVLink or peer-to-peer access needed: cards in x4 slots work.\n- **Measured** on an RTX 5080 + RTX 3090 (Ryzen 9 9950X3D) with the Coder, 32K context:\n  - prompts 18-20% faster than the 5080 alone: 2,357 vs 1,970 tokens/s at 28K tokens;\n  - decoding on par (84 / 110 tokens/s, story / code), because both caches then hold ~99% of the routed experts and the per-layer GPU time decides.\n- **Placement:**\n  - `--layer-split auto` (the default with several cards) places the split from each card's free VRAM and speed. It picked a split within 0-12% of the best one measured.\n  - List the fastest card first, and leave out a much slower one: an RTX 2080 Ti as a third card made the pair slower.\n  - Details, limits and all measurements: [docs/MULTI_GPU.md](https://github.com/Niko1221/Strata/blob/main/docs/MULTI_GPU.md) and `bench/results/2026-09-29-layer-split/`.\n- **Also included:**\n  - The experimental helper-GPU expert caches from #16 by @Daerdaal (`--expert-cache-remote`, [docs/SECOND_GPU.md](https://github.com/Niko1221/Strata/blob/main/docs/SECOND_GPU.md)): the first multi-GPU groundwork.\n  - On a PCIe link below 4 GB/s (x1 risers), no missing expert is read over PCIe any more; the CPU computes them all (it is faster there).\n  - `-DSTRATA_EXPERIMENTAL_SM75=ON` builds the engine for an RTX 20-series card (Turing), meant as an extra layer-split card. Not supported otherwise.\n- **One GPU is unchanged:**\n  - Tested against 0.1.20 on Windows with every model size (Coder, Q2_0, IQ3_XXS, IQ3_S, Swift IQ2_XS) and on Linux (Q2_0): the same answers, byte for byte.\n  - Same speed.\n\nThanks to the two community members who lent their PCs for the multi-GPU testing.\n\n**Updating:** get the latest files (`git pull`, or download and unzip anywhere), then run `START-HERE.bat` with the model window closed: it updates the engine to 0.1.21 by itself. On Linux, run `./setup.sh`: it compiles the new engine.\n\nThe ready-made Strata engine for Windows (RTX 30 / 40 / 50: sm_86, sm_89, sm_120 + PTX), CUDA 13.0.\n\nYou don't need to download this yourself: `START-HERE.bat` fetches it (and NVIDIA's cuBLAS from pip), so no compiler or CUDA Toolkit is needed, only an NVIDIA driver 580 or newer.\n\nContents: `strata.exe` (the engine), `strata-vision.exe` (the optional image encoder), `BUILD.json`.",
-      "assets": [
-        {
-          "name": "strata-windows-x64.zip",
-          "size": 96440144,
-          "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.1.21/strata-windows-x64.zip"
         }
       ]
     }

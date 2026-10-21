@@ -28,7 +28,7 @@ X gateway（X_GATEWAY_KEY，免费配额）
 网关每天约 50 个新任务。默认 budget：
 
 - 用户：`coldniko`、`Niko1221`、`ZedLLM`（`INTAKE_X_USER_LIMIT`）
-- 当前版本：每轮都搜 `Strata v0.1.40.2` 这种标签，不跟轮换走
+- 当前版本：每轮都搜 `Strata v0.1.44.1` 这种标签，不跟轮换走。标签从 `releases.json` 顶部读取，不要写进 `sources.json`
 - 搜索：一般 / 对比 / 升级 / 显卡，每轮再加其中一条，下一轮换下一条
 - 冷却：`X_GATEWAY_COOLDOWN_MINUTES=240`
 
@@ -48,4 +48,4 @@ pnpm sync:intelligence
 pnpm content:grow
 ```
 
-搜索词在 `scripts/intake/sources.json`。升级词里要保留当前版本号，例如 `Strata v0.1.40.2`。
+搜索词在 `scripts/intake/sources.json`。当前版本号由 `scripts/sync-intelligence.mjs` 的 `currentReleaseQuery()` 读取 `releases.json`，升级词里不要写死旧 tag。
