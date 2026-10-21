@@ -53,11 +53,17 @@ fi
 echo "publish exit=$?"
 
 if [ "${1:-}" != "--no-build" ]; then
-  pm2 stop strata-www >/dev/null 2>&1
-  rm -rf "$ROOT/apps/www/.next"
+  # Build first, restart only on success: stopping pm2 up front turned a failed build into an
+  # outage, because nothing was left running to serve the previous build.
   NODE_OPTIONS=--max-old-space-size=6144 pnpm --filter @stratat/www build
-  echo "build exit=$?"
-  pm2 restart strata-www >/dev/null 2>&1
+  build_status=$?
+  echo "build exit=$build_status"
+  if [ "$build_status" -eq 0 ]; then
+    pm2 restart strata-www >/dev/null 2>&1
+    echo "restart exit=$?"
+  else
+    echo "build failed — site left on the previous build"
+  fi
 fi
 
 echo "=== $(date -Is) daily-guides done ==="

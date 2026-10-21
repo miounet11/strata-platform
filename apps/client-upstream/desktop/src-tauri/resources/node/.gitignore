@@ -4,3 +4,4 @@
 # `packaging/README.md` and `apps/desktop/scripts/fetch-node.sh` record exactly how to obtain it:
 # the official nodejs.org build for the target, verified against its published SHA-256.
 /node
+/node.exe
