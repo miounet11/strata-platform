@@ -146,10 +146,37 @@ export interface Prefs {
   shareTelemetry: boolean;
 }
 
-// Resolved at load time from the OS/browser locale, not a fixed English default: a first-run
+/**
+ * Whether this machine is being used in China. Language preference order alone is not enough:
+ * Chinese Windows installs commonly list `en-US` first and `zh-CN` second, so `detectLanguage`
+ * would still hand those users an English interface. Region comes from the OS time zone and from
+ * the region subtag of any listed locale.
+ */
+function chinaRegion(): boolean {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone ?? '';
+    if (/^(Asia\/(Shanghai|Chongqing|Harbin|Urumqi|Kashgar|Beijing))$/i.test(tz)) return true;
+  } catch {
+    /* Intl is always present in the shipped WebViews; fall through to the locale tags. */
+  }
+  const tags: string[] = typeof navigator === 'undefined'
+    ? []
+    : navigator.languages?.length
+      ? [...navigator.languages]
+      : [navigator.language].filter(Boolean);
+  return tags.some((tag) => /^zh\b/i.test(tag) && /-CN\b|-Hans\b/i.test(tag));
+}
+
+/** First-run UI language: Chinese for users in China, otherwise the browser's own preference. */
+function firstRunLanguage(): Language {
+  if (typeof navigator === 'undefined') return 'en';
+  return chinaRegion() ? 'zh' : detectLanguage(navigator);
+}
+
+// Resolved at load time from locale and region, not a fixed English default: a first-run
 // install in China must open in Chinese.
 const PREFS_DEFAULTS: Prefs = {
-  language: detectLanguage(typeof navigator === 'undefined' ? undefined : navigator),
+  language: firstRunLanguage(),
   fontFamily: '',
   theme: 'system',
   contrast: 'standard',
