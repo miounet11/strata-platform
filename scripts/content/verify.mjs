@@ -23,10 +23,17 @@ const MIN_BODY = { zh: 550, ja: 550, en: 900, de: 900, fr: 900, es: 900, pt: 900
 const MAX_CROSS_LOCALE_SIMILARITY = 0.4;
 const MAX_PAIRS_SIMILARITY = 0.3;
 
+/**
+ * Character n-grams, not word n-grams. Chinese and Japanese do not put spaces between words, so
+ * splitting on whitespace yields a handful of "words" per article and every similarity score
+ * collapses to 0 — the cross-locale check would silently pass for zh/ja. Character shingles work
+ * for every script and still survive one language being a translation of another.
+ */
 function shingles(text, n = 5) {
-  const words = String(text).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
+  const chars = [...String(text).toLowerCase().replace(/[^\p{L}\p{N}]/gu, "")];
+  if (chars.length < n) return new Set(chars.join("") ? [chars.join("")] : []);
   const set = new Set();
-  for (let i = 0; i + n <= words.length; i++) set.add(words.slice(i, i + n).join(" "));
+  for (let i = 0; i + n <= chars.length; i++) set.add(chars.slice(i, i + n).join(""));
   return set;
 }
 

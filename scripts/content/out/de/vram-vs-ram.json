@@ -1,0 +1,33 @@
+{
+  "id": "de-concept-vram-vs-ram",
+  "locale": "de",
+  "kind": "concept",
+  "slug": "vram-vs-ram",
+  "path": "/de/guides/vram-vs-ram",
+  "workingTitle": "VRAM versus system RAM",
+  "order": 579,
+  "publishAt": "2026-10-25",
+  "status": "scheduled",
+  "article": {
+    "title": "VRAM vs. RAM: Speicher für lokale KI-Modelle richtig nutzen",
+    "description": "Warum VRAM für KI entscheidend ist und wie RAM als Notlösung dient. Wir erklären die Unterschiede, die Auswirkungen auf die Leistung und wie Sie Ihren Speicher optimal konfigurieren.",
+    "body": "## Die kurze Antwort\n\nVRAM (Video RAM) ist für die lokale KI-Modellausführung unersetzlich, da er die extrem hohe Datendurchsatzrate bietet, die die GPU für Matrixoperationen benötigt. RAM (Systemarbeitsspeicher) kann zwar als Ausweichspeicher dienen, wenn VRAM fehlt, führt jedoch zu drastischen Geschwindigkeitsverlusten, da er um ein Vielfaches langsamer ist. Die Wahl des richtigen Speichertyps bestimmt direkt, ob ein Modell in Sekunden oder in Minuten reagiert.\n\n## Warum die Geschwindigkeit des Speichers entscheidend ist\n\nBei der Verarbeitung von Large Language Models (LLMs) werden gewaltige Mengen an Daten gleichzeitig verarbeitet. Die Grafikkarte (GPU) ist darauf spezialisiert, diese parallelen Berechnungen durchzuführen. Der Engpass ist dabei oft nicht die Rechenleistung der GPU selbst, sondern die Geschwindigkeit, mit der sie Daten aus dem Speicher abrufen kann. VRAM ist speziell für diese Aufgabe optimiert und bietet eine Bandbreite, die mit dem klassischen RAM eines Computers nicht vergleichbar ist. Wenn Sie ein Modell laden, das größer ist als Ihr verfügbarer VRAM, muss das System auf den langsameren RAM ausweichen. Dieser Vorgang wird als \"Swapping\" oder \"Offloading\" bezeichnet. Während das Modell dadurch überhaupt erst läuft, sinkt die Generierungsgeschwindigkeit (Tokens pro Sekunde) oft auf ein kaum nutzbares Niveau. Für ein flüssiges Gesprächserlebnis ist daher VRAM die primäre Währung.\n\n## Wie Sie Ihren Speicher prüfen und vergleichen\n\nUm zu verstehen, was Ihr System leisten kann, müssen Sie die Kapazitäten und die Art des Speichers genau betrachten. Integrierte Grafikkarten teilen sich oft den RAM mit der CPU, was die Leistung stark einschränkt. Diskrete Grafikkarten bieten dagegen eigenen, schnellen VRAM. Sie können diese Werte in den Systemeinstellungen oder über Aufgabenmanager überprüfen. Achten Sie dabei nicht nur auf die Gesamtgröße, sondern auch auf die verfügbare Kapazität nach Laden des Betriebssystems.\n\n| Speichertyp | Typische Anwendung | Geschwindigkeitsmerkmal |\n| :--- | :--- | :--- |\n| VRAM (GDDR6X/HBM) | Dedizierte GPUs für KI | Extrem hohe Bandbreite, optimiert für parallele Datenströme |\n| System-RAM (DDR4/DDR5) | CPU-Arbeitsspeicher | Geringere Latenz für CPU, aber zu langsam für große KI-Lasten als Ersatz |\n| Shared Memory | Integrierte Grafikkarten | Teilen sich Ressourcen mit dem CPU-RAM, stark begrenzte Leistung |\n\n## Kernbegriff-Definition\n\nVRAM ist der hochgeschwindigkeits optimierte Arbeitsspeicher einer Grafikkarte, der für die effiziente Verarbeitung der massiven Datenmengen bei der lokalen KI-Modellinferenz unerlässlich ist, während RAM als langsamerer, aber funktionierender Fallback dient.\n\n## Fazit für die Praxis\n\nInvestieren Sie in eine GPU mit ausreichend VRAM, wenn Sie lokale KI ernsthaft nutzen möchten. Ein Modell, das in den VRAM passt, läuft nicht nur schneller, sondern ist auch stabiler. Verlassen Sie sich nicht auf RAM als primären Speicher für Modelle, die größer als 8 GB sind, es sei denn, Sie sind mit extrem langsamen Antwortzeiten bereit zu leben.",
+    "faq": [
+      {
+        "q": "Kann ich KI-Modelle nur mit RAM betreiben, wenn ich keine GPU habe?",
+        "a": "Ja, Sie können Modelle über CPU und RAM ausführen, aber die Geschwindigkeit wird erheblich langsamer sein. Dies ist für Experimente okay, aber nicht für produktive Arbeit geeignet."
+      },
+      {
+        "q": "Was passiert, wenn das Modell größer ist als mein VRAM?",
+        "a": "Das System versucht, den überschüssigen Teil des Modells in den langsameren RAM auszulagern. Dies führt zu einer starken Verlangsamung der Textgenerierung, da der Datenabruf zum Flaschenhals wird."
+      },
+      {
+        "q": "Ist DDR5 RAM schneller als alter VRAM?",
+        "a": "Nein, selbst moderner DDR5 RAM ist in der Regel langsamer als der spezialisierte VRAM (wie GDDR6X) in modernen Grafikkarten, wenn es um den Durchsatz für parallele Berechnungen geht."
+      }
+    ],
+    "imagePrompt": "abstract editorial illustration, dark navy background, teal accent, geometric shapes representing data flow, absolutely no text or letters, 16:9, minimalist design"
+  },
+  "generatedAt": "2026-10-21T08:03:44.779Z",
+  "model": "qwen3.6:35b-a3b"
+}

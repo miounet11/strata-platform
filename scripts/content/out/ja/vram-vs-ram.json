@@ -1,0 +1,33 @@
+{
+  "id": "ja-concept-vram-vs-ram",
+  "locale": "ja",
+  "kind": "concept",
+  "slug": "vram-vs-ram",
+  "path": "/ja/guides/vram-vs-ram",
+  "workingTitle": "VRAM versus system RAM",
+  "order": 432,
+  "publishAt": "2026-10-24",
+  "status": "scheduled",
+  "article": {
+    "title": "VRAMとRAMの違いを理解してローカルLLMの動作環境を最適化する",
+    "description": "VRAMとRAMの違い、ローカルLLMにおけるメモリ割り当ての仕組み、およびStratエンジンでの最適化方法を解説します。コストとパフォーマンスのバランスを考える。",
+    "body": "ローカルLLMの動作においてVRAM（ビデオメモリ）はGPUの処理速度を決定し、RAM（システムメモリ）はモデルの読み込み容量を担います。VRAMが不足すると処理速度が著しく低下するため、モデルの量子化（Quantization）設定と自身のハードウェア仕様のマッチが重要です。\n\n## メモリの役割とStratエンジン\n\nStratatアプリ（Stratエンジン）では、AIモデルの推論（Inference）にGPUのVRAMを最も優先して使用します。VRAMはGPUがデータを高速に読み書きするための専用メモリであり、ここに乗らないデータは処理速度のボトルネックになります。一方でRAMはCPUがアクセスする汎用メモリであり、VRAMが溢れた場合にモデルの一部や一時データをここに退避させる役割を果たします。RAMへの退避はVRAMの速度と比較して圧倒的に遅いため、可能な限りVRAMにモデルを収めることが高速化の鍵です。\n\n## ハードウェアの確認方法\n\n自身のPCがVRAMとRAMをどのように使用しているかを確認するには、Windowsの場合「タスクマネージャー」を開き「パフォーマンス」タブを選択します。「GPU」セクションでは「Dedicated GPU memory（専有GPUメモリ）」がVRAMの総量、「Shared GPU memory（共有GPUメモリ）」がRAMから借用可能な領域を示します。また、モデルをロードする際、VRAM使用量が80%を超えるとパフォーマンスが低下する傾向があるため、使用可能なVRAMの量に合わせてモデルのビット数（7bit, 4bitなど）を選択する必要があります。\n\n## メモリ構成とコストの現実\n\n電気代やハードウェアの特性を考慮すると、VRAMの容量拡張はRAMの拡張よりもコストと電力効率の面で異なる影響を持ちます。以下の表は、一般的な構成における特徴と関連する運用コストの基準を示しています。ここで示す31円/kWhは日本の家庭用電気の平均的な単価であり、実際の消費電力はこの値を用いて計算されます。\n\n| 構成要素 | 役割 | 速度特性 | 運用コスト基準 |\n| :--- | :--- | :--- | :--- |\n| VRAM (GDDR6等) | GPU内でのモデル推論 | 極めて高速（数百GB/s） | 電力消費大、高コスト |\n| RAM (DDR4/5) | CPUとのデータやり取り、退避 | 中程度（数十GB/s） | 電力消費中程度 |\n| ストレージ (SSD) | モデルファイルの保存 | 低速（数百MB/s） | 電力消費小 |\n\nVRAMとRAMの違いを正しく理解し、自身のPCのリソースに合ったモデルサイズを選ぶことで、Stratアプリを効率的に運用できます。VRAMとは、グラフィックスプロセッサー（GPU）が画像やデータを一時的に高速に保存するために使用する専用メモリのことであり、ローカルLLMの推論速度を決定する最も重要なハードウェアリソースである。",
+    "faq": [
+      {
+        "q": "VRAMとRAMの違いを簡単に教えてください。",
+        "a": "VRAMはGPU専用の高速メモリで推論速度に関わり、RAMはCPUが使用する汎用メモリです。VRAMにモデルが入らないと処理が遅くなります。"
+      },
+      {
+        "q": "ローカルLLMでVRAMが足りない場合どうなりますか？",
+        "a": "VRAMが不足すると、モデルの一部がRAMに退避されます。これにより処理速度が大幅に低下しますが、動作は続行できます。"
+      },
+      {
+        "q": "自分のPCのVRAM容量はどうやって確認できますか？",
+        "a": "Windowsの「タスクマネージャー」＞「パフォーマンス」＞「GPU」で「専有GPUメモリ」の値を確認できます。"
+      }
+    ],
+    "imagePrompt": "abstract editorial illustration, dark navy background, teal accent, geometric shapes representing data flow, absolutely no text or letters, 16:9"
+  },
+  "generatedAt": "2026-10-21T08:04:04.234Z",
+  "model": "qwen3.6:35b-a3b"
+}

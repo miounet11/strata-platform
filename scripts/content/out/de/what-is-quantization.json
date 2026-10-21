@@ -1,0 +1,33 @@
+{
+  "id": "de-concept-what-is-quantization",
+  "locale": "de",
+  "kind": "concept",
+  "slug": "what-is-quantization",
+  "path": "/de/guides/what-is-quantization",
+  "workingTitle": "What quantization is",
+  "order": 578,
+  "publishAt": "2026-10-25",
+  "status": "scheduled",
+  "article": {
+    "title": "Was ist Quantisierung bei lokalen LLMs?",
+    "description": "Erfahren Sie, wie Quantisierung lokale KI-Modelle optimiert, um Speicher zu sparen und die Leistung auf Standard-Hardware zu erhalten.",
+    "body": "Quantisierung ist die gezielte Reduzierung der Rechengenauigkeit, um KI-Modelle kompakter und effizienter zu machen, ohne die Sprachfähigkeiten signifikant zu beeinträchtigen. Durch diese Technik können Nutzer große Sprachmodelle (LLMs) auf eigenem Desktop-Hardware ausführen, was den Datenschutz stärkt und die Abhängigkeit von teuren Cloud-Diensten eliminiert.\n\n## Warum ist Quantisierung notwendig?\n\nDie Entwicklung großer Sprachmodelle führt zu einem massiven Anstieg der Rechenanforderungen. Ein unquantisiertes Modell im 16-Bit-Format (FP16) benötigt enorm viel Arbeitsspeicher, was selbst für leistungsstarke Workstations oft zur Grenze wird. Quantisierung komprimiert diese Daten, indem sie die Präzision der Zahlenwerte senkt. Dies ermöglicht es der Stratat-Engine, Modelle nahtlos auf lokaler Hardware zu verarbeiten, die keine professionellen Server-GPUs besitzt.\n\n## Wie funktioniert die Optimierung?\n\nStatt jede Gewichtszahl mit hoher Genauigkeit zu speichern, werden sie auf niedrigere Bitzahlen wie 8, 4 oder sogar 2 Bit reduziert. Dies führt zu einer drastischen Verringerung der Speichergröße. Bei der Ausführung rechnet der Prozessor mit diesen kleineren Werten, was den Energieverbrauch senkt und die Latenzzeit verkürzt. Nutzer können auf diesem Weg entscheiden, wie viel Genauigkeit sie für ihre spezifischen Aufgaben opfern möchten.\n\n| Quantisierungsstufe | Geschätzte Speichereinsparung | Typische Anwendungsrate |\n| :--- | :--- | :--- |\n| FP16 (Standard) | Basisgröße (100%) | Hohe Präzision, hoher RAM-Bedarf |\n| INT8 | ca. 50% | Gute Balance für den Alltag |\n| INT4 | ca. 75% | Sehr effizient für Standard-Hardware |\n\nQuantisierung ist der Prozess der Reduzierung der numerischen Genauigkeit, um Modelle kleiner und schneller zu machen.\n\nDie Wahl der richtigen Stufe hängt von der Hardware des Nutzers ab. Ein System mit 16 GB RAM mag INT8 gut handhaben, während ein System mit nur 8 GB RAM auf INT4 angewiesen ist, um das Modell überhaupt zu laden. Dies macht lokale KI für einen breiten Kreis von Anwendern zugänglich.",
+    "faq": [
+      {
+        "q": "Bekommt das Modell bei Quantisierung schlechte Antworten?",
+        "a": "Moderne Quantisierungsmethoden (wie INT4 oder INT8) bewahren die meisten sprachlichen Fähigkeiten fast vollständig. Bei sehr komplexen logischen Aufgaben kann es minimal zu Genauigkeitsverlusten kommen, die für die meisten alltäglichen Aufgaben jedoch vernachlässigbar sind."
+      },
+      {
+        "q": "Wie viel RAM spare ich durch Quantisierung?",
+        "a": "Je nach Stufe kann der Speicherbedarf um bis zu 75 % sinken. Ein Modell, das im Standardformat 32 GB belegt, kann mit stark quantisiert 8 GB oder weniger benötigen, was den Betrieb auf Consumer-Hardware erst möglich macht."
+      },
+      {
+        "q": "Ist Quantisierung umkehrbar?",
+        "a": "Nein, der Prozess ist verlustbehaftet. Sie können eine quantisierte Version nicht einfach wieder in das ursprüngliche hochpräzise Format zurückverwandeln. Sie müssen daher die originalen Modellgewichte behalten, wenn Sie später höhere Präzision benötigen."
+      }
+    ],
+    "imagePrompt": "an abstract editorial illustration on a dark navy background with teal accents, featuring geometric shapes and subtle gradients, absolutely no text or letters, 16:9 aspect ratio"
+  },
+  "generatedAt": "2026-10-21T08:03:46.363Z",
+  "model": "qwen3.6:35b-a3b"
+}
