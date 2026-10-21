@@ -19,7 +19,7 @@ import { noModelNotice } from './no-model';
 import { taskHandoverMessage, taskHandoverTitle } from './task-handover';
 import type { Task } from './tasks';
 import { postWithFolderFallback } from './folder-pick';
-import { setTranslationLanguage, tr, validLanguage, type Language } from './i18n';
+import { detectLanguage, setTranslationLanguage, tr, validLanguage, type Language } from './i18n';
 /**
  * Stratat app store.
  *
@@ -146,8 +146,10 @@ export interface Prefs {
   shareTelemetry: boolean;
 }
 
+// Resolved at load time from the OS/browser locale, not a fixed English default: a first-run
+// install in China must open in Chinese.
 const PREFS_DEFAULTS: Prefs = {
-  language: 'en',
+  language: detectLanguage(typeof navigator === 'undefined' ? undefined : navigator),
   fontFamily: '',
   theme: 'system',
   contrast: 'standard',
@@ -198,7 +200,7 @@ function loadPrefs(): Prefs {
       return {
         ...PREFS_DEFAULTS,
         ...parsed,
-        language: validLanguage(parsed.language) ? parsed.language : 'en',
+        language: validLanguage(parsed.language) ? parsed.language : PREFS_DEFAULTS.language,
         fontFamily: typeof parsed.fontFamily === 'string' ? parsed.fontFamily.slice(0,128).replace(/[\x00-\x1f]/g,'') : '',
         contentFontSize: Math.min(CONTENT_FS_MAX, Math.max(CONTENT_FS_MIN, Number(parsed.contentFontSize) || 14)),
       };

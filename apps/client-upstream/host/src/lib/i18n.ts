@@ -29,6 +29,21 @@ export const validLanguage=(value:unknown):value is Language=>LANGUAGES.some(ite
 export const currentLanguage=()=>language;
 export const localeTag=()=>language==='zh'?'zh-CN':language;
 export function setTranslationLanguage(value:Language){language=value;}
+
+/**
+ * First-run language. A user in China must land in Chinese without hunting through settings —
+ * the old hardcoded `'en'` default left every non-English user on an English interface.
+ * Matches on the primary subtag only, so zh-CN / zh-Hans / zh-TW all resolve to Chinese, and
+ * falls back to English for anything we do not ship.
+ */
+export function detectLanguage(nav?: {language?:string;languages?:readonly string[]}):Language{
+ const preferred=nav?.languages?.length?nav.languages:[nav?.language].filter(Boolean) as string[];
+ for(const tag of preferred){
+  const primary=String(tag).toLowerCase().split('-')[0];
+  if(validLanguage(primary))return primary;
+ }
+ return 'en';
+}
 const escape=(value:string)=>value.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const patterns=Object.entries(english).filter(([,value])=>/\{\d+\}/.test(value)).map(([id,value])=>{
  const slots:number[]=[];let expression='',at=0;
