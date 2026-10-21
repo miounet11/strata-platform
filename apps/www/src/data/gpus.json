@@ -1,0 +1,1786 @@
+{
+  "generatedAt": "2026-10-21T10:58:13.174Z",
+  "baseModel": "Qwen3.8-Flash-Next",
+  "variants": [
+    {
+      "id": "q2_0",
+      "name": "Q2_0",
+      "description": "Fastest quant; great for 48 GB RAM systems.",
+      "ramGbMin": 48,
+      "vramGbMin": 12,
+      "downloadGb": 70,
+      "outputTps5070": 94,
+      "tags": [
+        "speed",
+        "recommended-48gb"
+      ]
+    },
+    {
+      "id": "iq2_xs",
+      "name": "IQ2_XS",
+      "description": "Recommended default for 64 GB RAM; balance of speed and quality.",
+      "ramGbMin": 64,
+      "vramGbMin": 12,
+      "downloadGb": 72,
+      "outputTps5070": 79,
+      "tags": [
+        "recommended",
+        "64gb"
+      ]
+    },
+    {
+      "id": "iq3_xxs",
+      "name": "IQ3_XXS",
+      "description": "Smarter than IQ2; still fits most 64 GB builds.",
+      "ramGbMin": 64,
+      "vramGbMin": 12,
+      "downloadGb": 74,
+      "outputTps5070": 62,
+      "tags": [
+        "quality"
+      ]
+    },
+    {
+      "id": "iq3_s",
+      "name": "IQ3_S",
+      "description": "Best quality that still runs on 64 GB; slowest of the IQ line.",
+      "ramGbMin": 64,
+      "vramGbMin": 12,
+      "downloadGb": 76,
+      "outputTps5070": 53,
+      "tags": [
+        "quality",
+        "best-64gb"
+      ]
+    },
+    {
+      "id": "coder",
+      "name": "Coder",
+      "description": "Coding-focused variant; fits 32 GB RAM (weaker on CJK general text).",
+      "ramGbMin": 32,
+      "vramGbMin": 12,
+      "downloadGb": 68,
+      "outputTps5070": 55,
+      "tags": [
+        "code",
+        "32gb"
+      ]
+    },
+    {
+      "id": "ud-iq4_xs",
+      "name": "Unsloth UD-IQ4_XS",
+      "description": "~4-bit Unsloth pack; needs ~80 GB RAM or partial SSD offload.",
+      "ramGbMin": 80,
+      "vramGbMin": 12,
+      "downloadGb": 94,
+      "outputTps5070": 45,
+      "tags": [
+        "unsloth",
+        "96gb"
+      ]
+    }
+  ],
+  "counts": {
+    "total": 49,
+    "measured": 9,
+    "estimated": 40,
+    "runnable": 42,
+    "verified": 9,
+    "supported": 33,
+    "notSupported": 7
+  },
+  "gpus": [
+    {
+      "id": "rtx5090",
+      "slug": "rtx-5090",
+      "name": "RTX 5090",
+      "vendor": "nvidia",
+      "arch": "Blackwell",
+      "vramGb": 32,
+      "year": 2025,
+      "bandwidthGbs": 1792,
+      "readingTps": 5803,
+      "writingTps": 168.4,
+      "evidence": "measured",
+      "cardPrice": 7300,
+      "powerWatts": 700,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx5080",
+      "slug": "rtx-5080",
+      "name": "RTX 5080",
+      "vendor": "nvidia",
+      "arch": "Blackwell",
+      "vramGb": 16,
+      "year": 2025,
+      "bandwidthGbs": 960,
+      "readingTps": 3712.5,
+      "writingTps": 80.7,
+      "evidence": "measured",
+      "cardPrice": 1600,
+      "powerWatts": 510,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx5070ti",
+      "slug": "rtx-5070-ti",
+      "name": "RTX 5070 Ti",
+      "vendor": "nvidia",
+      "arch": "Blackwell",
+      "vramGb": 16,
+      "year": 2025,
+      "bandwidthGbs": 896,
+      "readingTps": 3556,
+      "writingTps": 97.2,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx5070",
+      "slug": "rtx-5070",
+      "name": "RTX 5070",
+      "vendor": "nvidia",
+      "arch": "Blackwell",
+      "vramGb": 12,
+      "year": 2025,
+      "bandwidthGbs": 672,
+      "readingTps": 2498.5,
+      "writingTps": 71.1,
+      "evidence": "measured",
+      "cardPrice": 1180,
+      "powerWatts": 450,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx5060ti_16",
+      "slug": "rtx-5060-ti-16gb",
+      "name": "RTX 5060 Ti 16GB",
+      "vendor": "nvidia",
+      "arch": "Blackwell",
+      "vramGb": 16,
+      "year": 2025,
+      "bandwidthGbs": 448,
+      "readingTps": 1778,
+      "writingTps": 48.6,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4090",
+      "slug": "rtx-4090",
+      "name": "RTX 4090",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 24,
+      "year": 2022,
+      "bandwidthGbs": 1008,
+      "readingTps": 4000,
+      "writingTps": 109.3,
+      "evidence": "measured",
+      "cardPrice": 2999,
+      "powerWatts": 550,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4080super",
+      "slug": "rtx-4080-super",
+      "name": "RTX 4080 SUPER",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 16,
+      "year": 2024,
+      "bandwidthGbs": 736,
+      "readingTps": 2921,
+      "writingTps": 79.8,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4080",
+      "slug": "rtx-4080",
+      "name": "RTX 4080",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 16,
+      "year": 2022,
+      "bandwidthGbs": 717,
+      "readingTps": 2845,
+      "writingTps": 77.7,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4070tisuper",
+      "slug": "rtx-4070-ti-super-16gb",
+      "name": "RTX 4070 Ti SUPER 16GB",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 16,
+      "year": 2024,
+      "bandwidthGbs": 672,
+      "readingTps": 2667,
+      "writingTps": 72.9,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4070ti",
+      "slug": "rtx-4070-ti",
+      "name": "RTX 4070 Ti",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 12,
+      "year": 2023,
+      "bandwidthGbs": 504,
+      "readingTps": 2000,
+      "writingTps": 54.7,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4070super",
+      "slug": "rtx-4070-super",
+      "name": "RTX 4070 SUPER",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 12,
+      "year": 2024,
+      "bandwidthGbs": 504,
+      "readingTps": 2000,
+      "writingTps": 54.7,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4070",
+      "slug": "rtx-4070-12-gb",
+      "name": "RTX 4070 12 GB",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 12,
+      "year": 2023,
+      "bandwidthGbs": 504,
+      "readingTps": 1376,
+      "writingTps": 36.9,
+      "evidence": "measured",
+      "cardPrice": null,
+      "powerWatts": 350,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4060ti_16",
+      "slug": "rtx-4060-ti-16gb",
+      "name": "RTX 4060 Ti 16GB",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 16,
+      "year": 2023,
+      "bandwidthGbs": 288,
+      "readingTps": 1143,
+      "writingTps": 31.2,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rtx4060ti_8",
+      "slug": "rtx-4060-ti-8gb",
+      "name": "RTX 4060 Ti 8GB",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 8,
+      "year": 2023,
+      "bandwidthGbs": 288,
+      "readingTps": 1143,
+      "writingTps": 31.2,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": null,
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "not-supported",
+      "reason": "VRAM 8 GB is below the 12 GB floor of the smallest build",
+      "runnable": false,
+      "recommendedBuild": null
+    },
+    {
+      "id": "rtx4060",
+      "slug": "rtx-4060",
+      "name": "RTX 4060",
+      "vendor": "nvidia",
+      "arch": "Ada Lovelace",
+      "vramGb": 8,
+      "year": 2023,
+      "bandwidthGbs": 272,
+      "readingTps": 1079,
+      "writingTps": 29.5,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": null,
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "not-supported",
+      "reason": "VRAM 8 GB is below the 12 GB floor of the smallest build",
+      "runnable": false,
+      "recommendedBuild": null
+    },
+    {
+      "id": "rtx3090ti",
+      "slug": "rtx-3090-ti",
+      "name": "RTX 3090 Ti",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 24,
+      "year": 2022,
+      "bandwidthGbs": 1008,
+      "readingTps": 2255.1,
+      "writingTps": 93.1,
+      "evidence": "measured",
+      "cardPrice": 1574,
+      "powerWatts": 600,
+      "quant": "q2_0",
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia-legacy",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 525.60+ (CUDA 12)"
+      }
+    },
+    {
+      "id": "rtx3090",
+      "slug": "rtx-3090",
+      "name": "RTX 3090",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 24,
+      "year": 2020,
+      "bandwidthGbs": 936,
+      "readingTps": 2094,
+      "writingTps": 86.5,
+      "evidence": "measured",
+      "cardPrice": 1500,
+      "powerWatts": 500,
+      "quant": "q2_0",
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia-legacy",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 525.60+ (CUDA 12)"
+      }
+    },
+    {
+      "id": "rtx3080ti",
+      "slug": "rtx-3080-ti",
+      "name": "RTX 3080 Ti",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 12,
+      "year": 2021,
+      "bandwidthGbs": 912,
+      "readingTps": 3619,
+      "writingTps": 98.9,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia-legacy",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 525.60+ (CUDA 12)"
+      }
+    },
+    {
+      "id": "rtx3080_12",
+      "slug": "rtx-3080-12gb",
+      "name": "RTX 3080 12GB",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 12,
+      "year": 2022,
+      "bandwidthGbs": 760,
+      "readingTps": 3016,
+      "writingTps": 82.4,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia-legacy",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 525.60+ (CUDA 12)"
+      }
+    },
+    {
+      "id": "rtx3080",
+      "slug": "rtx-3080",
+      "name": "RTX 3080",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 10,
+      "year": 2020,
+      "bandwidthGbs": 760,
+      "readingTps": 3016,
+      "writingTps": 82.4,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": null,
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "not-supported",
+      "reason": "VRAM 10 GB is below the 12 GB floor of the smallest build",
+      "runnable": false,
+      "recommendedBuild": null
+    },
+    {
+      "id": "rtx3070ti",
+      "slug": "rtx-3070-ti",
+      "name": "RTX 3070 Ti",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 8,
+      "year": 2021,
+      "bandwidthGbs": 608,
+      "readingTps": 2413,
+      "writingTps": 65.9,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": null,
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "not-supported",
+      "reason": "VRAM 8 GB is below the 12 GB floor of the smallest build",
+      "runnable": false,
+      "recommendedBuild": null
+    },
+    {
+      "id": "rtx3070",
+      "slug": "rtx-3070",
+      "name": "RTX 3070",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 8,
+      "year": 2020,
+      "bandwidthGbs": 448,
+      "readingTps": 1778,
+      "writingTps": 48.6,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": null,
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "not-supported",
+      "reason": "VRAM 8 GB is below the 12 GB floor of the smallest build",
+      "runnable": false,
+      "recommendedBuild": null
+    },
+    {
+      "id": "rtx3060ti",
+      "slug": "rtx-3060-ti",
+      "name": "RTX 3060 Ti",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 8,
+      "year": 2020,
+      "bandwidthGbs": 448,
+      "readingTps": 1778,
+      "writingTps": 48.6,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": null,
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "not-supported",
+      "reason": "VRAM 8 GB is below the 12 GB floor of the smallest build",
+      "runnable": false,
+      "recommendedBuild": null
+    },
+    {
+      "id": "rtx3060_12",
+      "slug": "rtx-3060-12gb",
+      "name": "RTX 3060 12GB",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 12,
+      "year": 2021,
+      "bandwidthGbs": 360,
+      "readingTps": 1429,
+      "writingTps": 39,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia-legacy",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 525.60+ (CUDA 12)"
+      }
+    },
+    {
+      "id": "rtx3060",
+      "slug": "rtx-3060-8gb",
+      "name": "RTX 3060 8GB",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 8,
+      "year": 2022,
+      "bandwidthGbs": 360,
+      "readingTps": 1429,
+      "writingTps": 39,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": null,
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "not-supported",
+      "reason": "VRAM 8 GB is below the 12 GB floor of the smallest build",
+      "runnable": false,
+      "recommendedBuild": null
+    },
+    {
+      "id": "rtxa6000",
+      "slug": "rtx-a6000",
+      "name": "RTX A6000",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 48,
+      "year": 2020,
+      "bandwidthGbs": 960,
+      "readingTps": 3810,
+      "writingTps": 104.1,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia-legacy",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 525.60+ (CUDA 12)"
+      }
+    },
+    {
+      "id": "rtxa5000",
+      "slug": "rtx-a5000",
+      "name": "RTX A5000",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 24,
+      "year": 2021,
+      "bandwidthGbs": 768,
+      "readingTps": 3048,
+      "writingTps": 83.3,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia-legacy",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 525.60+ (CUDA 12)"
+      }
+    },
+    {
+      "id": "rtxa4000",
+      "slug": "rtx-a4000",
+      "name": "RTX A4000",
+      "vendor": "nvidia",
+      "arch": "Ampere",
+      "vramGb": 16,
+      "year": 2021,
+      "bandwidthGbs": 448,
+      "readingTps": 1778,
+      "writingTps": 48.6,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "nvidia-legacy",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 525.60+ (CUDA 12)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia-legacy",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 525.60+ (CUDA 12)"
+      }
+    },
+    {
+      "id": "rtxpro6000",
+      "slug": "rtx-pro-6000-blackwell",
+      "name": "RTX PRO 6000 Blackwell",
+      "vendor": "nvidia",
+      "arch": "Blackwell",
+      "vramGb": 96,
+      "year": 2025,
+      "bandwidthGbs": 1792,
+      "readingTps": 8987.9,
+      "writingTps": 171.1,
+      "evidence": "measured",
+      "cardPrice": 17117,
+      "powerWatts": 720,
+      "quant": "q2_0",
+      "variant": "nvidia",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "CUDA",
+      "driverMin": "NVIDIA 580.65+ (CUDA 13)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "nvidia",
+        "runtime": "CUDA",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "NVIDIA 580.65+ (CUDA 13)"
+      }
+    },
+    {
+      "id": "rx9070xt_16",
+      "slug": "amd-radeon-rx-9070-xt-16gb",
+      "name": "AMD Radeon RX 9070 XT 16GB",
+      "vendor": "amd",
+      "arch": "RDNA 4",
+      "vramGb": 16,
+      "year": 2025,
+      "bandwidthGbs": 645,
+      "readingTps": 2560,
+      "writingTps": 69.9,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx9070_16",
+      "slug": "amd-radeon-rx-9070-16gb",
+      "name": "AMD Radeon RX 9070 16GB",
+      "vendor": "amd",
+      "arch": "RDNA 4",
+      "vramGb": 16,
+      "year": 2025,
+      "bandwidthGbs": 645,
+      "readingTps": 2560,
+      "writingTps": 69.9,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx9060xt_16",
+      "slug": "amd-radeon-rx-9060-xt-16gb",
+      "name": "AMD Radeon RX 9060 XT 16GB",
+      "vendor": "amd",
+      "arch": "RDNA 4",
+      "vramGb": 16,
+      "year": 2025,
+      "bandwidthGbs": 322,
+      "readingTps": 1278,
+      "writingTps": 34.9,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx7900xtx",
+      "slug": "amd-radeon-rx-7900-xtx",
+      "name": "AMD Radeon RX 7900 XTX",
+      "vendor": "amd",
+      "arch": "RDNA 3",
+      "vramGb": 24,
+      "year": 2022,
+      "bandwidthGbs": 960,
+      "readingTps": 1459.3,
+      "writingTps": 75.5,
+      "evidence": "measured",
+      "cardPrice": 800,
+      "powerWatts": 475,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "verified",
+      "reason": null,
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx7900xt",
+      "slug": "amd-radeon-rx-7900-xt",
+      "name": "AMD Radeon RX 7900 XT",
+      "vendor": "amd",
+      "arch": "RDNA 3",
+      "vramGb": 20,
+      "year": 2022,
+      "bandwidthGbs": 800,
+      "readingTps": 3175,
+      "writingTps": 86.7,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx7800xt",
+      "slug": "amd-radeon-rx-7800-xt",
+      "name": "AMD Radeon RX 7800 XT",
+      "vendor": "amd",
+      "arch": "RDNA 3",
+      "vramGb": 16,
+      "year": 2023,
+      "bandwidthGbs": 624,
+      "readingTps": 2476,
+      "writingTps": 67.7,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx7700xt",
+      "slug": "amd-radeon-rx-7700-xt",
+      "name": "AMD Radeon RX 7700 XT",
+      "vendor": "amd",
+      "arch": "RDNA 3",
+      "vramGb": 12,
+      "year": 2023,
+      "bandwidthGbs": 432,
+      "readingTps": 1714,
+      "writingTps": 46.8,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx6950xt",
+      "slug": "amd-radeon-rx-6950-xt",
+      "name": "AMD Radeon RX 6950 XT",
+      "vendor": "amd",
+      "arch": "RDNA 2",
+      "vramGb": 16,
+      "year": 2022,
+      "bandwidthGbs": 576,
+      "readingTps": 2286,
+      "writingTps": 62.5,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx6900xt",
+      "slug": "amd-radeon-rx-6900-xt-16gb",
+      "name": "AMD Radeon RX 6900 XT 16GB",
+      "vendor": "amd",
+      "arch": "RDNA 2",
+      "vramGb": 16,
+      "year": 2020,
+      "bandwidthGbs": 512,
+      "readingTps": 2032,
+      "writingTps": 55.5,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx6800xt",
+      "slug": "amd-radeon-rx-6800-xt",
+      "name": "AMD Radeon RX 6800 XT",
+      "vendor": "amd",
+      "arch": "RDNA 2",
+      "vramGb": 16,
+      "year": 2020,
+      "bandwidthGbs": 512,
+      "readingTps": 2032,
+      "writingTps": 55.5,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx6800",
+      "slug": "amd-radeon-rx-6800",
+      "name": "AMD Radeon RX 6800",
+      "vendor": "amd",
+      "arch": "RDNA 2",
+      "vramGb": 16,
+      "year": 2020,
+      "bandwidthGbs": 512,
+      "readingTps": 2032,
+      "writingTps": 55.5,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "rx6700xt",
+      "slug": "amd-radeon-rx-6700-xt",
+      "name": "AMD Radeon RX 6700 XT",
+      "vendor": "amd",
+      "arch": "RDNA 2",
+      "vramGb": 12,
+      "year": 2021,
+      "bandwidthGbs": 384,
+      "readingTps": 1524,
+      "writingTps": 41.6,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "amd",
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "runtime": "ROCm",
+      "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "amd",
+        "runtime": "ROCm",
+        "platforms": [
+          "windows",
+          "linux"
+        ],
+        "driverMin": "AMD Adrenalin 24.6.1+ (ROCm 6)"
+      }
+    },
+    {
+      "id": "m5ultra_512",
+      "slug": "mac-studio-m5-ultra-512-gb",
+      "name": "Mac Studio M5 Ultra 512 GB",
+      "vendor": "apple",
+      "arch": "Apple M5",
+      "vramGb": 512,
+      "year": 2026,
+      "bandwidthGbs": 819,
+      "readingTps": 3250,
+      "writingTps": 88.8,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "apple",
+      "platforms": [
+        "macos"
+      ],
+      "runtime": "Metal",
+      "driverMin": "macOS 14+ (Metal 3)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "apple",
+        "runtime": "Metal",
+        "platforms": [
+          "macos"
+        ],
+        "driverMin": "macOS 14+ (Metal 3)"
+      }
+    },
+    {
+      "id": "m5ultra_256",
+      "slug": "mac-studio-m5-ultra-256-gb",
+      "name": "Mac Studio M5 Ultra 256 GB",
+      "vendor": "apple",
+      "arch": "Apple M5",
+      "vramGb": 256,
+      "year": 2026,
+      "bandwidthGbs": 819,
+      "readingTps": 3250,
+      "writingTps": 88.8,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "apple",
+      "platforms": [
+        "macos"
+      ],
+      "runtime": "Metal",
+      "driverMin": "macOS 14+ (Metal 3)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "apple",
+        "runtime": "Metal",
+        "platforms": [
+          "macos"
+        ],
+        "driverMin": "macOS 14+ (Metal 3)"
+      }
+    },
+    {
+      "id": "m5ultra_96",
+      "slug": "mac-studio-m5-ultra-96-gb",
+      "name": "Mac Studio M5 Ultra 96 GB",
+      "vendor": "apple",
+      "arch": "Apple M5",
+      "vramGb": 96,
+      "year": 2026,
+      "bandwidthGbs": 819,
+      "readingTps": 3250,
+      "writingTps": 88.8,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "apple",
+      "platforms": [
+        "macos"
+      ],
+      "runtime": "Metal",
+      "driverMin": "macOS 14+ (Metal 3)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "apple",
+        "runtime": "Metal",
+        "platforms": [
+          "macos"
+        ],
+        "driverMin": "macOS 14+ (Metal 3)"
+      }
+    },
+    {
+      "id": "m5max_128",
+      "slug": "mac-studio-m5-max-128-gb",
+      "name": "Mac Studio M5 Max 128 GB",
+      "vendor": "apple",
+      "arch": "Apple M5",
+      "vramGb": 128,
+      "year": 2026,
+      "bandwidthGbs": 546,
+      "readingTps": 2167,
+      "writingTps": 59.2,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "apple",
+      "platforms": [
+        "macos"
+      ],
+      "runtime": "Metal",
+      "driverMin": "macOS 14+ (Metal 3)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "apple",
+        "runtime": "Metal",
+        "platforms": [
+          "macos"
+        ],
+        "driverMin": "macOS 14+ (Metal 3)"
+      }
+    },
+    {
+      "id": "m5max_64",
+      "slug": "macbook-pro-m5-max-64-gb",
+      "name": "MacBook Pro M5 Max 64 GB",
+      "vendor": "apple",
+      "arch": "Apple M5",
+      "vramGb": 64,
+      "year": 2026,
+      "bandwidthGbs": 546,
+      "readingTps": 2167,
+      "writingTps": 59.2,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "apple",
+      "platforms": [
+        "macos"
+      ],
+      "runtime": "Metal",
+      "driverMin": "macOS 14+ (Metal 3)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "apple",
+        "runtime": "Metal",
+        "platforms": [
+          "macos"
+        ],
+        "driverMin": "macOS 14+ (Metal 3)"
+      }
+    },
+    {
+      "id": "m5pro_64",
+      "slug": "mac-mini-m5-pro-64-gb",
+      "name": "Mac mini M5 Pro 64 GB",
+      "vendor": "apple",
+      "arch": "Apple M5",
+      "vramGb": 64,
+      "year": 2026,
+      "bandwidthGbs": 273,
+      "readingTps": 1083,
+      "writingTps": 29.6,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "apple",
+      "platforms": [
+        "macos"
+      ],
+      "runtime": "Metal",
+      "driverMin": "macOS 14+ (Metal 3)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "apple",
+        "runtime": "Metal",
+        "platforms": [
+          "macos"
+        ],
+        "driverMin": "macOS 14+ (Metal 3)"
+      }
+    },
+    {
+      "id": "m4max_128",
+      "slug": "mac-studio-m4-max-128-gb",
+      "name": "Mac Studio M4 Max 128 GB",
+      "vendor": "apple",
+      "arch": "Apple M4",
+      "vramGb": 128,
+      "year": 2024,
+      "bandwidthGbs": 546,
+      "readingTps": 2167,
+      "writingTps": 59.2,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "apple",
+      "platforms": [
+        "macos"
+      ],
+      "runtime": "Metal",
+      "driverMin": "macOS 14+ (Metal 3)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "apple",
+        "runtime": "Metal",
+        "platforms": [
+          "macos"
+        ],
+        "driverMin": "macOS 14+ (Metal 3)"
+      }
+    },
+    {
+      "id": "m3ultra_512",
+      "slug": "mac-studio-m3-ultra-512-gb",
+      "name": "Mac Studio M3 Ultra 512 GB",
+      "vendor": "apple",
+      "arch": "Apple M3",
+      "vramGb": 512,
+      "year": 2025,
+      "bandwidthGbs": 819,
+      "readingTps": 3250,
+      "writingTps": 88.8,
+      "evidence": "estimated",
+      "cardPrice": null,
+      "powerWatts": null,
+      "quant": "q2_0",
+      "variant": "apple",
+      "platforms": [
+        "macos"
+      ],
+      "runtime": "Metal",
+      "driverMin": "macOS 14+ (Metal 3)",
+      "vramGbMin": 12,
+      "support": "supported",
+      "reason": "fits the VRAM and driver floor; throughput not measured on this card",
+      "runnable": true,
+      "recommendedBuild": {
+        "variant": "apple",
+        "runtime": "Metal",
+        "platforms": [
+          "macos"
+        ],
+        "driverMin": "macOS 14+ (Metal 3)"
+      }
+    }
+  ]
+}

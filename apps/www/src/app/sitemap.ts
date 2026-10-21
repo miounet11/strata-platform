@@ -9,6 +9,7 @@ import { newestXAt } from "@/lib/intelligence";
 import { getReleases } from "@/lib/releases";
 import { getLiveTopics } from "@/lib/topics";
 import { getLiveArticles } from "@/lib/articles";
+import { allGpus } from "@/lib/gpus";
 
 export const revalidate = 1800;
 
@@ -68,6 +69,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ...sharedPaths,
       ...getLiveTopics(locale).map((topic) => `/topics/${topic.slug}`),
       ...getLiveArticles(locale).map((article) => `/guides/${article.slug}`),
+      // The GPU catalogue is data, not prose: the same cards exist in every locale.
+      "/gpus",
+      ...allGpus().map((gpu) => `/gpus/${gpu.slug}`),
     ];
     for (const path of paths) {
       const issue = path.match(/^\/issues\/(\d+)$/);

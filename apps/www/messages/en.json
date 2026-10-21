@@ -76,6 +76,10 @@
     "dashboard": {
       "title": "Your Strata dashboard",
       "description": "Your saved models and tracked downloads in one place."
+    },
+    "gpus": {
+      "title": "GPU compatibility list",
+      "description": "Which NVIDIA, AMD and Apple GPUs can run a local 125B-class model, with the quantization that fits each card and the build to download."
     }
   },
   "nav": {
@@ -341,5 +345,53 @@
     "reset": "Reset",
     "daysShort": "days",
     "back": "All hardware"
+  },
+  "gpus": {
+    "title": "GPU compatibility",
+    "intro": "Every GPU we can run Qwen3.8-Flash-Next on, grouped by vendor and architecture. Pick your card to see which quantization fits and what to download.",
+    "summary": "{total} cards listed · {verified} benchmarked locally · {runnable} can run the model",
+    "badgeMeasured": "benchmarked",
+    "badgeEstimated": "estimated",
+    "badgeRuns": "runs",
+    "badgeTooSmall": "VRAM too small",
+    "back": "All GPUs",
+    "verdictTitle": "Can this card run it?",
+    "verdictRuns": "Yes — run {base} at {quant}.",
+    "verdictDownload": "Download {size} GB · needs {ram} GB system RAM.",
+    "verdictVariant": "Download the {variant} build.",
+    "verdictTooSmall": "Not enough VRAM ({vram} GB). The smallest build needs 12 GB.",
+    "specs": "Specifications",
+    "specVram": "VRAM",
+    "specBandwidth": "Memory bandwidth",
+    "specRead": "Reading speed",
+    "specWrite": "Writing speed",
+    "specPower": "Board power",
+    "specEvidence": "Data source",
+    "noteMeasured": "These numbers come from our own benchmark runs on this card.",
+    "noteEstimated": "This card is not benchmarked yet. The speeds are estimated from memory bandwidth and will be replaced when we measure it.",
+    "seeBenchmark": "See the full benchmark",
+    "metaRuns": "{name} has {vram} GB of VRAM — run Qwen3.8-Flash-Next at {quant} locally. Download links and estimated speed.",
+    "metaTooSmall": "{name} has {vram} GB of VRAM, below the 12 GB minimum for running this model locally.",
+    "seoTitle": "GPU compatibility list",
+    "seoDescription": "Which NVIDIA, AMD and Apple GPUs can run a local 125B-class model, with the quantization that fits each card and the build to download.",
+    "search": "Search a model",
+    "vendor": "Vendor",
+    "arch": "Architecture",
+    "minVram": "VRAM",
+    "support": "Support",
+    "sort": "Sort",
+    "all": "All",
+    "sortVram": "Sort: VRAM",
+    "sortSpeed": "Sort: speed",
+    "sortYear": "Sort: newest",
+    "sortName": "Sort: name",
+    "verified": "Benchmarked",
+    "supported": "Supported",
+    "notSupported": "Too little VRAM",
+    "empty": "No card matches these filters.",
+    "detect": "Detect my GPU",
+    "detectHint": "Reads the renderer string from your browser. Nothing is uploaded.",
+    "detectFound": "Detected",
+    "detectNone": "Could not identify the GPU; pick it from the list."
   }
 }
