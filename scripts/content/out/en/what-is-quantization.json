@@ -1,0 +1,37 @@
+{
+  "id": "en-concept-what-is-quantization",
+  "locale": "en",
+  "kind": "concept",
+  "slug": "what-is-quantization",
+  "path": "/en/guides/what-is-quantization",
+  "workingTitle": "What quantization is",
+  "order": 137,
+  "publishAt": "2026-10-22",
+  "status": "scheduled",
+  "article": {
+    "title": "What Is Quantization In Local LLMs And Why It Matters",
+    "description": "Understand quantization for local AI. See how reducing precision saves VRAM and cuts costs without sacrificing accuracy on your Stratat engine.",
+    "body": "Quantization is the process of reducing the precision of a large language model's weights to lower memory usage and increase inference speed. This technique allows you to run complex models locally on consumer hardware without hitting performance bottlenecks. You get significant efficiency gains without a noticeable drop in output quality.\n\n## The Precision Trade-off\n\nLarge language models are trained using high-precision data types, typically 32-bit floating-point numbers (FP32). These models require massive amounts of Random Access Memory (RAM) and Video RAM (VRAM) to operate. When you deploy a model on the Stratat engine, you must fit these weights into your local hardware. Standard 32-bit precision requires four bytes per parameter. A 70-billion parameter model in FP32 would need approximately 280 GB of VRAM. Most consumer graphics cards have far less memory. Quantization compresses these numbers. It maps high-precision values to lower-precision formats like 8-bit or 4-bit integers. This compression reduces the memory footprint by a factor of four or more. You can fit larger models into smaller hardware. The trade-off is a slight reduction in numerical precision. However, modern models retain their logical reasoning capabilities even at lower bit depths. You do not need to sacrifice intelligence for accessibility.\n\n## How Stratat Handles Quantization\n\nThe Stratat client manages this conversion automatically. You do not need to manually convert models before running them. The engine loads the quantized weights into your system memory. It then uses your CPU or GPU to perform calculations. The efficiency gain comes from reduced data transfer between memory and the processor. Less data moving means faster processing times. You also save on electricity costs. Running a smaller model consumes less power. At an average US cost of $0.17/kWh, the savings accumulate quickly. This is crucial for users who run models 24/7. The Stratat engine optimizes these loads for your specific hardware. It ensures stable performance without crashing. You can experiment with different quantization levels to find the best balance. Lower bits mean faster speeds but potentially lower accuracy. Higher bits mean better quality but slower speeds. The choice depends on your specific use case. For simple tasks, lower bits work fine. For complex coding tasks, higher bits are better. The Stratat client makes this adjustment seamless. You focus on the prompt, not the hardware limits.\n\n## Memory Requirements By Format\n\n| Model Size | FP32 Memory | Q4_K_M Memory | Savings |\n|---|---|---|---|\n| 7 Billion | 14 GB | 4.0 GB | 71% |\n| 13 Billion | 26 GB | 7.5 GB | 71% |\n| 70 Billion | 140 GB | 39.0 GB | 72% |\n\nQuantization is the compression of model weights into lower-precision data types to fit large language models into limited hardware resources while maintaining acceptable performance.",
+    "faq": [
+      {
+        "q": "Does quantization make the AI less smart?",
+        "a": "Quantization reduces precision but does not remove intelligence. Modern models retain their logical reasoning and creativity at low bit depths. You may see minor differences in complex reasoning tasks, but for most daily use, the output remains high quality. The loss is often imperceptible to the average user."
+      },
+      {
+        "q": "How much RAM do I need for a 7B model?",
+        "a": "For a 7-billion parameter model, you need approximately 4 GB of VRAM or system RAM if using a 4-bit quantization. This fits easily into most modern gaming laptops and desktops. If you use higher precision like FP16, you will need around 14 GB. The Stratat client handles these allocations efficiently."
+      },
+      {
+        "q": "Can I run quantized models on CPU?",
+        "a": "Yes, the Stratat engine supports CPU inference for quantized models. While GPU acceleration is faster, modern CPUs can handle 4-bit or 8-bit models effectively. You will experience slower generation speeds compared to a dedicated GPU. However, it allows you to run models without expensive hardware. This is ideal for occasional use or basic text generation."
+      },
+      {
+        "q": "Is quantization free to use?",
+        "a": "Quantization is a software technique that is free to use. You only pay for the electricity to run your hardware. At $0.17/kWh, the cost is minimal for local inference. There are no licensing fees for the quantization process itself. The Stratat client includes all necessary tools to manage these conversions."
+      }
+    ],
+    "imagePrompt": "Abstract editorial illustration featuring a dark navy background with a central geometric structure composed of teal accents. The design should be clean, modern, and minimalist, representing data compression or neural networks. Absolutely no text, letters, or numbers should be present in the image. The aspect ratio must be 16:9."
+  },
+  "generatedAt": "2026-10-21T06:49:22.676Z",
+  "model": "qwen3.6:35b-a3b"
+}

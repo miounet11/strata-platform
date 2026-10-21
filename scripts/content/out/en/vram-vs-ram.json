@@ -1,0 +1,34 @@
+{
+  "id": "en-concept-vram-vs-ram",
+  "locale": "en",
+  "kind": "concept",
+  "slug": "vram-vs-ram",
+  "path": "/en/guides/vram-vs-ram",
+  "workingTitle": "VRAM versus system RAM",
+  "order": 138,
+  "publishAt": "2026-10-21",
+  "status": "live",
+  "article": {
+    "title": "VRAM vs RAM: Understanding Memory for Local LLMs",
+    "description": "Learn how to choose between VRAM and RAM for running large language models locally on your desktop. We break down capacity, speed, and cost implications.",
+    "body": "The choice between VRAM and RAM determines whether your local LLM runs smoothly or chokes, but VRAM is always superior for performance when available. You must match the model's memory requirements against your system's hardware to avoid bottlenecks.\n\n## Understanding the Bottleneck\n\nWhen you deploy a large language model, the system must store the weights of the neural network. If these weights fit entirely into the GPU's Video RAM (VRAM), the inference process happens at maximum speed because the data transfer between the processor and the memory is minimized. However, if the model is too large for the GPU, the system spills over into the system's Random Access Memory (RAM). This transition is not seamless. Data must travel across the PCIe bus, which is significantly slower than the direct connection to the GPU memory. This results in a drastic reduction in token generation speed, often making the model unusable for real-time interaction.\n\n## Measuring Your Capacity\n\nYou need to check your specific hardware configuration to determine feasibility. Open your system settings or use a tool like `nvidia-smi` on Linux or the Task Manager on Windows to see exactly how much VRAM your graphics card has. Then, compare this number against the size of the model you wish to run. A 7-billion parameter model typically requires around 14GB of VRAM for 2-bit quantization, but much more for higher precision. If your GPU has only 8GB, you will be forced to use the system RAM, which might have 32GB or 64GB, but the speed penalty will be severe. The key is to keep the model entirely within the VRAM boundary whenever possible to maintain acceptable performance levels.\n\n## Hardware Comparison\n\n| Component | Role in LLM Inference | Impact on Speed | Typical Capacity Check |\n| :--- | :--- | :--- | :--- |\n| GPU VRAM | Stores model weights for direct GPU access | High speed, essential for real-time use | Check via `nvidia-smi` or OS settings |\n| System RAM | Acts as overflow storage when VRAM is full | Significant slowdown due to PCIe latency | Check via Task Manager or System Info |\n| PCIe Bus | Transport layer between GPU and CPU/RAM | Major bottleneck causing latency spikes | Fixed by hardware generation (e.g., 4.0) |\n\nVRAM is the dedicated high-speed memory on your graphics card that stores the active data for the neural network, allowing for rapid inference without bottlenecking through the system's slower main memory.",
+    "faq": [
+      {
+        "q": "Can I run a 70B model on a GPU with 24GB of VRAM?",
+        "a": "You can, but it will likely be very slow. The model will exceed your VRAM capacity and spill over into your system RAM, causing a significant drop in token generation speed due to PCIe bandwidth limitations."
+      },
+      {
+        "q": "Does more system RAM make the LLM faster?",
+        "a": "No, more system RAM alone does not increase speed. It only allows larger models to run by providing overflow space. The speed is primarily dictated by how much of the model fits into the GPU's VRAM."
+      },
+      {
+        "q": "How do I check my available VRAM on Windows?",
+        "a": "You can check your VRAM by opening Task Manager, going to the Performance tab, and selecting GPU. Look for the Dedicated GPU Memory section to see your total available VRAM."
+      }
+    ],
+    "imagePrompt": "Abstract editorial illustration, dark navy background, teal accent, geometric shapes representing data flow, absolutely no text or letters, 16:9 aspect ratio"
+  },
+  "generatedAt": "2026-10-21T06:48:12.599Z",
+  "model": "qwen3.6:35b-a3b",
+  "publishedAt": "2026-10-21"
+}

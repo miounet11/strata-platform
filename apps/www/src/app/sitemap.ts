@@ -8,6 +8,7 @@ import { getDownloads } from "@/lib/downloads";
 import { newestXAt } from "@/lib/intelligence";
 import { getReleases } from "@/lib/releases";
 import { getLiveTopics } from "@/lib/topics";
+import { getLiveArticles } from "@/lib/articles";
 
 export const revalidate = 1800;
 
@@ -62,8 +63,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const entries: MetadataRoute.Sitemap = [];
   for (const locale of routing.locales) {
-    // Topics are editorial per locale, not translations of a single list.
-    const paths = [...sharedPaths, ...getLiveTopics(locale).map((topic) => `/topics/${topic.slug}`)];
+    // Topics and guides are written per locale, not translated, so each locale lists only its own.
+    const paths = [
+      ...sharedPaths,
+      ...getLiveTopics(locale).map((topic) => `/topics/${topic.slug}`),
+      ...getLiveArticles(locale).map((article) => `/guides/${article.slug}`),
+    ];
     for (const path of paths) {
       const issue = path.match(/^\/issues\/(\d+)$/);
       const pull = path.match(/^\/pulls\/(\d+)$/);
