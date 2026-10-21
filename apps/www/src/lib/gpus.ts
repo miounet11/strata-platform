@@ -1,6 +1,6 @@
 import gpuData from "@/data/gpus.json";
 
-export type GpuVendor = "nvidia" | "amd" | "apple";
+export type GpuVendor = "nvidia" | "amd" | "intel" | "apple";
 
 export type Gpu = {
   id: string;
@@ -68,6 +68,7 @@ export function getGpu(slug: string): Gpu | undefined {
 export const vendorLabel: Record<GpuVendor, string> = {
   nvidia: "NVIDIA",
   amd: "AMD",
+  intel: "Intel",
   apple: "Apple",
 };
 
@@ -148,5 +149,6 @@ export const variantLabel: Record<string, string> = {
   nvidia: "NVIDIA · CUDA",
   "nvidia-legacy": "NVIDIA · CUDA 12 (legacy)",
   amd: "AMD · HIP / ROCm",
+  intel: "Intel · oneAPI / SYCL",
   apple: "Apple · Metal",
 };
