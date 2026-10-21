@@ -30,5 +30,6 @@
   },
   "generatedAt": "2026-10-21T06:48:12.599Z",
   "model": "qwen3.6:35b-a3b",
-  "publishedAt": "2026-10-21"
+  "publishedAt": "2026-10-21",
+  "imagePath": "/media/guides/en/vram-vs-ram.webp"
 }

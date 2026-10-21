@@ -33,5 +33,6 @@
     "imagePrompt": "Abstract editorial illustration featuring a dark navy background with a central geometric structure composed of teal accents. The design should be clean, modern, and minimalist, representing data compression or neural networks. Absolutely no text, letters, or numbers should be present in the image. The aspect ratio must be 16:9."
   },
   "generatedAt": "2026-10-21T06:49:22.676Z",
-  "model": "qwen3.6:35b-a3b"
+  "model": "qwen3.6:35b-a3b",
+  "imagePath": "/media/guides/en/what-is-quantization.webp"
 }
