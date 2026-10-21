@@ -9,9 +9,11 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const www = join(repoRoot, "apps/www");
+// Keep in step with `distDir` in next.config.ts: deploys build into a staging directory.
+const dist = join(www, process.env.NEXT_DIST_DIR || ".next");
 const standalone = [
-  join(www, ".next/standalone/apps/www"),
-  join(www, ".next/standalone"),
+  join(dist, "standalone/apps/www"),
+  join(dist, "standalone"),
 ].find((dir) => existsSync(join(dir, "server.js")));
 
 if (!standalone) {
@@ -29,6 +31,6 @@ function mirror(src, dest) {
   cpSync(src, dest, { recursive: true });
 }
 
-mirror(join(www, ".next/static"), join(standalone, ".next/static"));
+mirror(join(dist, "static"), join(standalone, ".next/static"));
 mirror(join(www, "public"), join(standalone, "public"));
 console.log(`[standalone-assets] copied into ${standalone}`);

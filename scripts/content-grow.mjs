@@ -10,9 +10,19 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
+/**
+ * Step results are collected instead of only warned: a rebuild that fails must make the cron job
+ * exit non-zero, otherwise the schedule reports success while the site serves stale pages.
+ */
+const failures = [];
 function run(cmd, args) {
   const r = spawnSync(cmd, args, { cwd: ROOT, stdio: "inherit", env: process.env });
-  if (r.status !== 0) console.warn(`[content-grow] ${cmd} ${args.join(" ")} exit ${r.status}`);
+  if (r.status !== 0) {
+    const line = `[content-grow] ${cmd} ${args.join(" ")} exit ${r.status}`;
+    console.warn(line);
+    failures.push(line);
+  }
+  return r.status;
 }
 
 const steps = [
@@ -66,10 +76,13 @@ for (const file of [
 console.log("[content-grow] stats", JSON.stringify(stats, null, 2));
 console.log(`[content-grow] done ${new Date().toISOString()}`);
 if (process.env.CONTENT_GROW_REBUILD === "1") {
-  run("pnpm", ["--filter", "@stratat/www", "build"]);
-  // next build deletes .next and unlinks the running standalone cwd. postbuild
-  // copies static back; restart so strata-www is not left on that deleted directory.
-  const pm2 =
-    ["/usr/local/bin/pm2", "/usr/bin/pm2"].find((bin) => existsSync(bin)) ?? "pm2";
-  run(pm2, ["restart", "strata-www"]);
+  // Go through the single deploy entry point. Building here directly rewrote the tree the live
+  // process was serving from, so a failed build could leave the site on mismatched chunks.
+  // deploy-www.sh builds into a staging directory and only swaps after a successful build.
+  run("bash", ["scripts/deploy-www.sh"]);
+}
+
+if (failures.length) {
+  console.error(`[content-grow] ${failures.length} step(s) failed`);
+  process.exit(1);
 }

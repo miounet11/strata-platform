@@ -8,6 +8,9 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Deploys build into a staging directory and swap it in, so the running process never serves
+  // from a partially rewritten tree. Must match NEXT_DIST_DIR in scripts/copy-standalone-assets.mjs.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   outputFileTracingRoot: root,
   poweredByHeader: false,
   async redirects() {
