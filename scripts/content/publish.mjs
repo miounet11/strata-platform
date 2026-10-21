@@ -11,6 +11,7 @@ import { join } from "node:path";
 
 const ROOT = new URL("../..", import.meta.url).pathname;
 const OUT = join(ROOT, "scripts/content/out");
+const MANIFEST = join(ROOT, "apps/www/src/data/media-manifest.json");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const all = args.includes("--all");
@@ -27,7 +28,14 @@ if (!existsSync(OUT)) {
   process.exit(1);
 }
 
-let live = 0, pending = 0, already = 0;
+// An article without its hero image renders a placeholder, which is worse than publishing a day
+// later. Images are produced on the workstation (the image worker is on a private network this
+// host cannot reach) and arrive with the next deploy, so hold those articles back instead.
+const manifest = existsSync(MANIFEST)
+  ? JSON.parse(readFileSync(MANIFEST, "utf8")).assets ?? {}
+  : {};
+
+let live = 0, pending = 0, already = 0, noImage = 0;
 const byLocale = {};
 
 for (const entry of readdirSync(OUT, { withFileTypes: true })) {
@@ -42,6 +50,8 @@ for (const entry of readdirSync(OUT, { withFileTypes: true })) {
     const due = all || !item.publishAt || item.publishAt <= today;
     if (!due) { pending++; continue; }
 
+    if (!manifest[`guide-${item.slug}`]?.path) { noImage++; continue; }
+
     item.status = "live";
     item.publishedAt = today;
     if (!dryRun) writeAtomic(path, `${JSON.stringify(item, null, 2)}\n`);
@@ -51,6 +61,6 @@ for (const entry of readdirSync(OUT, { withFileTypes: true })) {
 }
 
 const mode = dryRun ? "would publish" : "published";
-console.log(`${mode} ${live} · already live ${already} · still scheduled ${pending}`);
+console.log(`${mode} ${live} · already live ${already} · still scheduled ${pending} · waiting for image ${noImage}`);
 for (const [locale, n] of Object.entries(byLocale).sort()) console.log(`  ${locale}: ${n}`);
 if (dryRun) console.log("(dry run — nothing written)");

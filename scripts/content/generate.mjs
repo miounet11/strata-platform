@@ -123,7 +123,7 @@ async function chat(prompt) {
   }
 }
 
-function parseArticle(raw) {
+function parseArticle(raw, slug) {
   const text = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
@@ -142,6 +142,19 @@ function parseArticle(raw) {
     throw new Error(`title looks like a slug, not a sentence: ${title}`);
   }
   if (title.length < 20) throw new Error(`title too short (${title.length}): ${title}`);
+
+  // A title must not also carry the slug as a prefix ("rx7900xtx-iq2-xs: … Review"). It reads
+  // as a filename and duplicates the URL, which is exactly what the SEO review flags.
+  if (slug && title.toLowerCase().includes(String(slug).toLowerCase().replace(/-/g, " "))) {
+    throw new Error(`title repeats the slug: ${title}`);
+  }
+
+  // Structure is what makes the page extractable by answer engines: headings split it into
+  // quotable sections and a table carries the facts. Both are required, not nice to have.
+  const headings = (String(obj.body).match(/^#{2,3} /gm) ?? []).length;
+  if (headings < 2) throw new Error(`body needs at least 2 headings, got ${headings}`);
+  const rows = (String(obj.body).match(/^\|/gm) ?? []).length;
+  if (rows < 3) throw new Error(`body needs a fact table, got ${rows} table rows`);
   return obj;
 }
 
@@ -165,7 +178,7 @@ async function generateOne(item) {
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     const started = Date.now();
     try {
-      const article = parseArticle(await chat(buildPrompt(item)));
+      const article = parseArticle(await chat(buildPrompt(item)), item.slug);
       writeAtomic(
         path,
         `${JSON.stringify(

@@ -60,6 +60,7 @@ for (const entry of readdirSync(OUT, { withFileTypes: true })) {
 }
 
 const problems = [];
+const awaitingImage = [];
 const fail = (a, msg) => problems.push(`${a.locale}/${a.slug}: ${msg}`);
 
 for (const a of articles) {
@@ -80,9 +81,12 @@ for (const a of articles) {
   if (!a.article?.title || a.article.title.length < 20) fail(a, "title too short");
   if (/^[a-z0-9]+(?:-[a-z0-9]+){2,}$/i.test(a.article?.title ?? "")) fail(a, "title looks like a slug");
 
+  // An article that has not been illustrated yet is a task, not a defect: images are produced
+  // on the workstation, so a freshly written article legitimately has none. The hard error is a
+  // manifest entry that points at a file which is not there.
   const id = `guide-${a.slug}`;
   const asset = manifest.assets[id];
-  if (!asset?.path) fail(a, "no image registered in manifest");
+  if (!asset?.path) awaitingImage.push(`${a.locale}/${a.slug}`);
   else if (!existsSync(join(PUBLIC, asset.path.replace(/^\//, "")))) fail(a, `image file missing: ${asset.path}`);
 }
 
@@ -104,6 +108,9 @@ for (let i = 0; i < shop.length; i++) {
 
 console.log(`checked ${articles.length} article(s)`);
 console.log(`worst cross-locale pair: ${worstPair.sim.toFixed(3)} ${worstPair.label || "(n/a)"}`);
+if (awaitingImage.length) {
+  console.log(`${awaitingImage.length} article(s) await an image (generated on the workstation, then synced)`);
+}
 if (problems.length) {
   for (const p of problems.slice(0, 40)) console.log(`  ✗ ${p}`);
   if (problems.length > 40) console.log(`  … ${problems.length - 40} more`);
