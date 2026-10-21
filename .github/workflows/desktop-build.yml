@@ -94,34 +94,26 @@ jobs:
       # Signing is opt-in: `signingIdentity` in tauri.conf.json names a certificate that only
       # exists on the release Mac. On CI it must come from a secret, or be skipped entirely.
       - name: Configure macOS signing
-        if: runner.os == 'macOS' && env.APPLE_SIGNING_IDENTITY != ''
+        if: runner.os == 'macOS'
         shell: bash
         env:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
         run: |
-          echo "Signing as: $APPLE_SIGNING_IDENTITY"
           node -e '
             const fs = require("fs");
             const p = "src-tauri/tauri.conf.json";
+            const id = process.env.APPLE_SIGNING_IDENTITY;
             const c = JSON.parse(fs.readFileSync(p, "utf8"));
-            c.bundle.macOS = { ...(c.bundle.macOS ?? {}), signingIdentity: process.env.APPLE_SIGNING_IDENTITY };
-            fs.writeFileSync(p, JSON.stringify(c, null, 2) + "\n");
-          '
-
-      # Without the secret, drop the identity so tauri bundles an unsigned app instead of
-      # failing on a certificate that is not in the runner's keychain.
-      - name: Skip macOS signing when no identity is configured
-        if: runner.os == 'macOS' && env.APPLE_SIGNING_IDENTITY == ''
-        shell: bash
-        env:
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-        run: |
-          echo "::notice::APPLE_SIGNING_IDENTITY not set — building an unsigned macOS app"
-          node -e '
-            const fs = require("fs");
-            const p = "src-tauri/tauri.conf.json";
-            const c = JSON.parse(fs.readFileSync(p, "utf8"));
-            if (c.bundle.macOS) delete c.bundle.macOS.signingIdentity;
+            c.bundle.macOS = c.bundle.macOS ?? {};
+            if (id) {
+              c.bundle.macOS.signingIdentity = id;
+              console.log("signing as:", id);
+            } else {
+              // The identity in the repo names a certificate that only exists on the release
+              // Mac; bundling here would fail unless we drop it.
+              delete c.bundle.macOS.signingIdentity;
+              console.log("::notice::APPLE_SIGNING_IDENTITY not set — unsigned macOS build");
+            }
             fs.writeFileSync(p, JSON.stringify(c, null, 2) + "\n");
           '
 
@@ -173,6 +165,21 @@ jobs:
         with:
           path: artifacts
           merge-multiple: true
+
+      # A CI build without the signing secrets produces unsigned installers. Publishing those
+      # over an existing signed release would silently replace a good artifact with a worse one,
+      # so the release step refuses unless signing was actually configured.
+      - name: Refuse to publish unsigned installers over a signed release
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          if [ -z "$APPLE_SIGNING_IDENTITY" ] || [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo "::error::signing secrets are not configured; publish from the release machine instead"
+            exit 1
+          fi
+          echo "signing configured — publishing"
+
       - uses: softprops/action-gh-release@v2
         with:
           files: artifacts/**/*
