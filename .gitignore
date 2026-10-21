@@ -25,3 +25,7 @@ apps/www/tsconfig.tsbuildinfo
 # Client fork build output
 apps/client-upstream/host/dist
 apps/client-upstream/desktop/dist
+
+# Internal content board secret (server-only, never committed)
+.dashboard-secret
+apps/www/.dashboard-secret
