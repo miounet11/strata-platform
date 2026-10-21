@@ -95,6 +95,7 @@ jobs:
       # exists on the release Mac. On CI it must come from a secret, or be skipped entirely.
       - name: Configure macOS signing
         if: runner.os == 'macOS'
+        working-directory: ${{ env.DESKTOP_DIR }}
         shell: bash
         env:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
