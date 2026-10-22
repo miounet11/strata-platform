@@ -21,14 +21,91 @@ echo "=== $(date -Is) daily-guides start ==="
 # Credentials come from the host env file, never from this script. The previous version carried
 # a literal `sk-...` in the `${VAR:-default}` slot, which shipped a live API key to every clone
 # and kept it in git history. `/opt/stratat/.env` is gitignored and root-owned.
+#
+# This has to load *before* the webhook default below, or an operator who edits .env to point
+# alerts elsewhere would have no effect: the value would already be captured.
 if [ -f "$ROOT/.env" ]; then
   set -a
   . "$ROOT/.env"
   set +a
 fi
+
+# Nobody is watching this job: it runs from cron at 06:45 and a failure only lands in a log
+# file on a host no one has open. Two things therefore have to hold. (1) A step that fails must
+# make the script fail — the original version ran `node ...; echo "exit=$?"`, which recorded the
+# status and then carried on, so a publish failure still ended with exit 0 and an empty log line
+# looked like success. (2) The failure must reach a person, which is what the webhook is for.
+#
+# The webhook URL is the default here on purpose: if `.env` is missing or truncated, a silent
+# "no notification" is the one outcome we cannot detect later. A hook is a write endpoint, not a
+# credential — it can post messages, not read anything.
+FEISHU_WEBHOOK_URL="${FEISHU_WEBHOOK_URL:-https://open.feishu.cn/open-apis/bot/v2/hook/b5626c22-0a4e-467d-885f-585c3852ae77}"
+
+# Set by the failure path; the EXIT trap reads it to explain *why*, not just that something broke.
+FAIL_REASON=""
+# Counted, not acted on immediately: a failed item should not throw away the articles that were
+# written successfully. The count turns into a non-zero exit (and therefore an alert) at the end.
+GENERATE_FAILURES=0
+
+fail() {
+  FAIL_REASON="$1"
+  exit "${2:-1}"
+}
+
+# Sending must never be able to mask the original failure. If curl or DNS is down, the alert is
+# lost but the exit code and the log tail are still on disk, so the job reports the same failure
+# with or without the webhook.
+send_alert() {
+  local reason="$1" code="$2" when host tail20 text
+  when=$(date -Is)
+  host=$(hostname)
+  # 20 lines is enough to see the error without turning the card into a wall of text.
+  tail20=$(tail -n 20 "$LOG" 2>/dev/null | cut -c1-400)
+  text=$(printf '【Strata 发布失败】\n原因: %s\n主机: %s\n时间: %s\n退出码: %s\n\n最近日志:\n%s' \
+    "$reason" "$host" "$when" "$code" "$tail20")
+
+  # Logged as well as sent: when an alert is delivered but says the wrong thing, the log is the
+  # only place to see what was actually pushed.
+  echo "[alert] 发送失败通知: $reason (exit=$code)"
+
+  if ALERT_TEXT="$text" ALERT_URL="$FEISHU_WEBHOOK_URL" /usr/bin/node -e '
+    const text = process.env.ALERT_TEXT;
+    const url = process.env.ALERT_URL;
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ msg_type: "text", content: { text } }),
+      signal: AbortSignal.timeout(15000),
+    })
+      .then(async (r) => {
+        const body = await r.text();
+        console.log(`[alert] feishu HTTP ${r.status} ${body.slice(0, 200)}`);
+        // A 200 with code!=0 is a rejected message, not a delivered one.
+        try {
+          if (JSON.parse(body).code !== 0) process.exit(3);
+        } catch { process.exit(3); }
+      })
+      .catch((err) => {
+        console.error(`[alert] feishu send failed: ${err.message}`);
+        process.exit(4);
+      });
+  '; then
+    :
+  else
+    echo "[alert] 飞书通知未送达（网络或 webhook 异常）；失败原因与日志尾部已在上方记录" >&2
+  fi
+}
+
+on_exit() {
+  local code=$?
+  if [ "$code" -ne 0 ]; then
+    send_alert "${FAIL_REASON:-脚本异常退出（未归类的失败）}" "$code"
+  fi
+}
+trap on_exit EXIT
+
 if [ -z "${CONTENT_LLM_API_KEY:-}" ]; then
-  echo "FATAL: CONTENT_LLM_API_KEY is not set (expected in $ROOT/.env) — refusing to run"
-  exit 1
+  fail "CONTENT_LLM_API_KEY 未设置（应写在 $ROOT/.env），已拒绝运行" 1
 fi
 export CONTENT_CONCURRENCY="${CONTENT_CONCURRENCY:-3}"
 
@@ -48,7 +125,16 @@ else
   echo "writing for: $locales"
   for locale in $locales; do
     /usr/bin/node scripts/content/generate.mjs --locale "$locale"
-    echo "generate $locale exit=$?"
+    status=$?
+    echo "generate $locale exit=$status"
+    # generate.mjs exits non-zero when *any* item failed, even if others were written. Failing
+    # the whole run right here would throw away the articles that did succeed, so the count is
+    # carried to the end instead: verify still gates what ships, and the non-zero exit still
+    # reaches the webhook. It is not downgraded to a warning — that was the bug.
+    if [ "$status" -ne 0 ]; then
+      GENERATE_FAILURES=$((GENERATE_FAILURES + 1))
+      echo "ERROR: generate $locale reported failures (exit=$status)"
+    fi
   done
 fi
 
@@ -56,17 +142,31 @@ fi
 verify_status=$?
 echo "verify exit=$verify_status"
 if [ "$verify_status" -ne 0 ]; then
-  echo "quality gate failed — refusing to publish"
-  exit 1
+  fail "内容质量门禁未通过（verify.mjs exit=$verify_status），本次不发布" 1
 fi
 
 /usr/bin/node scripts/content/publish.mjs
-echo "publish exit=$?"
+publish_status=$?
+echo "publish exit=$publish_status"
+if [ "$publish_status" -ne 0 ]; then
+  fail "发布步骤失败（publish.mjs exit=$publish_status）" 1
+fi
 
 if [ "${1:-}" != "--no-build" ]; then
   # One deploy entry point: staging build, atomic swap, restart only on success.
   "$ROOT/scripts/deploy-www.sh"
-  echo "deploy exit=$?"
+  deploy_status=$?
+  echo "deploy exit=$deploy_status"
+  if [ "$deploy_status" -ne 0 ]; then
+    fail "站点构建或部署失败（deploy-www.sh exit=$deploy_status），线上仍是上一版" 1
+  fi
+fi
+
+# Content that failed to generate is a real failure even when verify passes on what exists:
+# the schedule expects those articles today and they are not there. Checked last so the alert
+# names the cause rather than a downstream symptom, but before the success line is printed.
+if [ "$GENERATE_FAILURES" -ne 0 ]; then
+  fail "有 $GENERATE_FAILURES 个语言的条目生成失败（详见上方 ERROR 与 .state.jsonl）" 1
 fi
 
 echo "=== $(date -Is) daily-guides done ==="
