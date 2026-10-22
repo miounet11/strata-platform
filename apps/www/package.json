@@ -8,7 +8,10 @@
     "postbuild": "node ../../scripts/copy-standalone-assets.mjs",
     "start": "next start -p 3000",
     "lint": "tsc --noEmit",
-    "check:locales": "node scripts/check-locale-bleed.mjs"
+    "check:locales": "node scripts/check-locale-bleed.mjs",
+    "check:sitemap": "node scripts/verify-sitemap.mjs",
+    "check:similarity": "node scripts/similarity.mjs",
+    "test:similarity": "node scripts/test-similarity.mjs"
   },
   "dependencies": {
     "next": "^15.5.4",
