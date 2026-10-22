@@ -24,10 +24,16 @@ NO_RESTART=0
 
 echo "=== build $(date -Is) ==="
 rm -rf .next-build
-# Images and audio live in the R2 bucket behind file.stratat.com. NEXT_PUBLIC_* is inlined at
-# build time, so this has to be set here rather than in the pm2 env. Set it empty to fall back
-# to serving /media from public/.
-NEXT_PUBLIC_MEDIA_BASE="${NEXT_PUBLIC_MEDIA_BASE-https://file.stratat.com}"
+# Drop TypeScript's incremental cache along with the output it describes. The cache records the
+# generated `.next-build/types/*.ts` files, so after this rm the next typecheck tried to read a
+# file it had just deleted and failed with "File ... not found" instead of typechecking anything.
+rm -f tsconfig.tsbuildinfo .next-build/tsconfig.tsbuildinfo
+# Media is served by this host from public/media. The bucket behind file.stratat.com is still
+# reachable, but nothing in the pipeline uploads to it: images are written by the content job on
+# this box, so pointing the build at the CDN made every new hero image a 404 (708 of them on
+# 2026-10-23) while the files sat on disk. NEXT_PUBLIC_* is inlined at build time, so the choice
+# is made here. Set it explicitly to move media back behind a CDN.
+NEXT_PUBLIC_MEDIA_BASE="${NEXT_PUBLIC_MEDIA_BASE-}"
 export NEXT_PUBLIC_MEDIA_BASE
 echo "media base: ${NEXT_PUBLIC_MEDIA_BASE:-<local public/>}"
 NODE_OPTIONS=--max-old-space-size=6144 NEXT_DIST_DIR=.next-build pnpm build

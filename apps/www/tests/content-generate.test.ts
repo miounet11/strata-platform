@@ -10,8 +10,10 @@ import { parseArticle, repairControlChars } from "../../../scripts/content/gener
  * behaving exactly as instructed. Each case below is one of those failures.
  */
 
-const EN_BODY = `## A\n\n${"x".repeat(950)}\n\n## B\n\n| a | b |\n|---|---|\n| 1 | 2 |\n| 3 | 4 |\n`;
-const ZH_BODY = `## 标题\n\n${"中文内容测试".repeat(120)}\n\n## 第二节\n\n| 项目 | 数值 |\n|---|---|\n| 1 | 2 |\n| 3 | 4 |\n`;
+// Three data rows: `parseArticle` requires a delimiter row plus at least three rows, so a
+// two-row fixture is rejected for the table shape rather than for whatever the case is about.
+const EN_BODY = `## A\n\n${"x".repeat(950)}\n\n## B\n\n| a | b |\n|---|---|\n| 1 | 2 |\n| 3 | 4 |\n| 5 | 6 |\n`;
+const ZH_BODY = `## 标题\n\n${"中文内容测试".repeat(120)}\n\n## 第二节\n\n| 项目 | 数值 |\n|---|---|\n| 1 | 2 |\n| 3 | 4 |\n| 5 | 6 |\n`;
 
 function article(title: string, body = EN_BODY) {
   return {
@@ -72,6 +74,30 @@ test("811 Han characters carries more content than 900 Latin ones", () => {
 
 test("short bodies are still rejected", () => {
   assert.equal(accepts(JSON.stringify(article("RTX 5090 量化模型部署实测", "## A\n\n短\n")), "rtx5090-iq2-xs"), false);
+});
+
+test("table rows without a delimiter row do not count as a fact table", () => {
+  // Counting every line that starts with `|` accepted bodies that never render as a table:
+  // five articles shipped rows with no `|---|` separator and the gate rejected them later.
+  const head = `## A\n\n${"x".repeat(950)}\n\n## B\n\n`;
+  const noDelimiter = `${head}| a | b |\n| 1 | 2 |\n| 3 | 4 |\n| 5 | 6 |\n`;
+  const withDelimiter = `${head}| a | b |\n| --- | --- |\n| 1 | 2 |\n| 3 | 4 |\n| 5 | 6 |\n`;
+  const title = "RTX 5090 量化模型本地部署实测：性能、功耗与成本完整分析报告";
+
+  assert.equal(accepts(JSON.stringify(article(title, noDelimiter)), "rtx5090-iq2-xs"), false);
+  assert.ok(accepts(JSON.stringify(article(title, withDelimiter)), "rtx5090-iq2-xs"));
+});
+
+test("a delimiter row with fewer than three data rows is not enough", () => {
+  const head = `## A\n\n${"x".repeat(950)}\n\n## B\n\n`;
+  const twoRows = `${head}| a | b |\n| --- | --- |\n| 1 | 2 |\n| 3 | 4 |\n`;
+  assert.equal(
+    accepts(
+      JSON.stringify(article("RTX 5090 量化模型本地部署实测：性能、功耗与成本完整分析报告", twoRows)),
+      "rtx5090-iq2-xs",
+    ),
+    false,
+  );
 });
 
 test("a raw newline inside a JSON string is repaired, not fatal", () => {

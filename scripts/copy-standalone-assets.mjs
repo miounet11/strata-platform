@@ -21,16 +21,25 @@ if (!standalone) {
   process.exit(0);
 }
 
-function mirror(src, dest) {
+function mirror(src, dest, skip = []) {
   if (!existsSync(src)) {
     console.warn(`[standalone-assets] missing ${src}`);
     return;
   }
   rmSync(dest, { recursive: true, force: true });
   mkdirSync(dirname(dest), { recursive: true });
-  cpSync(src, dest, { recursive: true });
+  cpSync(src, dest, {
+    recursive: true,
+    filter: (path) => !skip.some((name) => path === join(src, name)),
+  });
 }
 
 mirror(join(dist, "static"), join(standalone, ".next/static"));
-mirror(join(www, "public"), join(standalone, "public"));
+
+// When media are served from the CDN, `public/media` is dead weight in the standalone tree —
+// 21 MB duplicated on every deploy, and two retained builds make it 42 MB. The paths stay in the
+// manifest; only the copy is skipped, so unsetting NEXT_PUBLIC_MEDIA_BASE restores local serving.
+const mediaOnCdn = Boolean(process.env.NEXT_PUBLIC_MEDIA_BASE);
+mirror(join(www, "public"), join(standalone, "public"), mediaOnCdn ? ["media"] : []);
+if (mediaOnCdn) console.log("[standalone-assets] media served from CDN, skipping public/media");
 console.log(`[standalone-assets] copied into ${standalone}`);

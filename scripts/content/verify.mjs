@@ -61,6 +61,7 @@ for (const entry of readdirSync(OUT, { withFileTypes: true })) {
 
 const problems = [];
 const awaitingImage = [];
+const imageChecks = [];
 const fail = (a, msg) => problems.push(`${a.locale}/${a.slug}: ${msg}`);
 
 for (const a of articles) {
@@ -72,8 +73,13 @@ for (const a of articles) {
   if (faq.length < 3) fail(a, `faq ${faq.length} < 3`);
   if (faq.some((f) => !f.q || !f.a)) fail(a, "faq entry missing q or a");
 
-  // A fact table is what makes the page quotable by an AI answer engine.
-  if (!/^\|.+\|$/m.test(body)) fail(a, "no fact table");
+  // A fact table is what makes the page quotable by an AI answer engine. Detect it by its
+  // delimiter row rather than by requiring a closing pipe: GFM allows `| a | b` with no trailing
+  // bar, and the writer emits all three shapes (`| a | b |`, `| a | b | `, `| a | b`). Anchoring
+  // on `\|$` reported correct articles in de and pt as having no table at all.
+  // The lookahead keeps a plain `---` horizontal rule from counting as a table.
+  const hasTable = /^(?=[^\n]*\|)[\s|:-]*-{3,}[\s|:-]*$/m.test(body);
+  if (!hasTable) fail(a, "no fact table");
 
   const headings = (body.match(/^##+ /gm) ?? []).length;
   if (headings < 2) fail(a, `headings ${headings} < 2`);
@@ -87,7 +93,48 @@ for (const a of articles) {
   const id = `guide-${a.slug}`;
   const asset = manifest.assets[id];
   if (!asset?.path) awaitingImage.push(`${a.locale}/${a.slug}`);
-  else if (!existsSync(join(PUBLIC, asset.path.replace(/^\//, "")))) fail(a, `image file missing: ${asset.path}`);
+  else imageChecks.push({ a, path: asset.path });
+}
+
+// The images do not necessarily live on this host. When the site is built with
+// NEXT_PUBLIC_MEDIA_BASE (file.stratat.com), public/media is deliberately excluded from the
+// standalone tree and every asset is served from the bucket — so a local existsSync reports
+// "missing" for files that are fine in production, and the gate blocks a good publish. Ask the
+// URL that the page will actually request instead. Without a base, public/ is authoritative.
+const mediaBase = (process.env.NEXT_PUBLIC_MEDIA_BASE ?? "").replace(/\/$/, "");
+if (imageChecks.length) {
+  if (mediaBase) {
+    // Retry before failing. Observed on 2026-10-22: running this gate three times in a row gave
+    // exit 0, 1, 0 — a dropped connection to the bucket was reported as "unreachable" and would
+    // have blocked a healthy publish, then alerted about a problem that did not exist. A 404 is
+    // answered once; only transport errors and 5xx are worth retrying.
+    const probe = async (url) => {
+      let lastError = "";
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const res = await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(20000) });
+          if (res.ok) return null;
+          lastError = `image ${res.status} at ${url}`;
+          if (res.status < 500) return lastError;
+        } catch (error) {
+          lastError = `image unreachable: ${url} (${error.message})`;
+        }
+        if (attempt < 3) await new Promise((r) => setTimeout(r, 1000 * attempt));
+      }
+      return lastError;
+    };
+    const results = await Promise.all(
+      imageChecks.map(async ({ a, path }) => {
+        const msg = await probe(`${mediaBase}${path}`);
+        return msg ? { a, msg } : null;
+      }),
+    );
+    for (const r of results) if (r) fail(r.a, r.msg);
+  } else {
+    for (const { a, path } of imageChecks) {
+      if (!existsSync(join(PUBLIC, path.replace(/^\//, "")))) fail(a, `image file missing: ${path}`);
+    }
+  }
 }
 
 // Duplicate detection: every pair of articles must be distinct enough.

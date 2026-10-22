@@ -207,8 +207,20 @@ function parseArticle(raw, slug) {
   // quotable sections and a table carries the facts. Both are required, not nice to have.
   const headings = (String(obj.body).match(/^#{2,3} /gm) ?? []).length;
   if (headings < 2) throw new Error(`body needs at least 2 headings, got ${headings}`);
-  const rows = (String(obj.body).match(/^\|/gm) ?? []).length;
-  if (rows < 3) throw new Error(`body needs a fact table, got ${rows} table rows`);
+
+  // Count rows only inside a real table. Counting every line that starts with `|` accepted
+  // bodies that never render as a table — five articles (es x2, fr, pt x2) shipped rows like
+  // `| a | b | c` with no `|---|` separator, so the gate rejected them afterwards. A table is
+  // a header row, a delimiter row, then data rows; require the delimiter and at least three
+  // data rows, which is the same shape verify.mjs checks for.
+  const delimiter = /^(?=[^\n]*\|)[\s|:-]*-{3,}[\s|:-]*$/m.exec(String(obj.body));
+  const dataRows = delimiter
+    ? String(obj.body)
+        .slice(delimiter.index + delimiter[0].length)
+        .split("\n")
+        .filter((line) => line.trim().startsWith("|") && line.trim() !== "").length
+    : 0;
+  if (dataRows < 3) throw new Error(`body needs a fact table with a delimiter row, got ${dataRows} data rows`);
   return obj;
 }
 

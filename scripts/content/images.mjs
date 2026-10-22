@@ -29,6 +29,8 @@ const dryRun = args.includes("--dry-run");
 
 const manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
 let done = 0, skipped = 0, failed = 0;
+/** Per-article failures, so the alert names what actually broke instead of only a count. */
+const failures = [];
 const queue = [];
 
 for (const entry of readdirSync(OUT, { withFileTypes: true })) {
@@ -40,7 +42,15 @@ for (const entry of readdirSync(OUT, { withFileTypes: true })) {
     const path = join(dir, file);
     const item = JSON.parse(readFileSync(path, "utf8"));
     const id = `guide-${item.slug}`;
-    if (manifest.assets[id]?.path) { skipped++; continue; }
+    // A manifest entry alone does not mean the image exists. The manifest is a registry that is
+    // written after every file, and it is shared across the checkout — so a path can be recorded
+    // here while the file was never written (or was lost when public/media was pruned). Trusting
+    // the entry alone made this step skip articles whose page would then render a broken hero.
+    const recorded = manifest.assets[id]?.path;
+    if (recorded && existsSync(join(ROOT, "apps/www/public", recorded.replace(/^\//, "")))) {
+      skipped++;
+      continue;
+    }
     queue.push({ item, path, id });
   }
 }
@@ -91,6 +101,7 @@ async function illustrate({ item, path, id }) {
   } catch (err) {
     failed++;
     console.error(`   fail ${item.locale}/${item.slug}: ${String(err.message).slice(0, 120)}`);
+    failures.push(`${item.locale}/${item.slug}: ${String(err.message).slice(0, 160)}`);
   }
 }
 
@@ -105,4 +116,19 @@ const workers = Array.from({ length: Math.min(CONCURRENCY, todo.length) }, async
 await Promise.all(workers);
 
 console.log(`✓ generated=${done} skipped=${skipped} failed=${failed}`);
+
+if (failed > 0) {
+  // Until now this exited 1 with the detail only in stdout. In the scheduled run that stream goes
+  // to a log on the host, so a broken image backend meant articles silently piled up in
+  // "waiting for image" with nobody told why. Name the backend, the count and a sample.
+  const { notifyFeishu } = await import("../notify.mjs");
+  await notifyFeishu({
+    stage: "content/images",
+    reason: `配图生成失败 ${failed} 张（后端：${useCluster ? `cluster ${process.env.CLUSTER_HOST}` : "gateway"}）`,
+    raw:
+      `未生成的文章会一直被 publish.mjs 拦在 waiting for image，不会自动重试成功。\n` +
+      `失败的 ${failed} 篇：\n${failures.slice(0, 5).join("\n")}` +
+      (failures.length > 5 ? `\n… 另有 ${failures.length - 5} 篇` : ""),
+  });
+}
 process.exit(failed > 0 ? 1 : 0);

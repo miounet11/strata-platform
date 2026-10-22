@@ -162,11 +162,11 @@ if [ "$images_status" -ne 0 ]; then
   echo "WARNING: images reported failures (exit=$images_status); unillustrated articles will wait"
 fi
 
-# Must match the base deploy-www.sh builds with, or the gate checks the wrong place: without it
-# verify looks for images in apps/www/public, where they are not, because the standalone tree
-# excludes public/media when images come from the bucket. That mismatch failed the gate on
-# 2026-10-22 and blocked a publish that was actually fine.
-export NEXT_PUBLIC_MEDIA_BASE="${NEXT_PUBLIC_MEDIA_BASE-https://file.stratat.com}"
+# Must match the base deploy-www.sh builds with, or the gate checks the wrong place: verify probes
+# the URL the page will request, so a mismatch here either fails healthy articles (CDN base, files
+# only on disk) or passes broken ones. Both scripts now default to serving media from this host's
+# public/media; export a base to move them behind a CDN.
+export NEXT_PUBLIC_MEDIA_BASE="${NEXT_PUBLIC_MEDIA_BASE-}"
 
 /usr/bin/node scripts/content/verify.mjs
 verify_status=$?
