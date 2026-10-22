@@ -120,7 +120,18 @@ locales=$(/usr/bin/node --input-type=module -e '
 ')
 
 if [ -z "$locales" ]; then
-  echo "no locales scheduled for $today — nothing to write"
+  # An empty day is the one failure that looks exactly like success: the script exits 0, nothing
+  # is written, and the site quietly stops growing. `plan.json` currently ends on 2026-10-28, so
+  # from 2026-10-29 every run would land here. Distinguish "nothing due because everything is
+  # already published" from "the plan ran out" by asking the plan itself.
+  remaining=$(/usr/bin/node --input-type=module -e '
+    import plan from "/opt/stratat/scripts/content/plan.json" with { type: "json" };
+    console.log(plan.items.filter((a) => a.publishAt >= new Date().toISOString().slice(0, 10)).length);
+  ')
+  if [ "${remaining:-0}" -eq 0 ]; then
+    fail "内容排程已用尽：plan.json 中没有 $today 及之后的条目，站点不会再有新文章。需要补充 plan" 1
+  fi
+  echo "no locales scheduled for $today — nothing to write ($remaining item(s) still queued for later dates)"
 else
   echo "writing for: $locales"
   for locale in $locales; do
