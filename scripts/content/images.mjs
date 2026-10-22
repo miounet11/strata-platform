@@ -59,7 +59,16 @@ async function illustrate({ item, path, id }) {
     const prompt = item.article.imagePrompt ||
       "abstract editorial illustration, dark navy background, teal accent, geometric shapes, no text";
     const buf = await illustrateWith(prompt, { size: "1024x576" });
-    if (!Buffer.isBuffer(buf) || buf.length < 5000) throw new Error(`bad image (${buf?.length} bytes)`);
+    // Same mistake as the gateway check: a small but complete WebP is a normal result for these
+    // low-detail illustrations, so the container signature is what decides, not the byte count.
+    if (
+      !Buffer.isBuffer(buf) ||
+      buf.length < 64 ||
+      buf.subarray(0, 4).toString("latin1") !== "RIFF" ||
+      buf.subarray(8, 12).toString("latin1") !== "WEBP"
+    ) {
+      throw new Error(`bad image (${buf?.length} bytes)`);
+    }
     const tmp = `${target}.tmp`;
     writeFileSync(tmp, buf);
     renameSync(tmp, target);

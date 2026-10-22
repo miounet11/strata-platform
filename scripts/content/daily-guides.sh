@@ -149,18 +149,50 @@ else
   done
 fi
 
+# Illustrate before gating. `publish.mjs` refuses to publish an article with no hero image, so
+# without this step every newly written article waits forever and the run ends having published
+# nothing — the images were only ever produced by hand from the workstation. The gateway path is
+# used automatically because CLUSTER_HOST is unset on this host.
+/usr/bin/node scripts/content/images.mjs
+images_status=$?
+echo "images exit=$images_status"
+if [ "$images_status" -ne 0 ]; then
+  # Not fatal: a gateway hiccup on one prompt must not block the articles that do have images.
+  # Any article still missing one is held by publish.mjs, which reports the count below.
+  echo "WARNING: images reported failures (exit=$images_status); unillustrated articles will wait"
+fi
+
+# Must match the base deploy-www.sh builds with, or the gate checks the wrong place: without it
+# verify looks for images in apps/www/public, where they are not, because the standalone tree
+# excludes public/media when images come from the bucket. That mismatch failed the gate on
+# 2026-10-22 and blocked a publish that was actually fine.
+export NEXT_PUBLIC_MEDIA_BASE="${NEXT_PUBLIC_MEDIA_BASE-https://file.stratat.com}"
+
 /usr/bin/node scripts/content/verify.mjs
 verify_status=$?
-echo "verify exit=$verify_status"
+echo "verify exit=$verify_status (media base: ${NEXT_PUBLIC_MEDIA_BASE:-<local public/>})"
 if [ "$verify_status" -ne 0 ]; then
   fail "内容质量门禁未通过（verify.mjs exit=$verify_status），本次不发布" 1
 fi
 
-/usr/bin/node scripts/content/publish.mjs
+publish_out=$(/usr/bin/node scripts/content/publish.mjs 2>&1)
 publish_status=$?
+echo "$publish_out"
 echo "publish exit=$publish_status"
 if [ "$publish_status" -ne 0 ]; then
   fail "发布步骤失败（publish.mjs exit=$publish_status）" 1
+fi
+
+# Exit 0 with nothing published is the failure mode that hides: on 2026-10-22 all 131 due
+# articles were held for a missing hero image and the run still reported success. Alert, but do
+# not abort — a starved day should not stop the deploy of whatever did make it through.
+starved=$(printf '%s\n' "$publish_out" | grep -m1 '^STARVED ' || true)
+if [ -n "$starved" ]; then
+  echo "WARN: 今天有到期内容但没有一篇能发布——${starved#STARVED }"
+  /usr/bin/node "$ROOT/scripts/notify.mjs" \
+    --stage "daily-guides/starved" \
+    --reason "有到期文章，但全部因缺图被拦下，今天没有新内容上线" \
+    --raw "$publish_out" || true
 fi
 
 if [ "${1:-}" != "--no-build" ]; then

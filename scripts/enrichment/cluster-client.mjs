@@ -122,9 +122,13 @@ export async function generateImageViaGateway(prompt, { size = "1024x576", model
   if (!inline) throw new Error(`no inline image in gateway response: ${JSON.stringify(json).slice(0, 200)}`);
 
   const buf = Buffer.from(inline, "base64");
-  // A truncated or error body would otherwise be written as a .webp that renders blank. RIFF
-  // is the container signature both WebP and WAV use, and this endpoint only returns WebP.
-  if (buf.length < 5000 || buf.subarray(0, 4).toString("latin1") !== "RIFF") {
+
+  // Validate by signature, not by size. A flat dark-navy background with a few shapes compresses
+  // to 2.6-3.5 KB at 1024x576, so a byte floor rejects perfectly good images — that is what
+  // discarded three of the first hundred (3462, 3574, 4224 bytes, all valid RIFF/WebP). The
+  // container is RIFF and the form type at offset 8 is WEBP; anything else is an error page or a
+  // truncated body and would render as a blank hero.
+  if (buf.length < 64 || buf.subarray(0, 4).toString("latin1") !== "RIFF" || buf.subarray(8, 12).toString("latin1") !== "WEBP") {
     throw new Error(`gateway returned a non-image payload (${buf.length} bytes)`);
   }
   return buf;
