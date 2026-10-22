@@ -73,6 +73,39 @@ else
   fi
 fi
 
+# Near-duplicate page text. `audit.mjs` scores structure — h1 present, JSON-LD present — and says
+# nothing about whether the prose was actually rewritten per entity. On 2026-10-22 this found 1,936
+# pairs above 0.72, 546 of them byte-identical pages reachable at two URLs, from catalog rows that
+# differ only in a chip codename the page never renders.
+#
+# Exit 1 is a finding about the content, so it is advisory for the same reason as audit: those 546
+# are a data problem the pipeline has to fix, and blocking today would block every deploy.
+# SIMILARITY_STRICT=1 makes it blocking.
+#
+# Exit 2 means the check could not run — no build output, or no page above --min-tokens. That is
+# always fatal: after a successful build it can only mean this gate is broken, and continuing would
+# print a deploy as "duplicates reported, continuing" when nothing was measured at all.
+if [ "${SKIP_SIMILARITY:-0}" = "1" ]; then
+  echo "similarity SKIPPED (SKIP_SIMILARITY=1)"
+else
+  SITE_DIR=. NEXT_DIST_DIR=.next-build node scripts/similarity.mjs
+  similarity_status=$?
+  case "$similarity_status" in
+    0) ;;
+    2)
+      echo "similarity could not run (exit=2) — gate is broken, refusing to deploy" >&2
+      exit 1
+      ;;
+    *)
+      if [ "${SIMILARITY_STRICT:-0}" = "1" ]; then
+        echo "similarity failed (exit=$similarity_status) — live site untouched" >&2
+        exit 1
+      fi
+      echo "similarity reported duplicate pages (exit=$similarity_status) — deploy continues, set SIMILARITY_STRICT=1 to block" >&2
+      ;;
+  esac
+fi
+
 if [ "$NO_RESTART" -eq 1 ]; then
   echo "build ok; swap skipped (--no-restart)"
   exit 0
