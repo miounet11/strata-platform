@@ -18,7 +18,18 @@ LOG=/var/log/stratat-guides.log
 exec >>"$LOG" 2>&1
 echo "=== $(date -Is) daily-guides start ==="
 
-export CONTENT_LLM_API_KEY="${CONTENT_LLM_API_KEY:-sk-P12ImraCU1yToNuGAsVWIXbP9rjMXTMRSRaVl1ICELaqiOXd}"
+# Credentials come from the host env file, never from this script. The previous version carried
+# a literal `sk-...` in the `${VAR:-default}` slot, which shipped a live API key to every clone
+# and kept it in git history. `/opt/stratat/.env` is gitignored and root-owned.
+if [ -f "$ROOT/.env" ]; then
+  set -a
+  . "$ROOT/.env"
+  set +a
+fi
+if [ -z "${CONTENT_LLM_API_KEY:-}" ]; then
+  echo "FATAL: CONTENT_LLM_API_KEY is not set (expected in $ROOT/.env) — refusing to run"
+  exit 1
+fi
 export CONTENT_CONCURRENCY="${CONTENT_CONCURRENCY:-3}"
 
 today=$(date -u +%F)
