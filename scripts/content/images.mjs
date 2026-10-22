@@ -1,15 +1,21 @@
 // Generate one hero image per article and register it in the site's media manifest.
 //
-//   CLUSTER_HOST=192.168.2.100 node scripts/content/images.mjs
 //   node scripts/content/images.mjs --locale en --limit 2
 //   node scripts/content/images.mjs --dry-run
 //
 // Images go to apps/www/public/media/guides/<locale>/<slug>.webp so Next serves them as static
 // files. The page looks the asset up as `guide-<slug>` in media-manifest.json, which is why the
 // manifest write below is part of this step and not a separate one.
+//
+// Two backends exist. The gateway (CONTENT_LLM_BASE_URL) works from anywhere over HTTPS, which
+// is what the scheduled job on the production host uses. The LAN cluster needs SSH into a
+// private network and only the workstation can reach it; `CLUSTER_HOST` selects it explicitly.
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { generateImage } from "../enrichment/cluster-client.mjs";
+import { generateImage, generateImageViaGateway } from "../enrichment/cluster-client.mjs";
+
+const useCluster = Boolean(process.env.CLUSTER_HOST);
+const illustrateWith = useCluster ? generateImage : generateImageViaGateway;
 
 const ROOT = new URL("../..", import.meta.url).pathname;
 const OUT = join(ROOT, "scripts/content/out");
@@ -45,14 +51,14 @@ if (dryRun) {
   process.exit(0);
 }
 
-for (const { item, path, id } of queue.slice(0, limit)) {
+async function illustrate({ item, path, id }) {
   const dir = join(PUBLIC, item.locale);
   mkdirSync(dir, { recursive: true });
   const target = join(dir, `${item.slug}.webp`);
   try {
     const prompt = item.article.imagePrompt ||
       "abstract editorial illustration, dark navy background, teal accent, geometric shapes, no text";
-    const buf = await generateImage(prompt, { size: "1024x576" });
+    const buf = await illustrateWith(prompt, { size: "1024x576" });
     if (!Buffer.isBuffer(buf) || buf.length < 5000) throw new Error(`bad image (${buf?.length} bytes)`);
     const tmp = `${target}.tmp`;
     writeFileSync(tmp, buf);
@@ -78,6 +84,16 @@ for (const { item, path, id } of queue.slice(0, limit)) {
     console.error(`   fail ${item.locale}/${item.slug}: ${String(err.message).slice(0, 120)}`);
   }
 }
+
+// The worker runs six replicas and each image takes ~30s, so a serial loop leaves five GPUs idle.
+// Concurrency is capped low by default because one render is already heavy on the cluster.
+const CONCURRENCY = Math.max(1, Number(process.env.IMAGE_CONCURRENCY ?? 4));
+const todo = queue.slice(0, limit);
+console.log(`→ generating with concurrency ${CONCURRENCY}`);
+const workers = Array.from({ length: Math.min(CONCURRENCY, todo.length) }, async (_, w) => {
+  for (let i = w; i < todo.length; i += CONCURRENCY) await illustrate(todo[i]);
+});
+await Promise.all(workers);
 
 console.log(`✓ generated=${done} skipped=${skipped} failed=${failed}`);
 process.exit(failed > 0 ? 1 : 0);

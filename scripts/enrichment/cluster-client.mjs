@@ -12,18 +12,28 @@ export function clusterConfig() {
   };
 }
 
+// Every image costs two round trips (POST, then fetch the returned url). Without a multiplexed
+// connection each one pays a full handshake, which dominates generation time on a LAN.
+const SSH_OPTS = [
+  "-o", "BatchMode=yes",
+  "-o", "StrictHostKeyChecking=no",
+  "-o", "ControlMaster=auto",
+  "-o", "ControlPath=~/.ssh/cm/%r@%h:%p",
+  "-o", "ControlPersist=30m",
+];
+
 function sshExec(remoteCmd, timeoutMs = 180000) {
   const { host, sshUser, sshPass } = clusterConfig();
   const target = `${sshUser}@${host}`;
   const env = sshPass ? { ...process.env, SSHPASS: sshPass } : process.env;
   const r = sshPass
-    ? spawnSync("sshpass", ["-e", "ssh", "-o", "StrictHostKeyChecking=no", target, remoteCmd], {
+    ? spawnSync("sshpass", ["-e", "ssh", ...SSH_OPTS, target, remoteCmd], {
         env,
         encoding: "utf8",
         maxBuffer: 64 * 1024 * 1024,
         timeout: timeoutMs,
       })
-    : spawnSync("ssh", ["-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=no", target, remoteCmd], {
+    : spawnSync("ssh", ["-o", "BatchMode=yes", ...SSH_OPTS, target, remoteCmd], {
         env,
         encoding: "utf8",
         maxBuffer: 64 * 1024 * 1024,
@@ -77,6 +87,47 @@ export async function generateImage(prompt, { size = "1024x576", model } = {}) {
 
 export async function generateImageB64(prompt, opts) {
   return (await generateImage(prompt, opts)).toString("base64");
+}
+
+/**
+ * Generate an image through the OpenAI-compatible gateway instead of the LAN cluster.
+ *
+ * The cluster path above needs SSH into a private network, which the production host cannot
+ * reach — so anything scheduled there could never illustrate its own articles, and
+ * `publish.mjs` held back every article without a hero image. The gateway is reachable over
+ * plain HTTPS and speaks the same `/images/generations` shape, so the caller does not care
+ * which one produced the bytes.
+ *
+ * `b64_json` is requested explicitly: without it the gateway answers with a URL on its own
+ * internal address (`172.17.0.1:9102`), which is useless from any other machine. Rewriting that
+ * hostname onto the public domain does not work either — it returns the SPA's HTML fallback
+ * with a 200, so a naive fetch would happily save a web page as a .webp.
+ */
+export async function generateImageViaGateway(prompt, { size = "1024x576", model } = {}) {
+  const base = (process.env.CONTENT_IMAGE_BASE_URL ?? process.env.CONTENT_LLM_BASE_URL ?? "").replace(/\/$/, "");
+  const key = process.env.CONTENT_IMAGE_API_KEY ?? process.env.CONTENT_LLM_API_KEY;
+  const usedModel = model ?? process.env.CONTENT_IMAGE_MODEL ?? "z-image-turbo";
+  if (!base || !key) throw new Error("image gateway not configured (CONTENT_LLM_BASE_URL / CONTENT_LLM_API_KEY)");
+
+  const res = await fetch(`${base}/images/generations`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: usedModel, prompt, n: 1, size, response_format: "b64_json" }),
+    signal: AbortSignal.timeout(240000),
+  });
+  if (!res.ok) throw new Error(`image gateway ${res.status}: ${(await res.text()).slice(0, 200)}`);
+
+  const json = await res.json();
+  const inline = json?.data?.[0]?.b64_json;
+  if (!inline) throw new Error(`no inline image in gateway response: ${JSON.stringify(json).slice(0, 200)}`);
+
+  const buf = Buffer.from(inline, "base64");
+  // A truncated or error body would otherwise be written as a .webp that renders blank. RIFF
+  // is the container signature both WebP and WAV use, and this endpoint only returns WebP.
+  if (buf.length < 5000 || buf.subarray(0, 4).toString("latin1") !== "RIFF") {
+    throw new Error(`gateway returned a non-image payload (${buf.length} bytes)`);
+  }
+  return buf;
 }
 
 export async function generateTtsBuffer(text, { model = "qwen3-tts-acted", voice = "alloy" } = {}) {
