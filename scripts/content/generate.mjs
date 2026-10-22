@@ -35,10 +35,6 @@ const onlyLocale = arg("locale");
 const onlyKind = arg("kind");
 const limit = arg("limit") ? Number(arg("limit")) : Infinity;
 
-if (!KEY) {
-  console.error("error: CONTENT_LLM_API_KEY is not set");
-  process.exit(2);
-}
 
 /** Each language gets its own angle and vocabulary. Nothing is translated from another row. */
 const LANG = {
@@ -174,7 +170,15 @@ function parseArticle(raw, slug) {
     if (!obj[key]) throw new Error(`missing ${key}`);
   }
   if (!Array.isArray(obj.faq) || obj.faq.length < 3) throw new Error("need at least 3 FAQ entries");
-  if (String(obj.body).length < 900) throw new Error(`body too short (${String(obj.body).length})`);
+
+  // 900 characters is a length floor for Latin prose. A Han character carries roughly a word,
+  // not a letter, so a zh article at 811 characters is longer-form than an en one at 900 —
+  // measured against the same number it was rejected for being too short. Count Han characters
+  // twice so the floor means "enough substance" in every locale.
+  const bodyText = String(obj.body);
+  const han = (bodyText.match(/[\u3400-\u9fff]/g) ?? []).length;
+  const substance = bodyText.length + han;
+  if (substance < 900) throw new Error(`body too short (${bodyText.length}, weighted ${substance})`);
 
   // The model occasionally echoes the slug back as the title ("what-is-quantization").
   // A title is a sentence a person reads, so reject anything that reads like an identifier.
@@ -184,18 +188,19 @@ function parseArticle(raw, slug) {
   }
   if (title.length < 20) throw new Error(`title too short (${title.length}): ${title}`);
 
-  // A title must not read like a filename: the slug itself, or the slug spelled out and then
-  // used as a label ("rx7900xtx iq2 xs: … Review"). The subject is *supposed* to appear in the
-  // title — the prompt asks for it — so matching the slug words anywhere rejected every
-  // multi-word slug and made the whole queue ungeneratable. Only the prefix form is a defect.
+  // A title must not be *labelled* with the slug ("rx7900xtx iq2 xs: … Review"). The subject is
+  // supposed to appear in the title — the prompt asks for it — so any substring test rejects
+  // legitimate titles and is not a defect. Hardware slugs are model designations ("rtx5090-iq2-xs")
+  // that the model writes verbatim mid-sentence, which reads fine. Only the prefix-label form is
+  // a filename. The whole-title-is-the-slug case is already caught above.
   if (slug) {
     const s = String(slug).toLowerCase();
-    const spaced = s.replace(/-/g, " ");
-    const lower = title.toLowerCase();
-    if (lower.includes(s)) throw new Error(`title contains the raw slug: ${title}`);
-    if (new RegExp(`^\\s*${spaced.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[:|—–-]`).test(lower)) {
-      throw new Error(`title uses the slug as a label: ${title}`);
-    }
+    // The model writes the slug either verbatim or with its hyphens read as spaces, and labels
+    // with a half-width colon in en but a full-width one (：) in zh/ja. Both spellings and both
+    // colons have to be checked or the rule only fires in English.
+    const variants = [s, s.replace(/-/g, " ")].map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const label = new RegExp(`^\\s*(?:${variants.join("|")})\\s*[:：|—–]`, "i");
+    if (label.test(title)) throw new Error(`title uses the slug as a label: ${title}`);
   }
 
   // Structure is what makes the page extractable by answer engines: headings split it into
@@ -261,6 +266,10 @@ async function generateOne(item) {
 }
 
 async function main() {
+  if (!KEY) {
+    console.error("error: CONTENT_LLM_API_KEY is not set");
+    process.exit(2);
+  }
   const plan = JSON.parse(readFileSync(PLAN, "utf8"));
   let queue = plan.items;
   if (onlyLocale) queue = queue.filter((i) => i.locale === onlyLocale);
@@ -298,7 +307,13 @@ async function main() {
   if (stats.failed > 0) process.exitCode = 1;
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// Importable so the validators can be tested without a network call: running the script is the
+// only thing that needs a key.
+export { parseArticle, repairControlChars };
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
