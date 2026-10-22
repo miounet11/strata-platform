@@ -140,11 +140,25 @@ const CONCEPTS = [
 
 const pad = (n) => String(n).padStart(2, "0");
 
-// Spread 1001 articles over seven days: day 1 carries the data skeleton, the last days add
-// the market-local pieces that need the most editorial care.
+// The first day to schedule from. This used to be a literal `2026-10-22`, which made the plan a
+// seven-day window that expired on 2026-10-28: from the next day every run found nothing due,
+// printed "no locales scheduled", and exited 0 while the site stopped growing. An expired
+// schedule cannot be noticed by watching exit codes, so the start date has to move with the
+// calendar rather than be baked in at authoring time.
+//
+// `--start=YYYY-MM-DD` pins it for a reproducible regeneration; the default is today (UTC, to
+// match the `today` that daily-guides.sh and publish.mjs compare against).
+const startArg = process.argv.find((a) => a.startsWith("--start="));
+const startDate = startArg ? startArg.slice("--start=".length) : new Date().toISOString().slice(0, 10);
+if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) throw new Error(`--start must be YYYY-MM-DD, got ${startDate}`);
+
+// Spread the articles over seven days from the start date: day 1 carries the data skeleton, the
+// last days add the market-local pieces that need the most editorial care.
 function publishSlot(index, total) {
   const day = Math.min(7, Math.floor((index / total) * 7) + 1);
-  return `2026-10-${pad(22 + (day - 1))}`;
+  const at = new Date(`${startDate}T00:00:00Z`);
+  at.setUTCDate(at.getUTCDate() + (day - 1));
+  return at.toISOString().slice(0, 10);
 }
 
 const items = [];

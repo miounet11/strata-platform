@@ -121,18 +121,44 @@ locales=$(/usr/bin/node --input-type=module -e '
 
 if [ -z "$locales" ]; then
   # An empty day is the one failure that looks exactly like success: the script exits 0, nothing
-  # is written, and the site quietly stops growing. `plan.json` currently ends on 2026-10-28, so
-  # from 2026-10-29 every run would land here. Distinguish "nothing due because everything is
-  # already published" from "the plan ran out" by asking the plan itself.
+  # is written, and the site quietly stops growing — which is what happened from 2026-10-29 while
+  # the plan still ended on 2026-10-28.
+  #
+  # Rolling the schedule forward is the fix, not alerting about it. Every article already written
+  # is skipped by generate.mjs on the output file, so re-planning from today only moves items that
+  # have no JSON yet: days that are already behind us carry no work and nothing is re-generated.
+  # Keep the old plan first, because a re-plan rewrites every publishAt and that is the only
+  # record of what was originally intended.
   remaining=$(/usr/bin/node --input-type=module -e '
     import plan from "/opt/stratat/scripts/content/plan.json" with { type: "json" };
     console.log(plan.items.filter((a) => a.publishAt >= new Date().toISOString().slice(0, 10)).length);
   ')
+
   if [ "${remaining:-0}" -eq 0 ]; then
-    fail "内容排程已用尽：plan.json 中没有 $today 及之后的条目，站点不会再有新文章。需要补充 plan" 1
+    echo "schedule exhausted — rolling the plan forward from $today"
+    cp scripts/content/plan.json "scripts/content/.plan.${today}.json" 2>/dev/null || true
+    /usr/bin/node scripts/content/plan.mjs
+    plan_status=$?
+    echo "replan exit=$plan_status"
+    if [ "$plan_status" -ne 0 ]; then
+      fail "排程已用尽且自动续期失败（plan.mjs exit=$plan_status），站点不会再有新文章" 1
+    fi
+    # Re-read: the plan just changed underneath the locale query above.
+    locales=$(/usr/bin/node --input-type=module -e '
+      import plan from "/opt/stratat/scripts/content/plan.json" with { type: "json" };
+      const t = new Date().toISOString().slice(0, 10);
+      const set = new Set(plan.items.filter((a) => a.publishAt === t).map((a) => a.locale));
+      console.log([...set].join(" "));
+    ')
+    if [ -z "$locales" ]; then
+      fail "排程续期后仍无 $today 的条目，需人工检查 plan.mjs" 1
+    fi
+  else
+    echo "no locales scheduled for $today — nothing to write ($remaining item(s) still queued for later dates)"
   fi
-  echo "no locales scheduled for $today — nothing to write ($remaining item(s) still queued for later dates)"
-else
+fi
+
+if [ -n "$locales" ]; then
   echo "writing for: $locales"
   for locale in $locales; do
     /usr/bin/node scripts/content/generate.mjs --locale "$locale"
