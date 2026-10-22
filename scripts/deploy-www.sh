@@ -24,6 +24,12 @@ NO_RESTART=0
 
 echo "=== build $(date -Is) ==="
 rm -rf .next-build
+# Images and audio live in the R2 bucket behind file.stratat.com. NEXT_PUBLIC_* is inlined at
+# build time, so this has to be set here rather than in the pm2 env. Set it empty to fall back
+# to serving /media from public/.
+NEXT_PUBLIC_MEDIA_BASE="${NEXT_PUBLIC_MEDIA_BASE-https://file.stratat.com}"
+export NEXT_PUBLIC_MEDIA_BASE
+echo "media base: ${NEXT_PUBLIC_MEDIA_BASE:-<local public/>}"
 NODE_OPTIONS=--max-old-space-size=6144 NEXT_DIST_DIR=.next-build pnpm build
 build_status=$?
 
@@ -33,9 +39,74 @@ if [ "$build_status" -ne 0 ] || [ ! -d .next-build/standalone/apps/www ]; then
   exit 1
 fi
 
+# Gate the swap on the sitemap matching the build output in both directions. A successful build
+# says nothing about whether every listed URL has a page, or whether every page is reachable;
+# the reverse check is what caught `/gpus/vendor` shipping in seven locales with no sitemap entry.
+# Set SKIP_SITEMAP_CHECK=1 only to unblock an emergency deploy — it is not a normal flag.
+if [ "${SKIP_SITEMAP_CHECK:-0}" = "1" ]; then
+  echo "sitemap check SKIPPED (SKIP_SITEMAP_CHECK=1)"
+else
+  NEXT_DIST_DIR=.next-build node scripts/verify-sitemap.mjs
+  sitemap_status=$?
+  if [ "$sitemap_status" -ne 0 ]; then
+    echo "sitemap check failed (exit=$sitemap_status) — live site untouched, .next still serves" >&2
+    exit 1
+  fi
+fi
+
+# Score the build against the SEO/accessibility/performance budget. `audit.mjs` exits 1 when any
+# check fails, so this is a hard gate, not a report. Several of its checks (`jsonld-coverage`,
+# `performance-budget`) are currently failing on the live site — see
+# `yyds-2/docs/11-inspiration-yyds-bot.md`. Blocking the deploy on them today would block every
+# deploy, so the gate is advisory until those are fixed: set AUDIT_STRICT=1 to make it blocking.
+if [ "${SKIP_AUDIT:-0}" = "1" ]; then
+  echo "audit SKIPPED (SKIP_AUDIT=1)"
+else
+  NEXT_DIST_DIR=.next-build node scripts/audit.mjs
+  audit_status=$?
+  if [ "$audit_status" -ne 0 ]; then
+    if [ "${AUDIT_STRICT:-0}" = "1" ]; then
+      echo "audit failed (exit=$audit_status) — live site untouched" >&2
+      exit 1
+    fi
+    echo "audit reported failures (exit=$audit_status) — deploy continues, set AUDIT_STRICT=1 to block" >&2
+  fi
+fi
+
 if [ "$NO_RESTART" -eq 1 ]; then
   echo "build ok; swap skipped (--no-restart)"
   exit 0
+fi
+
+# Next writes the server output twice: once as the build's own `.next/server`, and again inside
+# `standalone/apps/www/.next-build`, which is what server.js actually loads (pm2 cwd is the
+# standalone dir). The outer copy is 4 GB of dead weight on every build. Dropping it here — and
+# from the rollback tree — is safe: a rollback renames `.next-prev` back to `.next` and pm2
+# restarts into that tree's own `standalone/apps/www`, whose `.next-build` copy is untouched.
+# Verified by moving the live copy away with the site still serving 200s.
+echo "pruning duplicate server output"
+# Only prune when the copy server.js actually loads is present. If the standalone build is
+# incomplete, keeping the duplicate is the safe failure: it costs disk, not uptime.
+if [ -d .next-build/standalone/apps/www/.next-build/server ]; then
+  rm -rf .next-build/server
+else
+  echo "standalone server output missing — keeping .next-build/server" >&2
+fi
+if [ -d .next-prev/standalone/apps/www/.next-build/server ]; then
+  rm -rf .next-prev/server
+fi
+
+# `route-cache` is runtime state, not build output: every ISR revalidation writes a file there,
+# and it grows for as long as the tree serves. Measured on 2026-10-22, the rollback copy held
+# 103,663 cache files (3.3 GB) against a fresh build's 1,854 (126 MB). The prerendered sitemaps
+# live in `server/app/sitemaps/*.body`; the cache copies are duplicates of them.
+#
+# Dropping it from the rollback tree costs a rollback nothing but a cold cache, which is what a
+# rollback produces anyway. Dropping it from the new tree would delete cache entries the live
+# process has not written yet — that is why only `.next-prev` is touched here.
+if [ -d .next-prev/standalone/apps/www/.next-build/server/route-cache ]; then
+  rm -rf .next-prev/standalone/apps/www/.next-build/server/route-cache
+  echo "pruned rollback route-cache"
 fi
 
 # Swap by rename: `.next` keeps serving until the new tree is complete, then replaces it in one
