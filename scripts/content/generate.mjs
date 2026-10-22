@@ -123,12 +123,53 @@ async function chat(prompt) {
   }
 }
 
+/**
+ * Repair literal control characters inside JSON string literals.
+ *
+ * The model emits markdown bodies as JSON strings but sometimes presses enter for real, so a
+ * `body` value carries a raw newline. That is invalid JSON and `JSON.parse` rejects the whole
+ * article — observed once in three attempts, which is enough to fail a 900-item queue. Escaping
+ * them inside strings only is safe: whitespace between tokens is untouched.
+ */
+function repairControlChars(text) {
+  let out = "";
+  let inString = false;
+  let escaped = false;
+  for (const ch of text) {
+    if (escaped) {
+      out += ch;
+      escaped = false;
+      continue;
+    }
+    if (ch === "\\") {
+      out += ch;
+      escaped = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      out += ch;
+      continue;
+    }
+    if (inString) {
+      if (ch === "\n") out += "\\n";
+      else if (ch === "\r") out += "\\r";
+      else if (ch === "\t") out += "\\t";
+      else if (ch < " ") out += `\\u${ch.charCodeAt(0).toString(16).padStart(4, "0")}`;
+      else out += ch;
+      continue;
+    }
+    out += ch;
+  }
+  return out;
+}
+
 function parseArticle(raw, slug) {
   const text = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
   if (start < 0 || end <= start) throw new Error("no JSON object in response");
-  const obj = JSON.parse(text.slice(start, end + 1));
+  const obj = JSON.parse(repairControlChars(text.slice(start, end + 1)));
   for (const key of ["title", "description", "body", "faq", "imagePrompt"]) {
     if (!obj[key]) throw new Error(`missing ${key}`);
   }
@@ -143,10 +184,18 @@ function parseArticle(raw, slug) {
   }
   if (title.length < 20) throw new Error(`title too short (${title.length}): ${title}`);
 
-  // A title must not also carry the slug as a prefix ("rx7900xtx-iq2-xs: … Review"). It reads
-  // as a filename and duplicates the URL, which is exactly what the SEO review flags.
-  if (slug && title.toLowerCase().includes(String(slug).toLowerCase().replace(/-/g, " "))) {
-    throw new Error(`title repeats the slug: ${title}`);
+  // A title must not read like a filename: the slug itself, or the slug spelled out and then
+  // used as a label ("rx7900xtx iq2 xs: … Review"). The subject is *supposed* to appear in the
+  // title — the prompt asks for it — so matching the slug words anywhere rejected every
+  // multi-word slug and made the whole queue ungeneratable. Only the prefix form is a defect.
+  if (slug) {
+    const s = String(slug).toLowerCase();
+    const spaced = s.replace(/-/g, " ");
+    const lower = title.toLowerCase();
+    if (lower.includes(s)) throw new Error(`title contains the raw slug: ${title}`);
+    if (new RegExp(`^\\s*${spaced.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[:|—–-]`).test(lower)) {
+      throw new Error(`title uses the slug as a label: ${title}`);
+    }
   }
 
   // Structure is what makes the page extractable by answer engines: headings split it into
