@@ -402,12 +402,28 @@ async function main() {
     const planPath = join(HERE, "plan.json");
     const plan = JSON.parse(readFileSync(planPath, "utf8"));
     const today = new Date().toISOString().slice(0, 10);
+    // Which languages a radar pick is written in.
+    //
+    // It used to be every locale in the plan, which on 2026-10-23 meant 7 picks × 7 locales = 49
+    // articles in one morning from a queue whose normal load is a handful. Three things break at
+    // that size: images.mjs must illustrate all 49, publish.mjs holds back any article without a
+    // hero image, and verify.mjs rejects cross-locale pairs above 0.4 similarity — the same
+    // article written seven times from one model is exactly that shape.
+    //
+    // A radar name is also an *English* signal: the model or repo is named in Latin script, and its
+    // search demand is overwhelmingly English. Writing it in six more languages adds no traffic
+    // for a term nobody searches for locally.
+    const wanted = (process.env.RADAR_LOCALES ?? "en")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const locales = (plan.locales ?? ["en"]).filter((l) => wanted.includes(l));
     // Keyed on locale+slug against the plan as read. Verified idempotent: a second run finds each
     // name already present per locale and adds nothing, so it picks new candidates instead.
     const known = new Set(plan.items.map((i) => `${i.locale}/${i.slug}`));
     let added = 0;
     for (const c of picked) {
-      for (const locale of plan.locales ?? ["en"]) {
+      for (const locale of locales) {
         if (known.has(`${locale}/${c.slug}`)) continue;
         plan.items.push({
           id: `${locale}-radar-${c.slug}`,
@@ -442,7 +458,7 @@ async function main() {
         const { notifyFeishu } = await import("../notify.mjs");
         await notifyFeishu({
           stage: "content/radar",
-          reason: `热词雷达新增 ${picked.length} 个选题（共 ${added} 篇待生成）`,
+          reason: `热词雷达新增 ${picked.length} 个选题（共 ${added} 篇待生成，语言 ${locales.join("/")}）`,
           raw: picked.map((c) => `  ${c.score.toFixed(2)} ${c.name} (${c.source})`).join("\n"),
         });
       } catch (err) {
