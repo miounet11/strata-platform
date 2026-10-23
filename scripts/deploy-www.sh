@@ -110,23 +110,35 @@ fi
 # Exit 2 means the check could not run — no build output, or no page above --min-tokens. That is
 # always fatal: after a successful build it can only mean this gate is broken, and continuing would
 # print a deploy as "duplicates reported, continuing" when nothing was measured at all.
+#
+# Only exit 1 is a finding. Every other non-zero code is the gate failing to run, and on 2026-10-23
+# this mattered: `scripts/similarity.mjs` existed in the workstation checkout but was never synced
+# to the server, so `node` exited 1 with MODULE_NOT_FOUND on every deploy while this branch printed
+# "duplicate pages reported, deploy continues". A missing file and 1,975 duplicate pairs are not the
+# same fact, and the catch-all `*)` was what collapsed them.
+#
+# NEXT_DIST_DIR is `.next-build` because this runs before the swap. The `.next` copy of the server
+# output is pruned after the swap, so this gate cannot be re-run later against a live tree.
 if [ "${SKIP_SIMILARITY:-0}" = "1" ]; then
   echo "similarity SKIPPED (SKIP_SIMILARITY=1)"
+elif [ ! -f scripts/similarity.mjs ]; then
+  echo "similarity gate missing: scripts/similarity.mjs not found in apps/www — refusing to deploy" >&2
+  exit 1
 else
   SITE_DIR=. NEXT_DIST_DIR=.next-build node scripts/similarity.mjs
   similarity_status=$?
   case "$similarity_status" in
     0) ;;
-    2)
-      echo "similarity could not run (exit=2) — gate is broken, refusing to deploy" >&2
-      exit 1
-      ;;
-    *)
+    1)
       if [ "${SIMILARITY_STRICT:-0}" = "1" ]; then
-        echo "similarity failed (exit=$similarity_status) — live site untouched" >&2
+        echo "similarity failed (exit=1) — live site untouched" >&2
         exit 1
       fi
-      echo "similarity reported duplicate pages (exit=$similarity_status) — deploy continues, set SIMILARITY_STRICT=1 to block" >&2
+      echo "similarity reported duplicate pages (exit=1) — deploy continues, set SIMILARITY_STRICT=1 to block" >&2
+      ;;
+    *)
+      echo "similarity could not run (exit=$similarity_status) — gate is broken, refusing to deploy" >&2
+      exit 1
       ;;
   esac
 fi
