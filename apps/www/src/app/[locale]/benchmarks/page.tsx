@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BenchmarkBoard } from "@/components/BenchmarkBoard";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { getBenchmarks } from "@/lib/benchmarks";
+import { jsonLdGraph } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({
@@ -25,6 +27,7 @@ export default async function BenchmarksPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Dataset",
+    "@id": `${SITE}/${locale}/benchmarks#dataset`,
     name: t("title"),
     description: t("intro"),
     url: `https://www.stratat.com/${locale}/benchmarks`,
@@ -34,7 +37,10 @@ export default async function BenchmarksPage({
 
   return (
     <div className="container container-wide page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([jsonLd])) }}
+      />
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
       <EnrichedImage id="bench-hero" locale={locale} className="page-visual" />

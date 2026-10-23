@@ -24,7 +24,8 @@
     "topics": "场景",
     "gpus": "显卡",
     "guides": "指南",
-    "gpuBrands": "显卡品牌"
+    "gpuBrands": "显卡品牌",
+    "skipToContent": "跳到主要内容"
   },
   "topics": {
     "title": "场景",

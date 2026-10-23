@@ -24,7 +24,8 @@
     "topics": "Usos",
     "gpus": "GPUs",
     "guides": "Guías",
-    "gpuBrands": "Marcas de GPU"
+    "gpuBrands": "Marcas de GPU",
+    "skipToContent": "Saltar al contenido principal"
   },
   "topics": {
     "title": "Usos",

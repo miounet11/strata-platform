@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { ReleaseNotes } from "@/components/ReleaseNotes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
+import { jsonLdGraph, nodeId } from "@/lib/jsonld";
 import { RelatedContent } from "@/components/RelatedContent";
 import { releasePath } from "@/lib/routes";
 import { engineVariantLabel } from "@/lib/downloads";
@@ -47,9 +48,11 @@ export default async function ReleaseVersionPage({
   const older = index >= 0 && index < releases.length - 1 ? releases[index + 1] : null;
   const assets = release.assets ?? [];
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
+  const pageId = nodeId(`${site}/${locale}/releases/${release.tag}`, "webpage");
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
+    "@id": nodeId(`${site}/${locale}/releases/${release.tag}`, "software"),
     name: "Strata",
     softwareVersion: release.tag.replace(/^v/i, ""),
     datePublished: release.publishedAt,
@@ -64,15 +67,15 @@ export default async function ReleaseVersionPage({
   const crumbLd = breadcrumbJsonLd(SITE, locale, [
     { path: "", name: tnav("home") },
     { path: "/releases", name: tnav("releases") },
-    { name: release.name },
+    { name: release.name, id: pageId },
   ]);
 
   return (
     <article className="container page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      {crumbLd ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
-      ) : null}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([jsonLd, crumbLd])) }}
+      />
       <Breadcrumbs label={release.name} />
       <h1 style={{ marginBottom: "0.4rem" }}>
         {release.name} {index === 0 ? <span className="badge">{t("latest")}</span> : null}

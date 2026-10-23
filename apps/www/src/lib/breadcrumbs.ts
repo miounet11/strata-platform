@@ -9,7 +9,7 @@
 export function breadcrumbJsonLd(
   site: string,
   locale: string,
-  trail: Array<{ path?: string; name: string }>,
+  trail: Array<{ path?: string; name: string; id?: string }>,
 ) {
   if (trail.length < 2) return null;
   return {
@@ -19,7 +19,18 @@ export function breadcrumbJsonLd(
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      ...(item.path ? { item: `${site}/${locale}${item.path}` } : {}),
+      // The last item is the page itself: point at its node instead of restating the URL, so the
+      // trail and the page node are visibly one thing inside the `@graph`.
+      //
+      // `path` is tested against `undefined`, not for truthiness: the home crumb is `path: ""`,
+      // which is falsy but must still resolve to `/en`. Testing truthiness silently dropped the
+      // item URL from the first crumb on all five trails that start at the home page, and Google
+      // requires `item` on every entry but the last.
+      ...(item.id
+        ? { item: { "@id": item.id } }
+        : item.path !== undefined
+          ? { item: `${site}/${locale}${item.path}` }
+          : {}),
     })),
   };
 }

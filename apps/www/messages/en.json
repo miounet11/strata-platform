@@ -107,7 +107,8 @@
     "topics": "Guides",
     "gpus": "GPUs",
     "guides": "Guides",
-    "gpuBrands": "GPU brands"
+    "gpuBrands": "GPU brands",
+    "skipToContent": "Skip to main content"
   },
   "topics": {
     "title": "Guides",

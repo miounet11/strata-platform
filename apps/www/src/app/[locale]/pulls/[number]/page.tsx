@@ -4,7 +4,8 @@ import { Link } from "@/i18n/navigation";
 import { CommunityBody } from "@/components/CommunityBody";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { excerpt, getCommunity, getPull, relatedLinks } from "@/lib/community";
-import { siteMetadata } from "@/lib/seo";
+import { jsonLdGraph } from "@/lib/jsonld";
+import { SITE, siteMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   const { pulls } = getCommunity();
@@ -37,6 +38,7 @@ export default async function PullDetailPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
+    "@id": `${SITE}/${locale}/pulls/${pr.number}#article`,
     headline: pr.title,
     url: pr.htmlUrl,
     datePublished: pr.createdAt,
@@ -46,7 +48,10 @@ export default async function PullDetailPage({
 
   return (
     <article className="container page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([jsonLd])) }}
+      />
       <Breadcrumbs label={`#${pr.number} ${pr.title}`} />
       <h1>
         #{pr.number} {pr.title}

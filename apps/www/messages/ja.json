@@ -24,7 +24,8 @@
     "topics": "使い方",
     "gpus": "GPU",
     "guides": "ガイド",
-    "gpuBrands": "GPUブランド"
+    "gpuBrands": "GPUブランド",
+    "skipToContent": "メインコンテンツへスキップ"
   },
   "topics": {
     "title": "使い方",

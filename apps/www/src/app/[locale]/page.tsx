@@ -7,6 +7,7 @@ import { guidePath, releasePath } from "@/lib/routes";
 import { getReleases } from "@/lib/releases";
 import { latestPosts, postHeadline } from "@/lib/creator";
 import { comparisonSignals, latestXSignals, upgradeSignals, worthReading } from "@/lib/intelligence";
+import { jsonLdGraph } from "@/lib/jsonld";
 import { siteMetadata, softwareJsonLd } from "@/lib/seo";
 
 export const revalidate = 1800;
@@ -55,7 +56,7 @@ export default async function HomePage({
     <div className="container hero">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([jsonLd])) }}
       />
       <p className="badge">{version}</p>
       <h1>{t("heroTitle")}</h1>

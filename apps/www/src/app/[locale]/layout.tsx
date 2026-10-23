@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -25,13 +25,19 @@ export default async function LocaleLayout({
   // Guides are written per locale, not translated, so the switcher must only offer the
   // languages that actually published this slug. Resolved on the server, passed as data.
   const guideLocales = guideLocaleMap();
+  const t = await getTranslations("nav");
 
   return (
     <html lang={locale}>
       <body>
         <NextIntlClientProvider messages={messages}>
+          {/* Keyboard users must be able to jump the header on every page; `main` carries
+              id="main-content" so this target exists everywhere, including the 404 body. */}
+          <a href="#main-content" className="skip-link">
+            {t("skipToContent")}
+          </a>
           <SiteHeader guideLocales={guideLocales} />
-          <main>{children}</main>
+          <main id="main-content">{children}</main>
           <SiteFooter />
         </NextIntlClientProvider>
       </body>

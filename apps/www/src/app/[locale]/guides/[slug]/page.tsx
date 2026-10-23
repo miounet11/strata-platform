@@ -8,6 +8,7 @@ import { RelatedContent, relatedArticles } from "@/components/RelatedContent";
 import { articleLocales, getArticle, getLiveArticles, localesForSlug } from "@/lib/articles";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
 import { allGpus } from "@/lib/gpus";
+import { jsonLdGraph, nodeId } from "@/lib/jsonld";
 import { linkifyMentions } from "@/lib/internal-links";
 import { seoMetadata } from "@/lib/seo-messages";
 
@@ -64,14 +65,16 @@ export default async function GuidePage({
   const url = `${SITE}/${locale}/guides/${slug}`;
   const tn = await getTranslations({ locale, namespace: "nav" });
 
+  const pageId = nodeId(url, "webpage");
   const articleLd = {
     "@context": "https://schema.org",
     "@type": "Article",
+    "@id": nodeId(url, "article"),
     headline: title,
     description,
     inLanguage: locale,
     url,
-    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    mainEntityOfPage: { "@id": pageId },
     datePublished: article.publishAt,
     dateModified: article.generatedAt ?? article.publishAt,
     author: { "@type": "Organization", name: "Stratat" },
@@ -82,8 +85,18 @@ export default async function GuidePage({
   const crumbLd = breadcrumbJsonLd(SITE, locale, [
     { path: "", name: tn("home") },
     { path: "/guides", name: tn("guides") },
-    { name: title },
+    { name: title, id: pageId },
   ]);
+
+  const webPageLd = {
+    "@type": "WebPage",
+    "@id": pageId,
+    url,
+    name: title,
+    description,
+    inLanguage: locale,
+    isPartOf: { "@type": "WebSite", name: "Strata", url: SITE },
+  };
 
   const faqLd =
     faq.length > 0
@@ -105,13 +118,12 @@ export default async function GuidePage({
 
   return (
     <div className="container page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
-      {crumbLd ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
-      ) : null}
-      {faqLd ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      ) : null}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLdGraph([webPageLd, articleLd, crumbLd, faqLd])),
+        }}
+      />
 
       <Breadcrumbs label={title} />
       <h1>{title}</h1>

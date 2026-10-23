@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BenchmarkBoard } from "@/components/BenchmarkBoard";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
+import { jsonLdGraph, nodeId } from "@/lib/jsonld";
 import { RelatedContent } from "@/components/RelatedContent";
 import { getLiveArticles } from "@/lib/articles";
 import { getGpu } from "@/lib/gpus";
@@ -48,17 +49,34 @@ export default async function BenchmarkRigPage({
   // Only rigs that are also catalogue cards have a spec page; the rest would link to a 404.
   const gpu = getGpu(rig.id);
 
+  const url = `${SITE}/${locale}/benchmarks/${rig.id}`;
+  const pageId = nodeId(url, "webpage");
   const crumbLd = breadcrumbJsonLd(SITE, locale, [
     { path: "", name: tnav("home") },
     { path: "/benchmarks", name: tnav("benchmarks") },
-    { name: rig.name },
+    { name: rig.name, id: pageId },
   ]);
 
   return (
     <div className="container container-wide page">
-      {crumbLd ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
-      ) : null}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            jsonLdGraph([
+              {
+                "@type": "WebPage",
+                "@id": pageId,
+                url,
+                name: rig.name,
+                inLanguage: locale,
+                isPartOf: { "@type": "WebSite", name: "Strata", url: SITE },
+              },
+              crumbLd,
+            ]),
+          ),
+        }}
+      />
       <Breadcrumbs label={rig.name} />
       <h1>{rig.name}</h1>
       <p style={{ color: "var(--muted)" }}>

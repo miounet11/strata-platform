@@ -5,7 +5,8 @@ import { EnrichedImage } from "@/components/EnrichedBlock";
 import { CommunityBody } from "@/components/CommunityBody";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { excerpt, getCommunity, getIssue, relatedLinks } from "@/lib/community";
-import { siteMetadata } from "@/lib/seo";
+import { jsonLdGraph } from "@/lib/jsonld";
+import { SITE, siteMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   const { issues } = getCommunity();
@@ -38,6 +39,7 @@ export default async function IssueDetailPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "DiscussionForumPosting",
+    "@id": `${SITE}/${locale}/issues/${issue.number}#posting`,
     headline: issue.title,
     url: issue.htmlUrl,
     datePublished: issue.createdAt,
@@ -47,7 +49,10 @@ export default async function IssueDetailPage({
 
   return (
     <article className="container page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([jsonLd])) }}
+      />
       <Breadcrumbs label={`#${issue.number} ${issue.title}`} />
       <h1>
         #{issue.number} {issue.title}

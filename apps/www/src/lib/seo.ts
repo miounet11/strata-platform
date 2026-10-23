@@ -92,6 +92,7 @@ export function softwareJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
+    "@id": `${SITE}/#software`,
     name: "Strata",
     applicationCategory: "DeveloperApplication",
     operatingSystem: "Windows, Linux",

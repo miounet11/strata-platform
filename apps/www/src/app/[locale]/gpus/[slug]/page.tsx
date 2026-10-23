@@ -19,6 +19,7 @@ import { guidesMentioning } from "@/lib/articles";
 import { guidePath, gpuPath, gpuSeriesPath, gpuVendorPath, rigPath } from "@/lib/routes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
+import { jsonLdGraph, nodeId } from "@/lib/jsonld";
 import { RelatedContent } from "@/components/RelatedContent";
 import { siteMetadata } from "@/lib/seo";
 
@@ -87,12 +88,13 @@ export default async function GpuPage({
     title: article.article.title,
   }));
 
+  const pageId = nodeId(`${SITE}/${locale}${gpuPath(gpu.slug)}`, "webpage");
   const crumbLd = breadcrumbJsonLd(SITE, locale, [
     { path: "", name: tnav("home") },
     { path: "/gpus", name: tnav("gpus") },
     { path: gpuVendorPath(vendorSlug(gpu.vendor)), name: vendorLabel[gpu.vendor] },
     { path: gpuSeriesPath(vendorSlug(gpu.vendor), seriesSlug(gpu.series)), name: gpu.series },
-    { name: gpu.name },
+    { name: gpu.name, id: pageId },
   ]);
 
   // The trail is already emitted as BreadcrumbList; this adds the hardware facts a crawler
@@ -101,6 +103,7 @@ export default async function GpuPage({
   const productLd = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": nodeId(`${SITE}/${locale}${gpuPath(gpu.slug)}`, "product"),
     name: gpu.name,
     brand: { "@type": "Brand", name: vendorLabel[gpu.vendor] },
     category: "Graphics processing unit",
@@ -121,10 +124,10 @@ export default async function GpuPage({
 
   return (
     <div className="container page">
-      {crumbLd ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
-      ) : null}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([productLd, crumbLd])) }}
+      />
       <Breadcrumbs
         label={gpu.name}
         parents={[

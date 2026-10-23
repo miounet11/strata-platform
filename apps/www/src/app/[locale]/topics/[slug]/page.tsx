@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
+import { jsonLdGraph, nodeId } from "@/lib/jsonld";
 import { rigPath } from "@/lib/routes";
 import { RelatedContent, relatedArticles } from "@/components/RelatedContent";
 import { getLiveTopics, getTopic, hasTopic, rigsForTopic, topicText } from "@/lib/topics";
@@ -56,13 +57,16 @@ export default async function TopicPage({
   const title = topicText(topic.title, locale);
   const body = topicText(topic.body, locale);
   const rigs = rigsForTopic(topic);
+  const url = `${SITE}/${locale}/topics/${topic.slug}`;
+  const pageId = nodeId(url, "webpage");
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
+    "@id": pageId,
     name: title,
     description: body,
-    url: `https://www.stratat.com/${locale}/topics/${topic.slug}`,
-    isPartOf: { "@type": "WebSite", name: "Strata", url: "https://www.stratat.com" },
+    url,
+    isPartOf: { "@type": "WebSite", name: "Strata", url: SITE },
   };
 
   // Topics are the editorial entry point, so each one points at the guides written for the same
@@ -71,15 +75,17 @@ export default async function TopicPage({
 
   return (
     <div className="container page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
-            breadcrumbJsonLd(SITE, locale, [
-              { path: "", name: "Strata" },
-              { path: "/topics", name: t("title") },
-              { name: title },
+            jsonLdGraph([
+              jsonLd,
+              breadcrumbJsonLd(SITE, locale, [
+                { path: "", name: "Strata" },
+                { path: "/topics", name: t("title") },
+                { name: title, id: pageId },
+              ]),
             ]),
           ),
         }}

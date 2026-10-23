@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCreatorPulse, postExcerpt, postHeadline } from "@/lib/creator";
+import { jsonLdGraph } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 import { seoMetadata } from "@/lib/seo-messages";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 
@@ -28,6 +30,7 @@ export default async function CreatorPage({
   const personLd = {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": `${SITE}/${locale}/creator#person`,
     name: profile.name,
     url: profile.xUrl,
     sameAs: [profile.xUrl, profile.github, profile.strataRepo, profile.telegram],
@@ -36,7 +39,10 @@ export default async function CreatorPage({
 
   return (
     <div className="container page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([personLd])) }}
+      />
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
       <EnrichedImage id="creator-hero" locale={locale} className="page-visual" />
