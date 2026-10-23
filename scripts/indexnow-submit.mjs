@@ -4,11 +4,17 @@
  * The key is public: apps/www/public/<key>.txt must match INDEXNOW_KEY.
  *
  * Default (no --since): hubs + every release + benchmarks + newest
- * issues/pulls/posts, capped at 500. Same list as before this flag existed.
+ * issues/pulls/posts + every live guide, capped at 500. Same list as before this flag existed,
+ * plus guides — see below.
  *
- * --since <ISO> or FRESHNESS_SINCE: only release / issue / pull / post pages
+ * --since <ISO> or FRESHNESS_SINCE: only release / issue / pull / post / guide pages
  * whose publishedAt or updatedAt is strictly later than that instant, expanded
  * per locale. Hub URLs are left out. Zero matches falls back to the full list.
+ *
+ * Guides were missing from both lists until 2026-10-23: the sitemap committed them, but IndexNow
+ * was never told, so the article the radar wrote today waited for a crawler to notice it. For a
+ * page whose whole value is being found while the name is still rising, that wait is the
+ * difference between traffic and no traffic.
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -60,6 +66,35 @@ function addLocales(urls, path) {
   for (const locale of locales) urls.add(`${SITE}/${locale}${path}`);
 }
 
+/**
+ * Articles the content pipeline has flipped to `live`.
+ *
+ * Read from the article files rather than the sitemap because only these carry `publishedAt`,
+ * which is what `--since` needs: the sitemap is regenerated at build time and has no dates.
+ * A guide is written per locale, so it is added under its own locale only — expanding it across
+ * all seven would submit six 404s and burn the crawl budget that made the page worth publishing.
+ */
+function liveGuides() {
+  const out = [];
+  const outDir = join(ROOT, "scripts/content/out");
+  let entries;
+  try {
+    entries = readdirSync(outDir, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    for (const name of readdirSync(join(outDir, entry.name))) {
+      if (!name.endsWith(".json")) continue;
+      const item = loadJson(`scripts/content/out/${entry.name}/${name}`);
+      if (item?.status !== "live" || !item.slug || !item.locale) continue;
+      out.push({ locale: item.locale, slug: item.slug, t: timeOf(item.publishedAt) });
+    }
+  }
+  return out;
+}
+
 function timeOf(iso) {
   const t = Date.parse(String(iso ?? ""));
   return Number.isFinite(t) ? t : NaN;
@@ -70,7 +105,7 @@ function readSince() {
   let values;
   try {
     ({ values } = parseArgs({
-      options: { since: { type: "string" } },
+      options: { since: { type: "string" }, print: { type: "boolean" } },
       strict: true,
     }));
   } catch (err) {
@@ -88,6 +123,11 @@ function readSince() {
 
 function collectFull() {
   const urls = new Set();
+  // Guides go in first because the 500-URL cap trims from the end: appended last, a freshly
+  // published article was the first thing dropped, which is the opposite of what is wanted.
+  const guides = liveGuides().sort((a, b) => (b.t || 0) - (a.t || 0));
+  for (const guide of guides) urls.add(`${SITE}/${guide.locale}/guides/${guide.slug}`);
+
   for (const path of hubs) addLocales(urls, path);
 
   const releases = loadJson("apps/www/src/data/releases.json");
@@ -118,6 +158,7 @@ function collectFull() {
     String(b.publishedAt ?? "").localeCompare(String(a.publishedAt ?? "")),
   );
   for (const post of posts.slice(0, 8)) addLocales(urls, `/creator/updates/${post.id}`);
+
   return urls;
 }
 
@@ -145,9 +186,19 @@ function collectIncremental(sinceMs) {
     if (post?.id && t > sinceMs) ranked.push({ t, path: `/creator/updates/${post.id}` });
   }
 
+  // Guides carry their own locale, so they are ranked as full URLs rather than as a path that
+  // addLocales would expand across every locale.
+  const guideUrls = [];
+  for (const guide of liveGuides()) {
+    if (guide.t > sinceMs) {
+      guideUrls.push({ t: guide.t, url: `${SITE}/${guide.locale}/guides/${guide.slug}` });
+    }
+  }
+
   ranked.sort((a, b) => b.t - a.t || a.path.localeCompare(b.path));
   const urls = new Set();
   for (const item of ranked) addLocales(urls, item.path);
+  for (const guide of guideUrls) urls.add(guide.url);
   return urls;
 }
 
@@ -169,6 +220,15 @@ if (sinceRaw) {
 
 const KEY = publicKey();
 const urlList = [...urls].slice(0, 500);
+
+// `--print` shows exactly what would be submitted without posting: the 500-URL cap silently
+// drops the tail, so "did my new article make the list" is not answerable from the count alone.
+if (process.argv.includes("--print")) {
+  for (const url of urlList) console.log(url);
+  console.log(`(${urlList.length} of ${urls.size} URLs${modeNote})`);
+  process.exit(0);
+}
+
 if (!KEY) {
   console.log(`indexnow skipped — no public key (${urlList.length} URLs ready)${modeNote}`);
   process.exit(0);

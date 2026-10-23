@@ -4,7 +4,7 @@
 //
 //   node scripts/content/plan.mjs            # write scripts/content/plan.json
 //   node scripts/content/plan.mjs --stats    # print the breakdown only
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -237,15 +237,59 @@ for (const locale of LOCALES) {
   }
 }
 
+/**
+ * Carry radar picks forward.
+ *
+ * This script rebuilds `items` from scratch and overwrites plan.json, while the radar appends its
+ * picks to that same file. A replan therefore deleted every term the radar had queued — and
+ * `daily-guides.sh` replans *automatically* the moment the schedule is exhausted, so the deletion
+ * would have arrived as routine maintenance. The radar would keep looking healthy (it merges every
+ * morning) while none of its articles were ever written.
+ *
+ * Radar items are kept verbatim, including their original `publishAt`: the radar dates a pick for
+ * the day it was found, and re-slotting a name discovered three weeks ago would publish a page
+ * about a trend that has since been covered elsewhere.
+ */
+const existingPlanPath = join(HERE, "plan.json");
+if (existsSync(existingPlanPath)) {
+  let previous = null;
+  try {
+    previous = JSON.parse(readFileSync(existingPlanPath, "utf8"));
+  } catch {
+    // A corrupt plan is not a reason to refuse to write a new one.
+    previous = null;
+  }
+  // Radar entries expire. A pick was dated for the day its signal was seen; if the pipeline never
+  // wrote it — the queue was long, images were missing, generation failed — then a month later it
+  // is a page about a trend the rest of the web already covered, and carrying it forward forever
+  // would fill the queue with dead names that block the ones found this morning. Anything already
+  // written is protected by the article file, not by this entry.
+  const radarRetentionDays = 14;
+  const radarCutoff = new Date(Date.now() - radarRetentionDays * 86400000)
+    .toISOString()
+    .slice(0, 10);
+
+  for (const item of previous?.items ?? []) {
+    if (item?.kind !== "radar" || !item.slug || !item.locale) continue;
+    if (item.publishAt && item.publishAt < radarCutoff) continue;
+    const key = `${item.locale}/radar/${item.slug}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    items.push(item);
+  }
+}
+
 const byLocale = {};
 for (const item of items) byLocale[item.locale] = (byLocale[item.locale] ?? 0) + 1;
 const byKind = {};
 for (const item of items) byKind[item.kind] = (byKind[item.kind] ?? 0) + 1;
 
-// Stable ordering, then spread across the week so publishing is paced.
+// Stable ordering, then spread across the week so publishing is paced. Radar items keep the date
+// they were found on: a name is worth a page while it is rising, and re-slotting it into the
+// pacing schedule would hold it for weeks after the signal decayed.
 items.forEach((item, index) => {
   item.order = index;
-  item.publishAt = publishSlot(index, items.length);
+  if (item.kind !== "radar") item.publishAt = publishSlot(index, items.length);
   item.status = "scheduled";
 });
 

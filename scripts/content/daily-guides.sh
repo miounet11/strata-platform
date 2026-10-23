@@ -158,6 +158,18 @@ if [ -z "$locales" ]; then
   fi
 fi
 
+# Radar runs before the locale queue is turned into articles. Its whole value is timing: a name is
+# worth a page while it is still rising, so it has to become a plan item today, not sit in
+# radar.json. --merge appends today-dated items; generate.mjs then writes them like any other and
+# publish.mjs releases them the same way. A dead source must not stop the day's scheduled work, so
+# a failure here is reported and carried, never fatal.
+/usr/bin/node scripts/content/radar.mjs --merge
+radar_status=$?
+echo "radar exit=$radar_status"
+if [ "$radar_status" -ne 0 ]; then
+  echo "WARNING: radar reported a problem (exit=$radar_status); scheduled articles still run"
+fi
+
 if [ -n "$locales" ]; then
   echo "writing for: $locales"
   for locale in $locales; do
@@ -229,6 +241,19 @@ if [ "${1:-}" != "--no-build" ]; then
   if [ "$deploy_status" -ne 0 ]; then
     fail "站点构建或部署失败（deploy-www.sh exit=$deploy_status），线上仍是上一版" 1
   fi
+fi
+
+# Tell the indexers what just shipped, and only now: submitting before the build would hand
+# crawlers a URL that still 404s, which is worse than not submitting. This step did not exist in
+# this job at all — `indexnow-submit.mjs` was only reachable through `content-grow.mjs` and
+# `freshness-watch.mjs`, so every article published here waited for a crawler to find it.
+# For a radar article, whose whole value is being indexed while the name is still rising, that
+# wait can outlast the signal. Not fatal: a failed submit costs discovery time, not the run.
+/usr/bin/node "$ROOT/scripts/indexnow-submit.mjs"
+indexnow_status=$?
+echo "indexnow exit=$indexnow_status"
+if [ "$indexnow_status" -ne 0 ]; then
+  echo "WARNING: IndexNow 提交失败（exit=$indexnow_status）；文章已上线，只是收录变慢"
 fi
 
 # Content that failed to generate is a real failure even when verify passes on what exists:

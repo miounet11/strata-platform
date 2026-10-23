@@ -1,6 +1,7 @@
 node_modules
 dist
 .next
+.next-build
 .turbo
 *.log
 .env
@@ -22,6 +23,11 @@ apps/www/tsconfig.tsbuildinfo
 .freshness-state.json
 .freshness.lock
 
+# Term radar: per-run output and baseline (tens of thousands of URLs), not source. Rebuilt by the
+# next run, so committing them would add megabytes of churn on every job.
+scripts/content/radar.json
+scripts/content/radar-state.json
+
 # Client fork build output
 apps/client-upstream/host/dist
 apps/client-upstream/desktop/dist
@@ -29,3 +35,6 @@ apps/client-upstream/desktop/dist
 # Internal content board secret (server-only, never committed)
 .dashboard-secret
 apps/www/.dashboard-secret
+
+# Site factory: its own repository (loututu114-pixel/yyds), versioned separately
+.factory/
