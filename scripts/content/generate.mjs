@@ -92,8 +92,12 @@ function buildPrompt(item) {
     factsBlock(item),
     "",
     "Return ONE JSON object with exactly these keys:",
-    `  title: string, 50-62 characters, contains the subject, no clickbait, no site name`,
-    `  description: string, 120-155 characters, a real summary for a search result`,
+    // The limits are repeated as hard limits because a range alone was read as a suggestion: on
+    // 2026-10-23 a radar article came back at 279 characters for the description, and every retry
+    // overshot the same way until the item failed outright. A number the writer is told it will be
+    // rejected for exceeding is followed; "120-155" is not.
+    `  title: string, 50-62 characters, contains the subject, no clickbait, no site name. Over 100 characters is rejected`,
+    `  description: string, 120-155 characters, a real summary for a search result. Over 200 characters is rejected — count before answering`,
     `  body: string, markdown, at least 900 characters, using these sections:`,
     `        1. a 2-3 sentence answer-first opening (the conclusion, before any preamble)`,
     `        2. "## " heading sections that explain the why and the how`,
@@ -201,18 +205,6 @@ function parseArticle(raw, slug) {
   }
   if (title.length < 20) throw new Error(`title too short (${title.length}): ${title}`);
 
-  // The prompt asks for 50-62 characters and 120-155 for the description; until now only the
-  // lower bound was enforced. On 2026-10-23 a radar article came back at 73 and 176 characters,
-  // which is past where search results truncate: the tail of a long title and description is
-  // simply never shown, so the words the writer put there are wasted. Generous ceilings (the
-  // upper end of the prompt plus a little slack) reject only the clearly-too-long, never a
-  // borderline sentence written for a market where the unit name is longer.
-  if (title.length > 100) throw new Error(`title too long (${title.length}): ${title}`);
-  const description = String(obj.description ?? "").trim();
-  if (description.length > 200) {
-    throw new Error(`description too long (${description.length}): ${description.slice(0, 80)}…`);
-  }
-
   // A title must not be *labelled* with the slug ("rx7900xtx iq2 xs: … Review"). The subject is
   // supposed to appear in the title — the prompt asks for it — so any substring test rejects
   // legitimate titles and is not a defect. Hardware slugs are model designations ("rtx5090-iq2-xs")
@@ -246,7 +238,34 @@ function parseArticle(raw, slug) {
         .filter((line) => line.trim().startsWith("|") && line.trim() !== "").length
     : 0;
   if (dataRows < 3) throw new Error(`body needs a fact table with a delimiter row, got ${dataRows} data rows`);
+
+  // Titles and descriptions are trimmed rather than rejected. The prompt asks for 50-62 and
+  // 120-155 characters, and this model treats both as suggestions: on 2026-10-23 a radar article
+  // came back at 279 characters, and every one of the three attempts overshot further (314), so
+  // the item failed outright and its signal was lost. Repeating the limit in the prompt changed
+  // nothing. A description that is merely too long is not a bad article — its opening sentence is
+  // still the summary — so cutting at a word boundary keeps the article and drops the tail a
+  // search result would have hidden anyway. The title keeps its ceiling as a real error: a title
+  // that needs 100+ characters is a structural problem with the premise, not trimming.
+  if (title.length > 100) throw new Error(`title too long (${title.length}): ${title}`);
+  const description = String(obj.description).trim();
+  obj.description = description.length > 200 ? clampToSentence(description, 200) : description;
   return obj;
+}
+
+/**
+ * Cut `text` to at most `max` characters, preferring a sentence end, then a word boundary.
+ *
+ * Truncation without this reads as broken prose mid-word, which is worse than the long version.
+ */
+function clampToSentence(text, max) {
+  const head = text.slice(0, max);
+  const sentenceEnd = Math.max(head.lastIndexOf(". "), head.lastIndexOf("! "), head.lastIndexOf("? "));
+  // Only accept a sentence break that keeps most of the text: a stray period near the start would
+  // otherwise cut a 250-character summary down to 40.
+  if (sentenceEnd >= max * 0.6) return text.slice(0, sentenceEnd + 1).trim();
+  const wordEnd = head.lastIndexOf(" ");
+  return `${(wordEnd > 0 ? text.slice(0, wordEnd) : head).trim()}…`;
 }
 
 /** Temp file in the destination directory, then rename: readers never see a partial article. */

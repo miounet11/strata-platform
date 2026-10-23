@@ -48,13 +48,22 @@ test("the prompt asks for the subject in the title, so a multi-word slug is allo
   );
 });
 
-test("an over-long title or description is rejected", () => {
-  // Observed on 2026-10-23: a radar article came back with a 73-character title and a
-  // 176-character description while the prompt asked for 50-62 and 120-155. Only the *lower*
-  // bound was enforced, so the tail — the part a search result truncates away — shipped unseen.
+test("an over-long title is rejected, but a long description is trimmed and kept", () => {
+  // Observed on 2026-10-23: a radar article came back at 73/176 characters while the prompt asked
+  // for 50-62 and 120-155 — only the lower bound was enforced, so the tail a search result hides
+  // shipped unseen. Rejecting was the obvious fix and the wrong one: every retry of that item
+  // overshot further (279 → 314), so the article failed outright and its signal was lost for a
+  // description that was merely verbose.
   assert.equal(accepts(JSON.stringify(article("T".repeat(140))), "some-slug"), false);
-  const longDesc = { ...article("A perfectly ordinary title for a local model guide"), description: "d".repeat(260) };
-  assert.equal(accepts(JSON.stringify(longDesc), "some-slug"), false);
+
+  const longDesc = {
+    ...article("A perfectly ordinary title for a local model guide"),
+    description: "A real summary sentence about local inference. " .repeat(6),
+  };
+  const parsed = parseArticle(JSON.stringify(longDesc), "some-slug");
+  assert.ok(parsed.description.length <= 200, `expected <= 200, got ${parsed.description.length}`);
+  assert.match(parsed.description, /[.…]$/, "the trim must end on a sentence or a word boundary");
+
   // The ceiling is generous on purpose: a title written for a market with longer unit names
   // must not be rejected for being 80 characters.
   assert.ok(accepts(JSON.stringify(article("Running a Local Model on a Mid-Range Laptop GPU")), "some-slug"));
