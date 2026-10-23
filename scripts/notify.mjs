@@ -40,7 +40,7 @@ function redact(text) {
     .replace(/([?&](?:key|token|api_key|apikey)=)[^&\s"']+/gi, "$1***");
 }
 
-export async function notifyFeishu({ stage, reason, raw = "", host = "" }) {
+export async function notifyFeishu({ stage, reason, raw = "", host = "", title = "" }) {
   const webhook = process.env.NOTIFY_WEBHOOK || process.env.FEISHU_WEBHOOK_URL;
   if (!webhook) {
     console.error(
@@ -53,16 +53,21 @@ export async function notifyFeishu({ stage, reason, raw = "", host = "" }) {
   }
 
   const where = host || process.env.HOSTNAME || "unknown-host";
-  const body = [
-    `【Strata 发布失败】${stage}`,
-    `主机：${where}`,
-    `时间：${new Date().toISOString()}`,
-    `原因：${reason}`,
-    "",
-    raw ? `原文（已脱敏，最多 ${RAW_LIMIT} 字）：\n${redact(raw).slice(-RAW_LIMIT)}` : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  // A report is not a failure. The prefix used to be hardcoded, so anything routed through this
+  // function arrived titled 「Strata 发布失败」 — a daily traffic summary would have read as an
+  // outage. Callers that are failures keep the original wording.
+  const body = title
+    ? [`【${title}】`, `主机：${where}`, `时间：${new Date().toISOString()}`, "", reason].join("\n")
+    : [
+        `【Strata 发布失败】${stage}`,
+        `主机：${where}`,
+        `时间：${new Date().toISOString()}`,
+        `原因：${reason}`,
+        "",
+        raw ? `原文（已脱敏，最多 ${RAW_LIMIT} 字）：\n${redact(raw).slice(-RAW_LIMIT)}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n");
 
   try {
     const response = await fetch(webhook, {
