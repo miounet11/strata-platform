@@ -152,13 +152,34 @@ export async function collectSitemaps(cfg, previous) {
   const seenBefore = new Set(previous?.sitemaps ?? []);
   const fresh = new Map(); // term -> Set(url), from URLs this site did not have before
   const baseline = new Map(); // term -> Set(url), from URLs it already had
+  const failures = []; // directory -> why it contributed nothing this run
+  const hostsOk = new Set(); // directories that answered, so their URL set is authoritative
+  let urlsRead = 0;
+
+  // A directory that never answered before has no baseline, so every one of its URLs would read
+  // as "new" and its entire vocabulary would arrive as a surge. That is exactly what adding
+  // aitoptools' working sitemap URL did on 2026-10-23: 19,829 URLs, all fresh, `blog` at lift 39.
+  // A host's first successful read is baseline only — the same rule the first run applies to
+  // every host, applied per host so one recovered directory cannot flood the radar.
+  const hostsSeenBefore = new Set();
+  for (const u of seenBefore) {
+    try {
+      hostsSeenBefore.add(new URL(u).host);
+    } catch {
+      // Ignore malformed leftovers; they cannot anchor a baseline anyway.
+    }
+  }
 
   for (const sitemapUrl of cfg.urls) {
     let xml;
     try {
       xml = await getText(sitemapUrl);
-    } catch {
-      // One unreachable directory must not lose the others.
+    } catch (err) {
+      // One unreachable directory must not lose the others — but it has to be *visible*. On
+      // 2026-10-23 three of the four configured directories were dead (toolify unreachable,
+      // aitoptools' index URL a 404, futurepedia a 308 to www) and this loop reported nothing,
+      // so a radar with no working source looked exactly like a quiet week with no new names.
+      failures.push(`${new URL(sitemapUrl).host}: ${String(err?.message ?? err).slice(0, 80)}`);
       continue;
     }
 
@@ -181,8 +202,17 @@ export async function collectSitemaps(cfg, previous) {
           ).flat()
         : locs;
 
+    const host = new URL(sitemapUrl).host;
+    if (pages.length === 0) failures.push(`${host}: sitemap had no <loc> entries`);
+    else hostsOk.add(host);
+    urlsRead += pages.length;
+    // Everything from a first-time host goes to the baseline, not to the fresh set.
+    const isNewHost = !hostsSeenBefore.has(host);
+    if (isNewHost && pages.length) {
+      failures.push(`${host}: first read, recorded as baseline (surges start next run)`);
+    }
     for (const u of pages) {
-      addUrlTerms(seenBefore.has(u) ? baseline : fresh, u);
+      addUrlTerms(isNewHost || seenBefore.has(u) ? baseline : fresh, u);
     }
   }
 
@@ -216,12 +246,33 @@ export async function collectSitemaps(cfg, previous) {
     if (!nested) terms.push(row);
   }
 
+  // A directory that is gone and a directory that is quiet both yield zero terms, so the failure
+  // has to be carried out of here. When every configured directory failed the error says so;
+  // a partial failure is still reported, because a radar quietly running on one source is a
+  // different thing from one running on all of them.
+  const error = [
+    urlsRead === 0 ? "no directory answered" : null,
+    failures.length ? failures.join("; ") : null,
+    hasBaseline ? null : "first run: baseline recorded, surges start next run",
+  ]
+    .filter(Boolean)
+    .join(" — ");
+
+  // The snapshot never shrinks. "New" is decided by set difference against it, so any URL that
+  // leaves it comes back as a fake surge on the next run — and URLs leave for reasons that have
+  // nothing to do with the product being new: a directory that did not answer, a sitemap index
+  // whose child list was truncated by `maxUrls`, a gzip response that failed mid-read. Measured
+  // on 2026-10-23: a single run read 19,829 URLs against a 83,245-URL baseline, and a shrinking
+  // snapshot would have re-announced 63,416 of them as new the next morning. Union, not replace.
+  const snapshot = [...new Set([...seenBefore, ...[...fresh.values(), ...baseline.values()].flatMap((s) => [...s])])];
+
   return {
     source: "sitemaps",
     terms,
-    // Old and new together: the next run must treat everything seen today as its baseline.
-    snapshot: [...fresh.values(), ...baseline.values()].flatMap((s) => [...s]),
-    error: hasBaseline ? undefined : "first run: baseline recorded, surges start next run",
+    // Monotonic by construction: today's reads plus everything already known, so the next run
+    // can only ever see genuinely new URLs as new.
+    snapshot,
+    error: error || undefined,
   };
 }
 

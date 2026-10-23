@@ -170,6 +170,22 @@ if [ "$radar_status" -ne 0 ]; then
   echo "WARNING: radar reported a problem (exit=$radar_status); scheduled articles still run"
 fi
 
+# Re-read the locale list after merging. `locales` above was computed before the radar appended
+# today-dated items, so a locale that only the radar has work for was never generated: the item
+# landed in the plan, waited for nothing, and was picked up days later or not at all. This is the
+# whole point of running the radar *before* generation, so the list has to be recomputed here.
+radar_locales=$(/usr/bin/node --input-type=module -e '
+  import plan from "/opt/stratat/scripts/content/plan.json" with { type: "json" };
+  const t = new Date().toISOString().slice(0, 10);
+  const set = new Set(plan.items.filter((a) => a.publishAt === t && a.status === "scheduled").map((a) => a.locale));
+  console.log([...set].join(" "));
+')
+# Union, never a replacement: the radar can only add locales, and dropping one that was already
+# queued would trade one silent gap for another.
+if [ -n "$radar_locales" ]; then
+  locales=$(printf '%s\n%s\n' ${locales} $radar_locales | tr ' ' '\n' | grep -v '^$' | sort -u | tr '\n' ' ')
+fi
+
 if [ -n "$locales" ]; then
   echo "writing for: $locales"
   for locale in $locales; do

@@ -17,6 +17,25 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT" || exit 1
+
+# The radar tests gate every deploy, because the radar is what puts new pages on the site each
+# morning and a broken scorer fails invisibly: it does not throw, it just selects nothing — which
+# looks exactly like a quiet week, and the only symptom is traffic that never arrives. The build
+# already costs minutes; this costs seconds and stops a regression from reaching the live tree.
+#
+# SKIP_TESTS=1 exists for the case where the box is down for an unrelated reason and someone needs
+# the previous build back. It prints, so the log records that the gate was skipped.
+if [ "${SKIP_TESTS:-0}" != "1" ]; then
+  if node --test scripts/content/radar.test.mjs; then
+    echo "radar tests passed"
+  else
+    echo "radar tests failed — live site untouched" >&2
+    exit 1
+  fi
+else
+  echo "WARNING: SKIP_TESTS=1 — radar tests not run for this deploy"
+fi
+
 cd apps/www || exit 1
 
 NO_RESTART=0

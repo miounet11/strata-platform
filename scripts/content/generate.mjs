@@ -54,6 +54,8 @@ const KIND_BRIEF = {
   troubleshoot: "a troubleshooting page for one concrete failure people hit",
   local: "a page about a local-market concern (electricity cost, buying channels, regulation, connectivity)",
   concept: "an explainer for one concept in local LLM deployment",
+  radar:
+    "a page about a newly released model that people have just started searching for. Explain what it is for, what hardware it needs to run locally, and how the reader can measure it on their own machine. Never invent a benchmark, a download count or a release date",
 };
 
 function factsBlock(item) {
@@ -71,9 +73,20 @@ function buildPrompt(item) {
     `You are writing original editorial content for Stratat, a desktop app that runs large AI models locally (the Strata engine with a Stratat client). All of it ships as static pages.`,
     `Write in ${lang.name} only. Do not translate from another language, and do not mention that this is a translation. The audience is in ${lang.market}; use local currency (${lang.unit}), local electricity unit (${lang.power}) and a realistic local price of ${lang.price} when you talk about cost.`,
     "",
-    `This page is ${KIND_BRIEF[item.kind]}. Subject: "${item.slug}".`,
+    // The subject is the *real* name where one exists. A radar item's slug is a normalised
+    // search key (`deepseek-v4-1-flash-1017`), not a product name, and handing it to the writer
+    // produced exactly that in the title on 2026-10-23: "Strata deepseek-v4-1-flash-1017 local
+    // inference review", plus a hallucinated "R1-1017" in the body. `workingTitle` carries the
+    // name as its source spells it (`deepseek-ai/DeepSeek-V4.1-Flash-1017`), and other kinds have
+    // human-written titles there too.
+    `This page is ${KIND_BRIEF[item.kind]}. Subject: "${item.workingTitle || item.slug}".`,
     item.rigName ? `Hardware: ${item.rigName}.` : "",
     item.quant ? `Quantization: ${item.quant}.` : "",
+    // Radar items have no measured facts by definition — the model is new. Tell the writer that
+    // plainly so it writes a how-to-measure page instead of inventing numbers to fill the table.
+    item.kind === "radar"
+      ? `This subject was detected by the new-term radar on ${item.radar?.source ?? "public signals"} (${item.radar?.url ?? "no url"}). Write the page so that every number comes from what the reader can run themselves; the table must contain measurements the reader can reproduce, not benchmarks we claim to have run.`
+      : "",
     "",
     "Measured facts you may use. These are the only numbers allowed — never invent a benchmark, a price or a spec:",
     factsBlock(item),
@@ -187,6 +200,18 @@ function parseArticle(raw, slug) {
     throw new Error(`title looks like a slug, not a sentence: ${title}`);
   }
   if (title.length < 20) throw new Error(`title too short (${title.length}): ${title}`);
+
+  // The prompt asks for 50-62 characters and 120-155 for the description; until now only the
+  // lower bound was enforced. On 2026-10-23 a radar article came back at 73 and 176 characters,
+  // which is past where search results truncate: the tail of a long title and description is
+  // simply never shown, so the words the writer put there are wasted. Generous ceilings (the
+  // upper end of the prompt plus a little slack) reject only the clearly-too-long, never a
+  // borderline sentence written for a market where the unit name is longer.
+  if (title.length > 100) throw new Error(`title too long (${title.length}): ${title}`);
+  const description = String(obj.description ?? "").trim();
+  if (description.length > 200) {
+    throw new Error(`description too long (${description.length}): ${description.slice(0, 80)}…`);
+  }
 
   // A title must not be *labelled* with the slug ("rx7900xtx iq2 xs: … Review"). The subject is
   // supposed to appear in the title — the prompt asks for it — so any substring test rejects

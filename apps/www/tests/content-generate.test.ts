@@ -48,6 +48,18 @@ test("the prompt asks for the subject in the title, so a multi-word slug is allo
   );
 });
 
+test("an over-long title or description is rejected", () => {
+  // Observed on 2026-10-23: a radar article came back with a 73-character title and a
+  // 176-character description while the prompt asked for 50-62 and 120-155. Only the *lower*
+  // bound was enforced, so the tail — the part a search result truncates away — shipped unseen.
+  assert.equal(accepts(JSON.stringify(article("T".repeat(140))), "some-slug"), false);
+  const longDesc = { ...article("A perfectly ordinary title for a local model guide"), description: "d".repeat(260) };
+  assert.equal(accepts(JSON.stringify(longDesc), "some-slug"), false);
+  // The ceiling is generous on purpose: a title written for a market with longer unit names
+  // must not be rejected for being 80 characters.
+  assert.ok(accepts(JSON.stringify(article("Running a Local Model on a Mid-Range Laptop GPU")), "some-slug"));
+});
+
 test("a hardware model designation mid-sentence is not a filename", () => {
   assert.ok(
     accepts(JSON.stringify(article("RTX 5090 运行 rtx5090-iq2-xs 的性能与功耗实测分析", ZH_BODY)), "rtx5090-iq2-xs"),

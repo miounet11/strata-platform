@@ -36,11 +36,17 @@ export const SOURCES = {
   // Words that several new URLs on a watched site share and its older URLs rarely carried.
   sitemaps: {
     enabled: true,
-    /** Directory sitemaps for the AI-tool and MCP space. */
+    /**
+     * Directory sitemaps for the AI-tool space.
+     *
+     * These rot silently — a directory changes its sitemap path or moves to www and the radar
+     * keeps "working" with one fewer source. Verified reachable on 2026-10-23; `toolify.ai` was
+     * removed that day because it answers nothing from here (connection failure on every attempt,
+     * both with and without www), and a URL that never worked only adds noise to the failure line.
+     */
     urls: [
-      "https://www.toolify.ai/sitemap.xml",
-      "https://aitoptools.com/sitemap_index.xml",
-      "https://futurepedia.io/sitemap.xml",
+      "https://www.futurepedia.io/sitemap.xml",
+      "https://aitoptools.com/sitemap.xml",
       "https://opentools.ai/sitemap.xml",
     ],
     /** A URL counts as "new" if it appeared within this window. */
