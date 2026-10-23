@@ -40,11 +40,14 @@ function redact(text) {
     .replace(/([?&](?:key|token|api_key|apikey)=)[^&\s"']+/gi, "$1***");
 }
 
-export async function notifyFeishu({ stage, reason, raw = "", host = "", title = "" }) {
-  const webhook = process.env.NOTIFY_WEBHOOK || process.env.FEISHU_WEBHOOK_URL;
+export async function notifyFeishu({ stage, reason, raw = "", host = "", title = "", bare = false, webhook: explicit }) {
+  // `webhook` lets a scheduled report target its own bot without borrowing the failure-alert
+  // channel: the two used to share one variable, so pointing the report somewhere else would have
+  // silently moved every deploy alert with it.
+  const webhook = explicit || process.env.NOTIFY_WEBHOOK || process.env.FEISHU_WEBHOOK_URL;
   if (!webhook) {
     console.error(
-      "[notify] neither NOTIFY_WEBHOOK nor FEISHU_WEBHOOK_URL is set — alert dropped:",
+      "[notify] no webhook given and neither NOTIFY_WEBHOOK nor FEISHU_WEBHOOK_URL is set — dropped:",
       stage,
       "|",
       reason,
@@ -56,7 +59,11 @@ export async function notifyFeishu({ stage, reason, raw = "", host = "", title =
   // A report is not a failure. The prefix used to be hardcoded, so anything routed through this
   // function arrived titled 「Strata 发布失败」 — a daily traffic summary would have read as an
   // outage. Callers that are failures keep the original wording.
-  const body = title
+  // `bare` sends the text as written: the daily report already opens with its own dated heading,
+  // and stacking a 【title】 plus host and timestamp on top only pushed the numbers down the screen.
+  const body = bare
+    ? reason
+    : title
     ? [`【${title}】`, `主机：${where}`, `时间：${new Date().toISOString()}`, "", reason].join("\n")
     : [
         `【Strata 发布失败】${stage}`,

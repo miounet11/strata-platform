@@ -7,7 +7,9 @@
  *   node scripts/daily-report.mjs --send          # also push to the Feishu webhook
  *   node scripts/daily-report.mjs --json          # machine-readable, skips the push
  *
- * Run by cron at 00:20 UTC, after logrotate has closed the previous day's file.
+ * Run by cron twice a day at 10:00 and 14:00 Asia/Shanghai (02:00 / 06:00 UTC). Both runs report
+ * the previous local day, so the two messages carry the same window — the second is a repeat, not
+ * a second half-day.
  *
  * ── What the numbers can and cannot say ──────────────────────────────────────────────────────
  *
@@ -246,7 +248,7 @@ function topEntries(map, n) {
 
 export function formatReport({ date, range, summary, published, logFrom }) {
   const lines = [];
-  lines.push(`Strata 日报 ${date}（${REPORT_TZ}）`);
+  lines.push(`功能实测数据（${date} 当天，服务器真实日志）`);
   lines.push("");
 
   if (!summary.total) {
@@ -342,7 +344,14 @@ async function main() {
 
   if (has("--send")) {
     const { notifyFeishu } = await import("./notify.mjs");
-    const result = await notifyFeishu({ stage: "daily-report", reason: text, title: "Strata 日报" });
+    // Reports have their own bot so that moving the daily summary to another group cannot also
+    // move the deploy-failure alerts. Falls back to the shared hook when unset.
+    const result = await notifyFeishu({
+      stage: "daily-report",
+      reason: text,
+      bare: true,
+      webhook: process.env.REPORT_WEBHOOK,
+    });
     if (!result.ok) process.exitCode = 1;
   }
 }
