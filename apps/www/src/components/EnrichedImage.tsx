@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { mediaById, mediaForPage } from "@/lib/media";
+import { mediaById, mediaForPage, mediaUrl } from "@/lib/media";
 
 /**
  * Client-side so a broken or missing file degrades to a labelled placeholder instead of a
@@ -44,7 +44,7 @@ export function EnrichedImage({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={asset.path}
+      src={mediaUrl(asset.path)}
       alt={alt}
       width={width}
       height={height}

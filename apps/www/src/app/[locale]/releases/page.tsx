@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { getReleases, releaseLead } from "@/lib/releases";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { siteMetadata } from "@/lib/seo";
+import { releasePath } from "@/lib/routes";
 
 export const revalidate = 1800;
 
@@ -40,7 +41,7 @@ export default async function ReleasesPage({
           <article key={release.tag} className="card">
             <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
               <h2 style={{ margin: 0, fontSize: "1.15rem" }}>
-                <Link href={`/releases/${release.tag}`}>{release.name}</Link>{" "}
+                <Link href={releasePath(release.tag)}>{release.name}</Link>{" "}
                 {index === 0 ? <span className="badge">{t("latest")}</span> : null}
               </h2>
               <time dateTime={release.publishedAt} className="meta">
@@ -49,7 +50,7 @@ export default async function ReleasesPage({
             </div>
             <p style={{ color: "var(--muted)" }}>{releaseLead(release.body ?? "")}</p>
             <p className="meta" style={{ margin: "0.75rem 0 0" }}>
-              <Link href={`/releases/${release.tag}`}>{t("notes")}</Link>
+              <Link href={releasePath(release.tag)}>{t("notes")}</Link>
               {" · "}
               <a href={release.url} rel="noopener noreferrer">
                 {t("readGithub")}

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { CommunityBody } from "@/components/CommunityBody";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { excerpt, getCommunity, getPull, relatedLinks } from "@/lib/community";
 import { siteMetadata } from "@/lib/seo";
 
@@ -46,9 +47,7 @@ export default async function PullDetailPage({
   return (
     <article className="container page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <p style={{ color: "var(--muted)" }}>
-        <Link href="/pulls">{t("pulls")}</Link> / #{pr.number}
-      </p>
+      <Breadcrumbs label={`#${pr.number} ${pr.title}`} />
       <h1>
         #{pr.number} {pr.title}
       </h1>

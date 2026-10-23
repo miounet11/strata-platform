@@ -1,4 +1,4 @@
-import { mediaById } from "@/lib/media";
+import { mediaById, mediaUrl } from "@/lib/media";
 
 // The image itself is a client component (failure placeholder, decode hints); re-export so
 // existing `@/components/EnrichedBlock` imports keep working.
@@ -10,7 +10,7 @@ export function EnrichedAudio({ id, locale }: { id: string; locale: string }) {
   if (asset.locale && asset.locale !== locale && locale !== "en") return null;
   return (
     <figure style={{ margin: "1rem 0" }}>
-      <audio controls preload="none" src={asset.path} style={{ width: "100%" }} />
+      <audio controls preload="none" src={mediaUrl(asset.path)} style={{ width: "100%" }} />
       {asset.text ? (
         <figcaption className="meta" style={{ marginTop: 6 }}>{asset.text}</figcaption>
       ) : null}

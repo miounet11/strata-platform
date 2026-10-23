@@ -1,8 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { changelogLead, getChangelog } from "@/lib/changelog";
+import { getReleases } from "@/lib/releases";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { seoMetadata } from "@/lib/seo-messages";
+import { releasePath } from "@/lib/routes";
 
 export const revalidate = 1800;
 
@@ -33,6 +35,10 @@ export default async function ChangelogPage({
   const t = await getTranslations("changelog");
   const tr = await getTranslations("releases");
   const { items, syncedAt, feedUrl } = getChangelog();
+  // The changelog is fed by the GitHub Atom feed, which carries tags the releases index does not
+  // have (Atom says `v0.2.1.1`, releases say `v0.2.1`). Trusting the tag alone produced links to
+  // two release pages that do not exist, so a row only links to a release that is really there.
+  const releaseTags = new Set(getReleases().releases.map((release) => release.tag));
 
   return (
     <div className="container page">
@@ -58,9 +64,15 @@ export default async function ChangelogPage({
               padding: "1rem 0",
             }}
           >
-            <Link href={item.tag.startsWith("v") ? `/releases/${item.tag}` : "/releases"} style={{ fontWeight: 600 }}>
-              {item.title}
-            </Link>
+            {releaseTags.has(item.tag) ? (
+              <Link href={releasePath(item.tag)} style={{ fontWeight: 600 }}>
+                {item.title}
+              </Link>
+            ) : (
+              // No release page for this tag: the title stays text and the Atom link below is the
+              // place to read it, rather than a 404 that ends the crawl.
+              <span style={{ fontWeight: 600 }}>{item.title}</span>
+            )}
             <span style={{ color: "var(--muted)", marginLeft: 8 }}>{item.publishedAt.slice(0, 10)}</span>
             {lead ? (
               <p style={{ margin: "0.5rem 0 0", color: "var(--muted)", fontSize: "0.9rem" }}>{lead}</p>

@@ -21,14 +21,18 @@
     "dashboard": "Tableau de bord",
     "more": "Plus",
     "changelog": "Journal",
-    "topics": "Usages"
+    "topics": "Usages",
+    "gpus": "GPU",
+    "guides": "Guides",
+    "gpuBrands": "Marques de GPU"
   },
   "topics": {
     "title": "Usages",
     "intro": "Quel nom chercher, faire tourner Qwen sur son PC, quelles machines suivent.",
     "rigs": "Machines du banc",
     "emptyRigs": "Aucune machine pour cette page.",
-    "openBench": "Voir tout le banc"
+    "openBench": "Voir tout le banc",
+    "guides": "Guides"
   },
   "home": {
     "heroTitle": "IA 125B sur votre bureau",
@@ -54,7 +58,11 @@
     "notes": "Notes de version",
     "downloads": "Téléchargements",
     "newer": "Version plus récente",
-    "older": "Version plus ancienne"
+    "older": "Version plus ancienne",
+    "relatedInstall": "Installer pas à pas",
+    "relatedDownload": "Télécharger le moteur",
+    "relatedGpus": "Vérifier votre GPU",
+    "relatedChangelog": "Journal complet"
   },
   "models": {
     "title": "Catalogue",
@@ -203,7 +211,8 @@
     "evidenceLink": "Voir la preuve",
     "reset": "Réinitialiser",
     "daysShort": "j",
-    "back": "Tout le matériel"
+    "back": "Tout le matériel",
+    "rigSpecNote": "Caractéristiques et compatibilité"
   },
   "footer": {
     "engine": "Moteur",
@@ -214,7 +223,13 @@
     "friends": "Amis",
     "allLinks": "Tous",
     "benchmarks": "Benchmarks",
-    "tagline": "Strata — IA locale"
+    "tagline": "Strata — IA locale",
+    "groups": {
+      "learn": "Apprendre",
+      "updates": "Mises à jour",
+      "community": "Communauté",
+      "site": "Site"
+    }
   },
   "community": {
     "hubTitle": "Miroir communauté",
@@ -344,6 +359,10 @@
     "gpus": {
       "title": "Liste de compatibilité GPU",
       "description": "Quels GPU NVIDIA, AMD et Apple peuvent exécuter un modèle local de classe 125B, avec la quantification adaptée et le téléchargement à choisir."
+    },
+    "guides": {
+      "title": "Guides pour un LLM local",
+      "description": "Guides pas à pas sur la VRAM, la quantification, le choix du GPU et le dépannage."
     }
   },
   "gpus": {
@@ -392,6 +411,52 @@
     "detect": "Détecter mon GPU",
     "detectHint": "Lit le nom du renderer fourni par le navigateur. Rien n'est envoyé.",
     "detectFound": "Détecté",
-    "detectNone": "GPU non identifié — choisissez-le dans la liste."
+    "detectNone": "GPU non identifié — choisissez-le dans la liste.",
+    "seeBenchmarkAll": "Voir le tableau complet",
+    "compare": "Comparer avec des cartes similaires",
+    "footer": "{count} cartes supplémentaires sont estimées à partir de la bande passante, pas mesurées. À vérifier avant achat.",
+    "vendorIndexTitle": "GPU par marque",
+    "vendorIndexIntro": "Tous les fabricants de puces du catalogue et le nombre de modèles couverts. Marque → série → carte.",
+    "vendorCount": "{count} modèles · plus récent {year}",
+    "vendorPageTitle": "GPU {vendor} — {count} modèles",
+    "vendorPageIntro": "Les {count} GPU {vendor} du catalogue, regroupés par série.",
+    "seriesHeading": "Séries",
+    "seriesCount": "{count} modèles · jusqu'à {vram} Go",
+    "seriesPageTitle": "{series} — {count} modèles",
+    "seriesPageIntro": "Tous les {count} modèles {series} ({vendor}) avec mémoire, bande passante et prise en charge.",
+    "seeAllInSeries": "Voir les {count} modèles",
+    "tableModel": "Modèle",
+    "tableVram": "VRAM",
+    "tableBandwidth": "Bande passante",
+    "tableYear": "Année",
+    "tableSupport": "Prise en charge",
+    "sharedMemory": "Mémoire partagée",
+    "otherSeriesHeading": "Autres séries",
+    "sameSeries": "Autres modèles de cette série",
+    "mentionedIn": "Guides qui mentionnent cette carte"
+  },
+  "guides": {
+    "title": "Guides",
+    "intro": "Des articles pratiques pour faire tourner un grand modèle sur votre machine : ce que veulent dire les chiffres, quelle carte convient, et quoi faire quand c'est lent.",
+    "count": "{n} guides",
+    "empty": "Pas encore de guides dans cette langue.",
+    "related": "À lire aussi",
+    "relatedIn": "Plus sur « {topic} »",
+    "kinds": {
+      "concept": "Notions",
+      "compare": "Comparaisons",
+      "local": "Installation locale",
+      "troubleshoot": "Dépannage",
+      "task": "Flux de travail",
+      "hardware": "Matériel"
+    },
+    "all": "Tous les guides",
+    "homeIntro": "Commencez par votre question. Chaque guide se termine par l’étape suivante.",
+    "editorial": "Pages thématiques"
+  },
+  "notFound": {
+    "title": "Cette page n’existe pas",
+    "body": "Le lien est probablement obsolète. Voici le reste du site.",
+    "home": "Retour à l’accueil"
   }
 }

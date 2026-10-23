@@ -1,9 +1,14 @@
 import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { EnrichedImage } from "@/components/EnrichedBlock";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Markdown } from "@/components/Markdown";
+import { RelatedContent, relatedArticles } from "@/components/RelatedContent";
 import { articleLocales, getArticle, getLiveArticles, localesForSlug } from "@/lib/articles";
+import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
+import { allGpus } from "@/lib/gpus";
+import { linkifyMentions } from "@/lib/internal-links";
 import { seoMetadata } from "@/lib/seo-messages";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
@@ -37,61 +42,6 @@ export async function generateMetadata({
   );
 }
 
-/**
- * The generator emits a narrow markdown subset: `##` headings, pipe tables, `-` lists and
- * paragraphs. Rendering that directly keeps the content readable without pulling a parser in.
- */
-function Markdown({ source }: { source: string }) {
-  const blocks = source.split(/\n{2,}/);
-  return (
-    <>
-      {blocks.map((block, index) => {
-        const lines = block.split("\n").filter((line) => line.trim().length > 0);
-        if (lines.length === 0) return null;
-
-        if (lines[0].startsWith("## ")) {
-          return (
-            <section key={index}>
-              <h2>{lines[0].slice(3).trim()}</h2>
-              <Markdown source={lines.slice(1).join("\n")} />
-            </section>
-          );
-        }
-        if (lines.every((line) => line.trim().startsWith("|"))) {
-          const rows = lines
-            .filter((line) => !/^\|[\s:|-]+\|$/.test(line.trim()))
-            .map((line) => line.trim().replace(/^\||\|$/g, "").split("|").map((cell) => cell.trim()));
-          const [head, ...body] = rows;
-          return (
-            <table key={index}>
-              <thead>
-                <tr>{head.map((cell) => <th key={cell}>{cell}</th>)}</tr>
-              </thead>
-              <tbody>
-                {body.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    {row.map((cell, cellIndex) => <td key={cellIndex}>{cell}</td>)}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          );
-        }
-        if (lines.every((line) => /^[-*]\s/.test(line.trim()))) {
-          return (
-            <ul key={index}>
-              {lines.map((line, lineIndex) => (
-                <li key={lineIndex}>{line.trim().replace(/^[-*]\s+/, "")}</li>
-              ))}
-            </ul>
-          );
-        }
-        return <p key={index}>{lines.join(" ")}</p>;
-      })}
-    </>
-  );
-}
-
 export default async function GuidePage({
   params,
 }: {
@@ -103,7 +53,16 @@ export default async function GuidePage({
   if (!article) notFound();
 
   const { title, description, body, faq } = article.article;
+  // A guide that names cards ("the 4090 does this at 30 tok/s") is the best inbound link those
+  // catalogue pages will ever get, so the first mention of each card becomes one. Capped at
+  // three: past that the prose reads as a link farm and the extra edges carry no new signal.
+  const linkedBody = linkifyMentions(
+    body,
+    allGpus().map((gpu) => ({ name: gpu.name, slug: gpu.slug })),
+    { limit: 3 },
+  );
   const url = `${SITE}/${locale}/guides/${slug}`;
+  const tn = await getTranslations({ locale, namespace: "nav" });
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -118,6 +77,13 @@ export default async function GuidePage({
     author: { "@type": "Organization", name: "Stratat" },
     publisher: { "@type": "Organization", name: "Stratat", url: SITE },
   };
+
+  // Labels come from `nav.*` so the structured trail matches the visible one in every language.
+  const crumbLd = breadcrumbJsonLd(SITE, locale, [
+    { path: "", name: tn("home") },
+    { path: "/guides", name: tn("guides") },
+    { name: title },
+  ]);
 
   const faqLd =
     faq.length > 0
@@ -140,19 +106,20 @@ export default async function GuidePage({
   return (
     <div className="container page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+      {crumbLd ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
+      ) : null}
       {faqLd ? (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       ) : null}
 
-      <p className="meta">
-        <Link href="/topics">Guides</Link>
-      </p>
+      <Breadcrumbs label={title} />
       <h1>{title}</h1>
       <p className="page-intro">{description}</p>
       <EnrichedImage id={`guide-${slug}`} locale={locale} className="page-visual" />
 
       <article className="article-body">
-        <Markdown source={body} />
+        <Markdown source={linkedBody} />
       </article>
 
       {faq.length > 0 ? (
@@ -166,6 +133,8 @@ export default async function GuidePage({
           ))}
         </section>
       ) : null}
+
+      <RelatedContent items={relatedArticles(locale, slug, article.kind)} />
     </div>
   );
 }

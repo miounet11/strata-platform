@@ -640,6 +640,77 @@ pre.copy-block {
   margin: 1rem 0 0;
 }
 
+/* ---- Breadcrumbs ---- */
+
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.4rem;
+  list-style: none;
+  margin: 0 0 0.9rem;
+  padding: 0;
+  font-size: 0.83rem;
+  color: var(--muted);
+}
+
+.breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.breadcrumbs li + li::before {
+  content: "/";
+  color: var(--border-strong);
+}
+
+.breadcrumbs a {
+  color: var(--muted);
+}
+
+.breadcrumbs a:hover {
+  color: var(--accent);
+}
+
+.breadcrumbs [aria-current="page"] {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 32rem;
+}
+
+/* ---- Guide index & related links ---- */
+
+.guide-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.guide-list li {
+  border-left: 2px solid var(--border);
+  padding: 0.1rem 0 0.1rem 0.85rem;
+}
+
+.guide-list li:hover {
+  border-left-color: var(--accent-dim);
+}
+
+.guide-list a {
+  font-weight: 500;
+}
+
+.guide-list p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
 /* ---- Benchmark controls ---- */
 
 .bench-controls {

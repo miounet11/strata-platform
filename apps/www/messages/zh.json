@@ -21,14 +21,18 @@
     "benchmarks": "跑分",
     "more": "更多",
     "changelog": "日志",
-    "topics": "场景"
+    "topics": "场景",
+    "gpus": "显卡",
+    "guides": "指南",
+    "gpuBrands": "显卡品牌"
   },
   "topics": {
     "title": "场景",
     "intro": "按要办的事来看：搜哪个名字、在自己电脑上跑 Qwen、哪些机器跑得下。",
     "rigs": "跑分里的机器",
     "emptyRigs": "这一页还没有对上的机器。",
-    "openBench": "看完整跑分"
+    "openBench": "看完整跑分",
+    "guides": "指南"
   },
   "home": {
     "heroTitle": "在自己的电脑上跑大模型",
@@ -54,7 +58,11 @@
     "notes": "版本说明",
     "downloads": "下载",
     "newer": "较新版本",
-    "older": "较旧版本"
+    "older": "较旧版本",
+    "relatedInstall": "逐步安装",
+    "relatedDownload": "下载引擎",
+    "relatedGpus": "查看你的显卡",
+    "relatedChangelog": "完整更新日志"
   },
   "models": {
     "title": "挑个模型",
@@ -206,7 +214,13 @@
     "friends": "友链",
     "allLinks": "全部友链",
     "tagline": "Strata — 本地 AI 在你的电脑上",
-    "benchmarks": "跑分"
+    "benchmarks": "跑分",
+    "groups": {
+      "learn": "了解",
+      "updates": "动态",
+      "community": "社区",
+      "site": "站点"
+    }
   },
   "auth": {
     "loginTitle": "登录",
@@ -265,7 +279,8 @@
     "evidenceLink": "查看来源",
     "reset": "恢复默认",
     "daysShort": "天",
-    "back": "全部硬件"
+    "back": "全部硬件",
+    "rigSpecNote": "规格与兼容性"
   },
   "seo": {
     "suffix": "Strata",
@@ -344,6 +359,10 @@
     "gpus": {
       "title": "显卡兼容列表",
       "description": "哪些 NVIDIA、AMD、Apple 显卡能本地运行 125B 级模型，各自适配的量化档位，以及应当下载的版本。"
+    },
+    "guides": {
+      "title": "本地大模型运行指南",
+      "description": "显存、量化、显卡选择与排障的分步指南，帮你在这台电脑上把大模型跑起来。"
     }
   },
   "gpus": {
@@ -392,6 +411,52 @@
     "detect": "自动检测我的显卡",
     "detectHint": "读取浏览器提供的显卡型号，不会上传任何数据。",
     "detectFound": "检测到",
-    "detectNone": "无法识别显卡，请从列表中选择。"
+    "detectNone": "无法识别显卡，请从列表中选择。",
+    "seeBenchmarkAll": "查看完整跑分表",
+    "compare": "同类显卡对比",
+    "footer": "另有 {count} 张卡是按带宽估算，而非实测，购买前请自行核实。",
+    "vendorIndexTitle": "按品牌浏览显卡",
+    "vendorIndexIntro": "目录里收录的全部芯片厂商，以及每家覆盖的型号数量。先选品牌，再选系列，最后到具体型号。",
+    "vendorCount": "{count} 个型号 · 最新 {year} 年",
+    "vendorPageTitle": "{vendor} 显卡 — {count} 个型号",
+    "vendorPageIntro": "目录中全部 {count} 个 {vendor} 显卡，按系列分组。每个型号都能看到显存、带宽和量化档位结论。",
+    "seriesHeading": "系列",
+    "seriesCount": "{count} 个型号 · 最大 {vram} GB",
+    "seriesPageTitle": "{series} — {count} 个型号",
+    "seriesPageIntro": "{series} 系列全部 {count} 个型号（{vendor}），含显存、带宽，以及是否被发行版支持。",
+    "seeAllInSeries": "查看全部 {count} 个型号",
+    "tableModel": "型号",
+    "tableVram": "显存",
+    "tableBandwidth": "带宽",
+    "tableYear": "年份",
+    "tableSupport": "支持",
+    "sharedMemory": "共享内存",
+    "otherSeriesHeading": "其他系列",
+    "sameSeries": "同系列其他型号",
+    "mentionedIn": "提到这款显卡的指南"
+  },
+  "guides": {
+    "title": "指南",
+    "intro": "在自己电脑上跑大模型的实操文章：这些数字是什么意思、哪张卡跑得动、慢了该从哪里查。",
+    "count": "{n} 篇",
+    "empty": "这个语言还没有指南。",
+    "related": "相关内容",
+    "relatedIn": "更多「{topic}」",
+    "kinds": {
+      "concept": "概念",
+      "compare": "对比",
+      "local": "本地部署",
+      "troubleshoot": "排障",
+      "task": "工作流",
+      "hardware": "硬件"
+    },
+    "all": "全部指南",
+    "homeIntro": "从你手上的问题开始。每篇指南结尾都会指向下一步。",
+    "editorial": "专题页"
+  },
+  "notFound": {
+    "title": "这个页面不存在",
+    "body": "链接可能已经过期。其余内容都在下面。",
+    "home": "回到首页"
   }
 }

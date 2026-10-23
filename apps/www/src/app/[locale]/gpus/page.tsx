@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { GpuExplorer } from "@/components/GpuExplorer";
-import { allGpus, gpuCounts } from "@/lib/gpus";
+import { allGpus, gpuCounts, vendorSlug, vendorSummaries } from "@/lib/gpus";
+import { gpuVendorPath } from "@/lib/routes";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -14,19 +16,23 @@ export default async function GpuIndexPage({ params }: { params: Promise<{ local
   setRequestLocale(locale);
   const t = await getTranslations("gpus");
 
-  // Only the fields the filter needs cross to the client; the page keeps the full catalogue.
-  const rows = allGpus().map((gpu) => ({
-    id: gpu.id,
-    slug: gpu.slug,
-    name: gpu.name,
-    vendor: gpu.vendor,
-    arch: gpu.arch,
-    vramGb: gpu.vramGb,
-    year: gpu.year,
-    readingTps: gpu.readingTps,
-    support: gpu.support,
-    evidence: gpu.evidence,
-  }));
+  // The live filter ships every row to the browser, so it gets the cards that can actually run
+  // the model. The other 2,800 have no build, no filter value and no reason to cost bytes — they
+  // are still published as detail pages and listed under their brand and series below.
+  const rows = allGpus()
+    .filter((gpu) => gpu.runnable || gpu.evidence === "measured")
+    .map((gpu) => ({
+      id: gpu.id,
+      slug: gpu.slug,
+      name: gpu.name,
+      vendor: gpu.vendor,
+      arch: gpu.arch,
+      vramGb: gpu.vramGb,
+      year: gpu.year,
+      readingTps: gpu.readingTps,
+      support: gpu.support,
+      evidence: gpu.evidence,
+    }));
 
   return (
     <div className="container container-wide page">
@@ -68,6 +74,23 @@ export default async function GpuIndexPage({ params }: { params: Promise<{ local
       />
 
       <p className="meta">{t("footer", { count: gpuCounts.estimated })}</p>
+
+      {/* Server-rendered brand links: the filter above is client-side, so without this the
+          3,000-card catalogue would have no crawlable path from its own index page. */}
+      <section className="section">
+        <h2>{t("vendorIndexTitle")}</h2>
+        <ul className="gpu-list">
+          {vendorSummaries().map((vendor) => (
+            <li key={vendor.vendor}>
+              <Link href={gpuVendorPath(vendor.slug)}>{vendor.label}</Link>
+              <span className="meta"> {t("vendorCount", { count: vendor.count, year: vendor.year })}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="meta">
+          <Link href="/gpus/vendor">{t("vendorIndexTitle")} →</Link>
+        </p>
+      </section>
     </div>
   );
 }

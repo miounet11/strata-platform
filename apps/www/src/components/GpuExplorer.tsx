@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Link } from "@/i18n/navigation";
+import { gpuPath } from "@/lib/routes";
 
 export type GpuRow = {
   id: string;
@@ -152,7 +153,7 @@ export function GpuExplorer({ gpus, labels }: { gpus: GpuRow[]; labels: Labels }
         {detectFailed && <span className="meta">{labels.detectNone}</span>}
         {detected && (
           <span className="meta">
-            {labels.detectFound}: <Link href={`/gpus/${detected}`}>{gpus.find((g) => g.slug === detected)?.name}</Link>
+            {labels.detectFound}: <Link href={gpuPath(detected)}>{gpus.find((g) => g.slug === detected)?.name}</Link>
           </span>
         )}
       </div>
@@ -173,7 +174,7 @@ export function GpuExplorer({ gpus, labels }: { gpus: GpuRow[]; labels: Labels }
           <tbody>
             {rows.map((gpu) => (
               <tr key={gpu.id} className={detected === gpu.slug ? "gpu-row-detected" : undefined}>
-                <td><Link href={`/gpus/${gpu.slug}`}>{gpu.name}</Link></td>
+                <td><Link href={gpuPath(gpu.slug)}>{gpu.name}</Link></td>
                 <td>{gpu.arch}</td>
                 <td>{gpu.vramGb} GB</td>
                 <td>

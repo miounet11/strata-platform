@@ -2,8 +2,14 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
+import { rigPath } from "@/lib/routes";
+import { RelatedContent, relatedArticles } from "@/components/RelatedContent";
 import { getLiveTopics, getTopic, hasTopic, rigsForTopic, topicText } from "@/lib/topics";
 import { seoMetadata } from "@/lib/seo-messages";
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
 
 export function generateStaticParams() {
   // Editorial topics differ per locale, so only build the pairs that exist.
@@ -59,12 +65,26 @@ export default async function TopicPage({
     isPartOf: { "@type": "WebSite", name: "Strata", url: "https://www.stratat.com" },
   };
 
+  // Topics are the editorial entry point, so each one points at the guides written for the same
+  // question: a reader who wants the long version should not have to go back to the hub first.
+  const guides = relatedArticles(locale, "", topic.kind ?? "", 4);
+
   return (
     <div className="container page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <p className="meta">
-        <Link href="/topics">{t("title")}</Link>
-      </p>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            breadcrumbJsonLd(SITE, locale, [
+              { path: "", name: "Strata" },
+              { path: "/topics", name: t("title") },
+              { name: title },
+            ]),
+          ),
+        }}
+      />
+      <Breadcrumbs label={title} />
       <h1>{title}</h1>
       <p className="page-intro">{body}</p>
       {topic.links && topic.links.length > 0 ? (
@@ -83,7 +103,7 @@ export default async function TopicPage({
           <ul className="grid-3" style={{ listStyle: "none", padding: 0 }}>
             {rigs.map((rig) => (
               <li key={rig.id} className="card">
-                <Link href={`/benchmarks/${rig.id}`}>
+                <Link href={rigPath(rig.id)}>
                   <strong>{rig.name}</strong>
                 </Link>
                 <p className="meta" style={{ margin: "0.5rem 0 0" }}>
@@ -97,6 +117,7 @@ export default async function TopicPage({
           </p>
         </section>
       ) : null}
+      <RelatedContent title={t("guides")} items={guides} />
     </div>
   );
 }

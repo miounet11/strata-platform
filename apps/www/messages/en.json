@@ -80,6 +80,10 @@
     "gpus": {
       "title": "GPU compatibility list",
       "description": "Which NVIDIA, AMD and Apple GPUs can run a local 125B-class model, with the quantization that fits each card and the build to download."
+    },
+    "guides": {
+      "title": "Guides for running a local LLM",
+      "description": "Step-by-step guides on VRAM, quantization, GPU choice and troubleshooting for running a large model on your own PC."
     }
   },
   "nav": {
@@ -100,14 +104,18 @@
     "benchmarks": "Benchmarks",
     "more": "More",
     "changelog": "Changelog",
-    "topics": "Guides"
+    "topics": "Guides",
+    "gpus": "GPUs",
+    "guides": "Guides",
+    "gpuBrands": "GPU brands"
   },
   "topics": {
     "title": "Guides",
     "intro": "Pages for the jobs this engine does: which name to search, running Qwen on your PC, and which machines fit.",
     "rigs": "Machines in the benchmarks",
     "emptyRigs": "No machines match this page yet.",
-    "openBench": "Open the full table"
+    "openBench": "Open the full table",
+    "guides": "Guides"
   },
   "home": {
     "heroTitle": "Run a big AI model on your own PC",
@@ -133,7 +141,11 @@
     "notes": "Release notes",
     "downloads": "Downloads",
     "newer": "Newer release",
-    "older": "Older release"
+    "older": "Older release",
+    "relatedInstall": "Install it step by step",
+    "relatedDownload": "Download the engine",
+    "relatedGpus": "Check your GPU",
+    "relatedChangelog": "Full changelog"
   },
   "models": {
     "title": "Pick a model",
@@ -285,7 +297,13 @@
     "friends": "Friends",
     "allLinks": "All links",
     "tagline": "Strata — local AI on your PC",
-    "benchmarks": "Benchmarks"
+    "benchmarks": "Benchmarks",
+    "groups": {
+      "learn": "Learn",
+      "updates": "Updates",
+      "community": "Community",
+      "site": "Site"
+    }
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -344,7 +362,8 @@
     "evidenceLink": "See source",
     "reset": "Reset",
     "daysShort": "days",
-    "back": "All hardware"
+    "back": "All hardware",
+    "rigSpecNote": "Specifications and compatibility"
   },
   "gpus": {
     "title": "GPU compatibility",
@@ -392,6 +411,52 @@
     "detect": "Detect my GPU",
     "detectHint": "Reads the renderer string from your browser. Nothing is uploaded.",
     "detectFound": "Detected",
-    "detectNone": "Could not identify the GPU; pick it from the list."
+    "detectNone": "Could not identify the GPU; pick it from the list.",
+    "seeBenchmarkAll": "See the full benchmark table",
+    "compare": "Compare with similar cards",
+    "footer": "{count} more cards are estimated from bandwidth rather than measured. Verify before buying.",
+    "vendorIndexTitle": "GPUs by brand",
+    "vendorIndexIntro": "Every chip vendor in the catalogue, with how many models each one covers. Pick a brand to see its series, then a series to see the cards.",
+    "vendorCount": "{count} models · newest {year}",
+    "vendorPageTitle": "{vendor} GPUs — {count} models",
+    "vendorPageIntro": "All {count} {vendor} GPUs in the catalogue, grouped by series. Each model links to its VRAM, bandwidth and quantization verdict.",
+    "seriesHeading": "Series",
+    "seriesCount": "{count} models · up to {vram} GB",
+    "seriesPageTitle": "{series} — {count} models",
+    "seriesPageIntro": "Every {series} model ({vendor}, {count} in total) with memory, bandwidth and whether the release build supports it.",
+    "seeAllInSeries": "See all {count} models",
+    "tableModel": "Model",
+    "tableVram": "VRAM",
+    "tableBandwidth": "Bandwidth",
+    "tableYear": "Year",
+    "tableSupport": "Support",
+    "sharedMemory": "Shared",
+    "otherSeriesHeading": "Other series",
+    "sameSeries": "More in this series",
+    "mentionedIn": "Guides that mention this card"
+  },
+  "guides": {
+    "title": "Guides",
+    "intro": "Practical write-ups on running a large model on your own machine: what the numbers mean, which card fits, and what to do when it is slow.",
+    "count": "{n} guides",
+    "empty": "No guides in this language yet.",
+    "related": "Related",
+    "relatedIn": "More on {topic}",
+    "kinds": {
+      "concept": "Concepts",
+      "compare": "Comparisons",
+      "local": "Local setup",
+      "troubleshoot": "Troubleshooting",
+      "task": "Workflows",
+      "hardware": "Hardware"
+    },
+    "all": "All guides",
+    "homeIntro": "Start with the question you have. Each guide ends by pointing at the next step.",
+    "editorial": "Editorial pages"
+  },
+  "notFound": {
+    "title": "This page does not exist",
+    "body": "The link may be outdated. Everything else is one click away.",
+    "home": "Back to the start"
   }
 }

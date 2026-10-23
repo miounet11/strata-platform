@@ -21,14 +21,18 @@
     "dashboard": "ダッシュボード",
     "more": "その他",
     "changelog": "更新履歴",
-    "topics": "使い方"
+    "topics": "使い方",
+    "gpus": "GPU",
+    "guides": "ガイド",
+    "gpuBrands": "GPUブランド"
   },
   "topics": {
     "title": "使い方",
     "intro": "名前の見分け、自分の PC で Qwen を動かす、入るマシン。",
     "rigs": "ベンチマークのマシン",
     "emptyRigs": "該当するマシンはまだありません。",
-    "openBench": "全表を見る"
+    "openBench": "全表を見る",
+    "guides": "ガイド"
   },
   "home": {
     "heroTitle": "125B クラスの AI を自分の PC で",
@@ -54,7 +58,11 @@
     "notes": "リリースノート",
     "downloads": "ダウンロード",
     "newer": "新しい版",
-    "older": "古い版"
+    "older": "古い版",
+    "relatedInstall": "インストール手順",
+    "relatedDownload": "エンジンをダウンロード",
+    "relatedGpus": "GPU を確認",
+    "relatedChangelog": "変更履歴"
   },
   "models": {
     "title": "モデル一覧",
@@ -203,7 +211,8 @@
     "evidenceLink": "根拠を見る",
     "reset": "初期値",
     "daysShort": "日",
-    "back": "すべてのハードウェア"
+    "back": "すべてのハードウェア",
+    "rigSpecNote": "仕様と互換性"
   },
   "footer": {
     "engine": "エンジン",
@@ -214,7 +223,13 @@
     "friends": "友リンク",
     "allLinks": "一覧",
     "benchmarks": "ベンチマーク",
-    "tagline": "Strata — ローカル AI"
+    "tagline": "Strata — ローカル AI",
+    "groups": {
+      "learn": "学ぶ",
+      "updates": "更新",
+      "community": "コミュニティ",
+      "site": "サイト"
+    }
   },
   "community": {
     "hubTitle": "Strata コミュニティ",
@@ -344,6 +359,10 @@
     "gpus": {
       "title": "GPU 対応リスト",
       "description": "NVIDIA・AMD・Apple のどの GPU が 125B 級モデルをローカル実行できるか、各カードに合う量子化とダウンロードすべき版。"
+    },
+    "guides": {
+      "title": "ローカル LLM 実行ガイド",
+      "description": "VRAM、量子化、GPU 選び、トラブル対処を手順付きで解説します。"
     }
   },
   "gpus": {
@@ -392,6 +411,52 @@
     "detect": "GPU を自動検出",
     "detectHint": "ブラウザが公開する GPU 名を読み取ります。送信はしません。",
     "detectFound": "検出",
-    "detectNone": "GPU を特定できませんでした。一覧から選択してください。"
+    "detectNone": "GPU を特定できませんでした。一覧から選択してください。",
+    "seeBenchmarkAll": "ベンチマーク一覧を見る",
+    "compare": "同クラスのカードと比較",
+    "footer": "残り {count} 枚は帯域幅からの推定値です。購入前に確認してください。",
+    "vendorIndexTitle": "ブランド別GPU",
+    "vendorIndexIntro": "カタログ内の全チップベンダーと収録モデル数です。ブランド→シリーズ→型番の順にたどれます。",
+    "vendorCount": "{count} モデル · 最新 {year} 年",
+    "vendorPageTitle": "{vendor} GPU — {count} モデル",
+    "vendorPageIntro": "カタログ内の {vendor} GPU 全 {count} モデルをシリーズ別に掲載しています。",
+    "seriesHeading": "シリーズ",
+    "seriesCount": "{count} モデル · 最大 {vram} GB",
+    "seriesPageTitle": "{series} — {count} モデル",
+    "seriesPageIntro": "{series} の全 {count} モデル（{vendor}）。メモリ、帯域、リリース版の対応状況を掲載。",
+    "seeAllInSeries": "全 {count} モデルを見る",
+    "tableModel": "型番",
+    "tableVram": "VRAM",
+    "tableBandwidth": "帯域",
+    "tableYear": "年",
+    "tableSupport": "対応",
+    "sharedMemory": "共有メモリ",
+    "otherSeriesHeading": "その他のシリーズ",
+    "sameSeries": "同じシリーズの他のモデル",
+    "mentionedIn": "このカードに言及しているガイド"
+  },
+  "guides": {
+    "title": "ガイド",
+    "intro": "自分の PC で大型モデルを動かすための実践記事。数字の意味、対応する GPU、遅いときの対処をまとめています。",
+    "count": "{n} 件",
+    "empty": "この言語のガイドはまだありません。",
+    "related": "関連記事",
+    "relatedIn": "「{topic}」をもっと見る",
+    "kinds": {
+      "concept": "概念",
+      "compare": "比較",
+      "local": "ローカル導入",
+      "troubleshoot": "トラブルシューティング",
+      "task": "ワークフロー",
+      "hardware": "ハードウェア"
+    },
+    "all": "すべてのガイド",
+    "homeIntro": "目の前の疑問から始めてください。各ガイドの最後に次の一歩があります。",
+    "editorial": "特集ページ"
+  },
+  "notFound": {
+    "title": "このページは存在しません",
+    "body": "リンクが古い可能性があります。以下から移動できます。",
+    "home": "ホームへ戻る"
   }
 }

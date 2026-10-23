@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-10-20T13:17:13.132Z",
+  "syncedAt": "2026-10-21T05:08:58.735Z",
   "siteUrl": "https://www.stratat.com",
   "engine": {
     "tag": "v0.2.1",
@@ -83,7 +83,7 @@
         "platform": "windows",
         "variant": "amd",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/Strata-0.2.1-windows-hip-rdna3.exe",
-        "sizeBytes": 229187807
+        "sizeBytes": 234272446
       },
       {
         "id": "Strata-0.2.1-windows-hip",
@@ -150,6 +150,54 @@
         "sizeBytes": 72126142
       },
       {
+        "id": "strata-control-0.1.46.2-linux-x86_64.tar",
+        "name": "strata-control-0.1.46.2-linux-x86_64.tar.gz",
+        "platform": "linux",
+        "variant": "other",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.2-linux-x86_64.tar.gz",
+        "sizeBytes": 98604152
+      },
+      {
+        "id": "strata-control-0.1.46.2-macos-arm64.tar",
+        "name": "strata-control-0.1.46.2-macos-arm64.tar.gz",
+        "platform": "macos",
+        "variant": "other",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.2-macos-arm64.tar.gz",
+        "sizeBytes": 49872924
+      },
+      {
+        "id": "strata-control-0.1.46.2-windows-x86_64",
+        "name": "strata-control-0.1.46.2-windows-x86_64.zip",
+        "platform": "windows",
+        "variant": "other",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.2-windows-x86_64.zip",
+        "sizeBytes": 72154914
+      },
+      {
+        "id": "strata-control-0.1.46.3-linux-x86_64.tar",
+        "name": "strata-control-0.1.46.3-linux-x86_64.tar.gz",
+        "platform": "linux",
+        "variant": "other",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.3-linux-x86_64.tar.gz",
+        "sizeBytes": 98609368
+      },
+      {
+        "id": "strata-control-0.1.46.3-macos-arm64.tar",
+        "name": "strata-control-0.1.46.3-macos-arm64.tar.gz",
+        "platform": "macos",
+        "variant": "other",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.3-macos-arm64.tar.gz",
+        "sizeBytes": 49878272
+      },
+      {
+        "id": "strata-control-0.1.46.3-windows-x86_64",
+        "name": "strata-control-0.1.46.3-windows-x86_64.zip",
+        "platform": "windows",
+        "variant": "other",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-control-0.1.46.3-windows-x86_64.zip",
+        "sizeBytes": 72159364
+      },
+      {
         "id": "strata-engine-0.1.46-linux-x86_64-cuda-cuda12.tar",
         "name": "strata-engine-0.1.46-linux-x86_64-cuda-cuda12.tar.gz",
         "platform": "linux",
@@ -214,20 +262,20 @@
         "sizeBytes": 579792118
       },
       {
-        "id": "strata-engine-0.1.46-windows-x86_64-hip-rdna3.tar",
-        "name": "strata-engine-0.1.46-windows-x86_64-hip-rdna3.tar.gz",
-        "platform": "windows",
-        "variant": "amd",
-        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-windows-x86_64-hip-rdna3.tar.gz",
-        "sizeBytes": 240813256
-      },
-      {
         "id": "strata-engine-0.1.46-windows-x86_64-hip-rx9070.tar",
         "name": "strata-engine-0.1.46-windows-x86_64-hip-rx9070.tar.gz",
         "platform": "windows",
         "variant": "amd",
         "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46-windows-x86_64-hip-rx9070.tar.gz",
         "sizeBytes": 562198572
+      },
+      {
+        "id": "strata-engine-0.1.46.1-windows-x86_64-hip-rdna3.tar",
+        "name": "strata-engine-0.1.46.1-windows-x86_64-hip-rdna3.tar.gz",
+        "platform": "windows",
+        "variant": "amd",
+        "downloadUrl": "https://github.com/Niko1221/Strata/releases/download/v0.2.1/strata-engine-0.1.46.1-windows-x86_64-hip-rdna3.tar.gz",
+        "sizeBytes": 266325897
       },
       {
         "id": "Strata.app.tar",
@@ -248,13 +296,13 @@
         "name": "Stratat_0.2.0-beta_aarch64.dmg",
         "platform": "macos",
         "downloadUrl": "https://github.com/miounet11/strata-platform/releases/download/desktop-v0.2.0-beta/Stratat_0.2.0-beta_aarch64.dmg",
-        "sizeBytes": 54353322
+        "sizeBytes": 47405232
       },
       {
         "name": "Stratat_0.2.0-beta_x64-setup.exe",
         "platform": "windows",
         "downloadUrl": "https://github.com/miounet11/strata-platform/releases/download/desktop-v0.2.0-beta/Stratat_0.2.0-beta_x64-setup.exe",
-        "sizeBytes": 32358147
+        "sizeBytes": 54935032
       }
     ]
   },

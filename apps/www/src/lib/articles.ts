@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { isLinkableName } from "./internal-links";
 
 export type Faq = { q: string; a: string };
 
@@ -94,4 +95,23 @@ export function guideLocaleMap(): Record<string, string[]> {
 
 export function articleLocales(): string[] {
   return [...new Set(readAll().map((a) => a.locale))];
+}
+
+/**
+ * Guides whose prose names a card, for the "mentioned in" block on its detail page.
+ *
+ * `linkifyMentions` already sends readers from a guide to the card; without the reverse edge
+ * that is a one-way street, and 3,209 pages would have no inbound link except their own series
+ * list. Matching is on the exact card name so "RTX 4090" does not answer for "RTX 4090 D".
+ */
+export function guidesMentioning(locale: string, name: string, limit = 4): Article[] {
+  const needle = name.trim().toLowerCase();
+  // "300" or "6326" would match every speed and every year in a guide; see `isLinkableName`.
+  if (!needle || !isLinkableName(needle)) return [];
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`(?<![\\w-])${escaped}(?![\\w-])`, "i");
+  return getLiveArticles(locale)
+    .filter((article) => pattern.test(article.article.body))
+    .sort((a, b) => b.publishAt.localeCompare(a.publishAt) || a.slug.localeCompare(b.slug))
+    .slice(0, limit);
 }

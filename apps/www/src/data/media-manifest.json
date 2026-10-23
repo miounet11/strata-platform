@@ -1294,6 +1294,126 @@
       "alt": {
         "en": "What Is Quantization In Local LLMs And Why It Matters"
       }
+    },
+    "guide-rtx4090-coder": {
+      "type": "image",
+      "path": "/media/guides/en/rtx4090-coder.webp",
+      "page": "/guides/rtx4090-coder",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "rtx4090-coder: Local LLM Performance on RTX 4090"
+      }
+    },
+    "guide-rtx4090-iq2-xs": {
+      "type": "image",
+      "path": "/media/guides/en/rtx4090-iq2-xs.webp",
+      "page": "/guides/rtx4090-iq2-xs",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "RTX 4090 IQ2-XS Local Inference Benchmarks"
+      }
+    },
+    "guide-rtx4090-iq3-s": {
+      "type": "image",
+      "path": "/media/guides/en/rtx4090-iq3-s.webp",
+      "page": "/guides/rtx4090-iq3-s",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "RTX 4090 iQ3-S Quantization: Performance and VRAM Analysis"
+      }
+    },
+    "guide-amd-fallback": {
+      "type": "image",
+      "path": "/media/guides/en/amd-fallback.webp",
+      "page": "/guides/amd-fallback",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "amd-fallback Troubleshooting Guide for Stratat Desktop App"
+      }
+    },
+    "guide-amd-radeon-rx-7900-xtx-vs-amd-radeon-rx-6900-xt-16gb": {
+      "type": "image",
+      "path": "/media/guides/en/amd-radeon-rx-7900-xtx-vs-amd-radeon-rx-6900-xt-16gb.webp",
+      "page": "/guides/amd-radeon-rx-7900-xtx-vs-amd-radeon-rx-6900-xt-16gb",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "AMD Radeon RX 7900 XTX vs RX 6900 XT: Which GPU Wins for Local AI?"
+      }
+    },
+    "guide-apartment-power-budget": {
+      "type": "image",
+      "path": "/media/guides/en/apartment-power-budget.webp",
+      "page": "/guides/apartment-power-budget",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "apartment-power-budget: Managing Local AI Electricity Costs"
+      }
+    },
+    "guide-backup-models": {
+      "type": "image",
+      "path": "/media/guides/en/backup-models.webp",
+      "page": "/guides/backup-models",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "How to Backup Local AI Models for Stratat"
+      }
+    },
+    "guide-batch-processing": {
+      "type": "image",
+      "path": "/media/guides/en/batch-processing.webp",
+      "page": "/guides/batch-processing",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "How to Batch Process Data with Stratat Local AI"
+      }
+    },
+    "guide-comcast-bandwidth": {
+      "type": "image",
+      "path": "/media/guides/en/comcast-bandwidth.webp",
+      "page": "/guides/comcast-bandwidth",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "comcast-bandwidth: How Local Limits Impact Your Stratat Model Performance"
+      }
+    },
+    "guide-context-truncated": {
+      "type": "image",
+      "path": "/media/guides/en/context-truncated.webp",
+      "page": "/guides/context-truncated",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "Fix context-truncated error in Stratat local AI"
+      }
+    },
+    "guide-cost-comparison": {
+      "type": "image",
+      "path": "/media/guides/en/cost-comparison.webp",
+      "page": "/guides/cost-comparison",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "How to Calculate Local AI Cost vs Cloud API for Stratat"
+      }
+    },
+    "guide-dorm-room-limits": {
+      "type": "image",
+      "path": "/media/guides/en/dorm-room-limits.webp",
+      "page": "/guides/dorm-room-limits",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "Dorm-room-limits: local AI constraints"
+      }
     }
   },
   "cluster": "192.168.2.100"

@@ -6,10 +6,23 @@ import {
   compatLevel,
   getGpu,
   recommendedVariant,
+  rivals,
+  seriesSiblings,
+  seriesSlug,
+  vramLabel,
   variantLabel,
   vendorLabel,
+  vendorSlug,
 } from "@/lib/gpus";
+import { getRig } from "@/lib/benchmarks";
+import { guidesMentioning } from "@/lib/articles";
+import { guidePath, gpuPath, gpuSeriesPath, gpuVendorPath, rigPath } from "@/lib/routes";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
+import { RelatedContent } from "@/components/RelatedContent";
 import { siteMetadata } from "@/lib/seo";
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
 
 export function generateStaticParams() {
   return allGpus().map((gpu) => ({ slug: gpu.slug }));
@@ -46,17 +59,87 @@ export default async function GpuPage({
   if (!gpu) notFound();
 
   const t = await getTranslations("gpus");
+  const tnav = await getTranslations({ locale, namespace: "nav" });
   const variant = recommendedVariant(gpu);
   const level = compatLevel(gpu);
+  // Only nine cards have a measured rig; the rest would point at a 404 from this link.
+  const measured = Boolean(getRig(gpu.id));
+  // Empty when the card's name already carries the figure ("RTX 4060 Ti 16GB").
+  const capacity = vramLabel(gpu, t("sharedMemory"));
+  // Same-VRAM cards from other vendors: the comparison a buyer actually makes, and the reason
+  // the catalogue interlinks at all instead of being 101 dead ends.
+  const comparisons = rivals(gpu).map((other) => ({
+    href: gpuPath(other.slug),
+    title: other.name,
+    note: [vramLabel(other, t("sharedMemory")), `${other.readingTps} tok/s`].filter(Boolean).join(" · "),
+  }));
+
+  // Card-to-card within the series, and card-to-guide: the two directions the catalogue was
+  // missing. Most cards are linked from their series list and nowhere else, so without these
+  // the page is a leaf with no internal traffic and no reason for a crawler to revisit it.
+  const siblings = seriesSiblings(gpu).map((other) => ({
+    href: gpuPath(other.slug),
+    title: other.name,
+    note: vramLabel(other, t("sharedMemory")),
+  }));
+  const mentions = guidesMentioning(locale, gpu.name).map((article) => ({
+    href: guidePath(article.slug),
+    title: article.article.title,
+  }));
+
+  const crumbLd = breadcrumbJsonLd(SITE, locale, [
+    { path: "", name: tnav("home") },
+    { path: "/gpus", name: tnav("gpus") },
+    { path: gpuVendorPath(vendorSlug(gpu.vendor)), name: vendorLabel[gpu.vendor] },
+    { path: gpuSeriesPath(vendorSlug(gpu.vendor), seriesSlug(gpu.series)), name: gpu.series },
+    { name: gpu.name },
+  ]);
+
+  // The trail is already emitted as BreadcrumbList; this adds the hardware facts a crawler
+  // would otherwise have to read off the table. `Product` with a brand and category lets the
+  // page be understood as a specific piece of hardware rather than a generic article.
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: gpu.name,
+    brand: { "@type": "Brand", name: vendorLabel[gpu.vendor] },
+    category: "Graphics processing unit",
+    url: `${SITE}/${locale}${gpuPath(gpu.slug)}`,
+    ...(gpu.year ? { releaseDate: String(gpu.year) } : {}),
+    ...(gpu.vramGb > 0
+      ? { additionalProperty: [
+          { "@type": "PropertyValue", name: "Memory", value: `${gpu.vramGb} GB` },
+          { "@type": "PropertyValue", name: "Memory bandwidth", value: `${gpu.bandwidthGbs} GB/s` },
+        ] }
+      : {}),
+    isPartOf: {
+      "@type": "CollectionPage",
+      name: gpu.series,
+      url: `${SITE}/${locale}${gpuSeriesPath(vendorSlug(gpu.vendor), seriesSlug(gpu.series))}`,
+    },
+  };
 
   return (
     <div className="container page">
-      <p style={{ color: "var(--muted)" }}>
-        <Link href="/gpus">{t("back")}</Link>
-      </p>
+      {crumbLd ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
+      ) : null}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
+      <Breadcrumbs
+        label={gpu.name}
+        parents={[
+          { href: gpuVendorPath(vendorSlug(gpu.vendor)), text: vendorLabel[gpu.vendor] },
+          { href: gpuSeriesPath(vendorSlug(gpu.vendor), seriesSlug(gpu.series)), text: gpu.series },
+        ]}
+      />
       <h1>{gpu.name}</h1>
       <p className="meta">
-        {vendorLabel[gpu.vendor]} · {gpu.arch} · {gpu.vramGb} GB · {gpu.year}
+        <Link href={gpuVendorPath(vendorSlug(gpu.vendor))}>{vendorLabel[gpu.vendor]}</Link>
+        {" · "}
+        <Link href={gpuSeriesPath(vendorSlug(gpu.vendor), seriesSlug(gpu.series))}>{gpu.series}</Link>
+        {gpu.arch && gpu.arch !== gpu.series ? ` · ${gpu.arch}` : ""}
+        {capacity ? ` · ${capacity}` : ""}
+        {gpu.year ? ` · ${gpu.year}` : ""}
       </p>
 
       <section className={`gpu-verdict gpu-verdict-${level}`}>
@@ -110,9 +193,21 @@ export default async function GpuPage({
         {gpu.evidence === "measured" ? t("noteMeasured") : t("noteEstimated")}
       </p>
 
-      <p>
-        <Link href={`/benchmarks/${gpu.id}`}>{t("seeBenchmark")}</Link>
-      </p>
+      {measured ? (
+        <p>
+          <Link href={rigPath(gpu.id)}>{t("seeBenchmark")}</Link>
+        </p>
+      ) : (
+        // Most cards in the catalogue have no measured rig, so linking one would 404 from 92 of
+        // the 101 pages. The table is the honest destination: it shows what was actually measured.
+        <p>
+          <Link href="/benchmarks">{t("seeBenchmarkAll")}</Link>
+        </p>
+      )}
+
+      <RelatedContent title={t("compare")} items={comparisons} />
+      <RelatedContent title={t("sameSeries")} items={siblings} />
+      <RelatedContent title={t("mentionedIn")} items={mentions} />
     </div>
   );
 }

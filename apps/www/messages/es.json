@@ -21,14 +21,18 @@
     "dashboard": "Panel",
     "more": "Más",
     "changelog": "Cambios",
-    "topics": "Usos"
+    "topics": "Usos",
+    "gpus": "GPUs",
+    "guides": "Guías",
+    "gpuBrands": "Marcas de GPU"
   },
   "topics": {
     "title": "Usos",
     "intro": "Qué nombre buscar, correr Qwen en tu PC y qué equipos caben.",
     "rigs": "Equipos del banco",
     "emptyRigs": "Ningún equipo coincide todavía.",
-    "openBench": "Ver la tabla"
+    "openBench": "Ver la tabla",
+    "guides": "Guías"
   },
   "home": {
     "heroTitle": "IA 125B en tu escritorio",
@@ -54,7 +58,11 @@
     "notes": "Notas de versión",
     "downloads": "Descargas",
     "newer": "Versión más nueva",
-    "older": "Versión anterior"
+    "older": "Versión anterior",
+    "relatedInstall": "Instalar paso a paso",
+    "relatedDownload": "Descargar el motor",
+    "relatedGpus": "Comprobar tu GPU",
+    "relatedChangelog": "Registro completo"
   },
   "models": {
     "title": "Catálogo",
@@ -203,7 +211,8 @@
     "evidenceLink": "Ver evidencia",
     "reset": "Restablecer",
     "daysShort": "d",
-    "back": "Todo el hardware"
+    "back": "Todo el hardware",
+    "rigSpecNote": "Especificaciones y compatibilidad"
   },
   "footer": {
     "engine": "Motor",
@@ -214,7 +223,13 @@
     "friends": "Amigos",
     "allLinks": "Todos",
     "benchmarks": "Benchmarks",
-    "tagline": "Strata — IA local"
+    "tagline": "Strata — IA local",
+    "groups": {
+      "learn": "Aprender",
+      "updates": "Novedades",
+      "community": "Comunidad",
+      "site": "Sitio"
+    }
   },
   "community": {
     "hubTitle": "Espejo de la comunidad",
@@ -344,6 +359,10 @@
     "gpus": {
       "title": "Lista de compatibilidad de GPU",
       "description": "Qué GPU NVIDIA, AMD y Apple pueden ejecutar un modelo local de clase 125B, con la cuantización adecuada y la descarga a elegir."
+    },
+    "guides": {
+      "title": "Guías para ejecutar un LLM local",
+      "description": "Guías paso a paso sobre VRAM, cuantización, elección de GPU y solución de problemas."
     }
   },
   "gpus": {
@@ -392,6 +411,52 @@
     "detect": "Detectar mi GPU",
     "detectHint": "Lee el nombre del renderer del navegador. No se envía nada.",
     "detectFound": "Detectada",
-    "detectNone": "No se pudo identificar la GPU; elígela en la lista."
+    "detectNone": "No se pudo identificar la GPU; elígela en la lista.",
+    "seeBenchmarkAll": "Ver la tabla completa",
+    "compare": "Comparar con tarjetas similares",
+    "footer": "{count} tarjetas más están estimadas por ancho de banda, no medidas. Verifica antes de comprar.",
+    "vendorIndexTitle": "GPUs por marca",
+    "vendorIndexIntro": "Todos los fabricantes de chips del catálogo y cuántos modelos cubre cada uno. Marca → serie → tarjeta.",
+    "vendorCount": "{count} modelos · más reciente {year}",
+    "vendorPageTitle": "GPUs {vendor} — {count} modelos",
+    "vendorPageIntro": "Las {count} GPUs {vendor} del catálogo, agrupadas por serie.",
+    "seriesHeading": "Series",
+    "seriesCount": "{count} modelos · hasta {vram} GB",
+    "seriesPageTitle": "{series} — {count} modelos",
+    "seriesPageIntro": "Todos los {count} modelos {series} ({vendor}) con memoria, ancho de banda y soporte.",
+    "seeAllInSeries": "Ver los {count} modelos",
+    "tableModel": "Modelo",
+    "tableVram": "VRAM",
+    "tableBandwidth": "Ancho de banda",
+    "tableYear": "Año",
+    "tableSupport": "Soporte",
+    "sharedMemory": "Memoria compartida",
+    "otherSeriesHeading": "Otras series",
+    "sameSeries": "Más de esta serie",
+    "mentionedIn": "Guías que mencionan esta tarjeta"
+  },
+  "guides": {
+    "title": "Guías",
+    "intro": "Artículos prácticos para ejecutar un modelo grande en tu propio equipo: qué significan las cifras, qué tarjeta sirve y qué hacer cuando va lento.",
+    "count": "{n} guías",
+    "empty": "Todavía no hay guías en este idioma.",
+    "related": "Relacionado",
+    "relatedIn": "Más sobre «{topic}»",
+    "kinds": {
+      "concept": "Conceptos",
+      "compare": "Comparativas",
+      "local": "Instalación local",
+      "troubleshoot": "Solución de problemas",
+      "task": "Flujos de trabajo",
+      "hardware": "Hardware"
+    },
+    "all": "Todas las guías",
+    "homeIntro": "Empieza por tu pregunta. Cada guía termina señalando el siguiente paso.",
+    "editorial": "Páginas temáticas"
+  },
+  "notFound": {
+    "title": "Esta página no existe",
+    "body": "Puede que el enlace esté desactualizado. Aquí tienes el resto.",
+    "home": "Volver al inicio"
   }
 }

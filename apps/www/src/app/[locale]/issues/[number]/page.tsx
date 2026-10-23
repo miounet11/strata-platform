@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { CommunityBody } from "@/components/CommunityBody";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { excerpt, getCommunity, getIssue, relatedLinks } from "@/lib/community";
 import { siteMetadata } from "@/lib/seo";
 
@@ -47,9 +48,7 @@ export default async function IssueDetailPage({
   return (
     <article className="container page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <p style={{ color: "var(--muted)" }}>
-        <Link href="/issues">{t("issues")}</Link> / #{issue.number}
-      </p>
+      <Breadcrumbs label={`#${issue.number} ${issue.title}`} />
       <h1>
         #{issue.number} {issue.title}
       </h1>

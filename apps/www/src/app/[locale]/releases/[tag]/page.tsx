@@ -2,11 +2,17 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ReleaseNotes } from "@/components/ReleaseNotes";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
+import { RelatedContent } from "@/components/RelatedContent";
+import { releasePath } from "@/lib/routes";
 import { engineVariantLabel } from "@/lib/downloads";
 import { getRelease, getReleases, releaseLead } from "@/lib/releases";
 import { siteMetadata } from "@/lib/seo";
 
 export const revalidate = 1800;
+
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
 
 export function generateStaticParams() {
   return getReleases().releases.map((release) => ({ tag: release.tag }));
@@ -34,6 +40,7 @@ export default async function ReleaseVersionPage({
   const release = getRelease(tag);
   if (!release) notFound();
   const t = await getTranslations("releases");
+  const tnav = await getTranslations({ locale, namespace: "nav" });
   const releases = getReleases().releases;
   const index = releases.findIndex((item) => item.tag === release.tag);
   const newer = index > 0 ? releases[index - 1] : null;
@@ -54,14 +61,19 @@ export default async function ReleaseVersionPage({
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
 
+  const crumbLd = breadcrumbJsonLd(SITE, locale, [
+    { path: "", name: tnav("home") },
+    { path: "/releases", name: tnav("releases") },
+    { name: release.name },
+  ]);
+
   return (
     <article className="container page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <p style={{ color: "var(--muted)" }}>
-        <Link href="/releases">{t("title")}</Link>
-        {" / "}
-        {release.tag}
-      </p>
+      {crumbLd ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbLd) }} />
+      ) : null}
+      <Breadcrumbs label={release.name} />
       <h1 style={{ marginBottom: "0.4rem" }}>
         {release.name} {index === 0 ? <span className="badge">{t("latest")}</span> : null}
       </h1>
@@ -93,9 +105,20 @@ export default async function ReleaseVersionPage({
         </a>
       </p>
       <p style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-        {newer ? <Link href={`/releases/${newer.tag}`}>{t("newer")}: {newer.tag}</Link> : null}
-        {older ? <Link href={`/releases/${older.tag}`}>{t("older")}: {older.tag}</Link> : null}
+        {newer ? <Link href={releasePath(newer.tag)}>{t("newer")}: {newer.tag}</Link> : null}
+        {older ? <Link href={releasePath(older.tag)}>{t("older")}: {older.tag}</Link> : null}
       </p>
+
+      {/* A release page is where someone lands from a download link; the install steps and the
+          compatibility list are the two things they need next. */}
+      <RelatedContent
+        items={[
+          { href: "/install", title: t("relatedInstall") },
+          { href: "/download", title: t("relatedDownload") },
+          { href: "/gpus", title: t("relatedGpus") },
+          { href: "/changelog", title: t("relatedChangelog") },
+        ]}
+      />
     </article>
   );
 }

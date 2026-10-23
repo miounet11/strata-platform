@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { engineVariantLabel, engineVariantRank, getDownloads } from "@/lib/downloads";
 import { seoMetadata } from "@/lib/seo-messages";
+import { releasePath } from "@/lib/routes";
 
 export const revalidate = 1800;
 
@@ -75,7 +76,7 @@ export default async function DownloadPage({
             ))}
         </div>
         <p className="meta" style={{ marginBottom: 0 }}>
-          <Link href={`/releases/${engine.tag}`}>{t("releaseNotes")}</Link>
+          <Link href={releasePath(engine.tag)}>{t("releaseNotes")}</Link>
           {" · "}
           <a href={engine.url} rel="noopener noreferrer">
             {tr("readGithub")}

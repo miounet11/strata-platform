@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { resolveLocale } from "@/lib/locale";
+import { rigPath } from "@/lib/routes";
 import {
   computeEconomics,
   defaultWorkload,
@@ -186,7 +187,7 @@ export function BenchmarkBoard({ focusId }: { focusId?: string }) {
                 onClick={() => setSelectedId(rig.id)}
               >
                 <td>
-                  <Link href={`/benchmarks/${rig.id}`}>
+                  <Link href={rigPath(rig.id)}>
                     <strong>{rig.name}</strong>
                   </Link>
                   <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>{rig.form}</div>
@@ -247,7 +248,7 @@ export function BenchmarkBoard({ focusId }: { focusId?: string }) {
             />
           </div>
           <p>
-            <Link href={`/benchmarks/${selected.rig.id}`}>{t("viewDetail")}</Link>
+            <Link href={rigPath(selected.rig.id)}>{t("viewDetail")}</Link>
             {" · "}
             <a href={selected.rig.evidenceUrl} rel="noopener noreferrer">
               {t("evidenceLink")}

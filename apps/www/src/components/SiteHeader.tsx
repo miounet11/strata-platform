@@ -5,25 +5,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { localeNames, resolveLocale } from "@/lib/locale";
 import { localesForTopicPath } from "@/lib/topic-locales";
-
-const primary = [
-  ["/download", "download"],
-  ["/install", "install"],
-  ["/benchmarks", "benchmarks"],
-  ["/models", "models"],
-  ["/releases", "releases"],
-  ["/community", "community"],
-] as const;
-
-const more = [
-  ["/topics", "topics"],
-  ["/pulse", "pulse"],
-  ["/creator", "creator"],
-  ["/changelog", "changelog"],
-  ["/links", "links"],
-  ["/dashboard", "dashboard"],
-  ["/login", "login"],
-] as const;
+import { PRIMARY_NAV, SECONDARY_NAV } from "@/lib/routes";
 
 export function SiteHeader({ guideLocales }: { guideLocales?: Record<string, string[]> }) {
   const t = useTranslations("nav");
@@ -50,10 +32,10 @@ export function SiteHeader({ guideLocales }: { guideLocales?: Record<string, str
         </Link>
         <nav aria-label="Main">
           <ul>
-            {primary.map(([href, key]) => (
-              <li key={key}>
-                <Link href={href} aria-current={isCurrent(href) ? "page" : undefined}>
-                  {t(key)}
+            {PRIMARY_NAV.map((item) => (
+              <li key={item.key}>
+                <Link href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
+                  {t(item.key)}
                 </Link>
               </li>
             ))}
@@ -61,13 +43,15 @@ export function SiteHeader({ guideLocales }: { guideLocales?: Record<string, str
               <details className="nav-more">
                 <summary>{t("more")}</summary>
                 <ul>
-                  {more.map(([href, key]) => (
-                    <li key={key}>
-                      <Link href={href} aria-current={isCurrent(href) ? "page" : undefined}>
-                        {t(key)}
-                      </Link>
-                    </li>
-                  ))}
+                  {SECONDARY_NAV.flatMap((group) =>
+                    group.items.map((item) => (
+                      <li key={`${group.key}-${item.key}`}>
+                        <Link href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
+                          {t(item.key)}
+                        </Link>
+                      </li>
+                    )),
+                  )}
                 </ul>
               </details>
             </li>

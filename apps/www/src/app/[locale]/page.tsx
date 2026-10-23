@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { EnrichedAudio, EnrichedImage } from "@/components/EnrichedBlock";
 import { FreshSignals } from "@/components/FreshSignals";
+import { getLiveArticles } from "@/lib/articles";
+import { guidePath, releasePath } from "@/lib/routes";
 import { getReleases } from "@/lib/releases";
 import { latestPosts, postHeadline } from "@/lib/creator";
 import { comparisonSignals, latestXSignals, upgradeSignals, worthReading } from "@/lib/intelligence";
@@ -34,6 +36,12 @@ export default async function HomePage({
   const tc = await getTranslations("creator");
   const tn = await getTranslations("nav");
   const tp = await getTranslations("pulse");
+  const tg = await getTranslations("guides");
+  // Newest first: the homepage should surface what shipped today, not the archive. Guides are
+  // per-locale, so this only ever lists the reader's own language.
+  const homeGuides = [...getLiveArticles(locale)]
+    .sort((a, b) => (a.publishAt < b.publishAt ? 1 : a.publishAt > b.publishAt ? -1 : a.order - b.order))
+    .slice(0, 6);
   const latest = getReleases().releases[0];
   const version = latest?.tag ?? "v0.1.40.3";
   const jsonLd = softwareJsonLd();
@@ -56,7 +64,7 @@ export default async function HomePage({
         <Link href="/install" className="btn btn-primary btn-lg">
           {t("ctaInstall")}
         </Link>
-        <Link href={latest ? `/releases/${latest.tag}` : "/releases"} className="btn btn-lg">
+        <Link href={latest ? releasePath(latest.tag) : "/releases"} className="btn btn-lg">
           {t("ctaRelease", { version })}
         </Link>
       </div>
@@ -76,7 +84,7 @@ export default async function HomePage({
         <section className="card" style={{ marginTop: "1.5rem" }}>
           <p className="badge" style={{ margin: 0 }}>{latest.tag}</p>
           <h2 style={{ margin: "0.6rem 0 0.4rem" }}>
-            <Link href={`/releases/${latest.tag}`}>{latest.name}</Link>
+            <Link href={releasePath(latest.tag)}>{latest.name}</Link>
           </h2>
           <p style={{ color: "var(--muted)", marginTop: 0 }}>{releaseLead(latest.body ?? "")}</p>
           <div className="row">
@@ -117,6 +125,40 @@ export default async function HomePage({
           </Link>
         </section>
       ) : null}
+
+      {/* The homepage is the only page every crawler is guaranteed to fetch, so the hubs and the
+          newest guides are listed here in full rather than left to the header menu. */}
+      <section className="section">
+        <h2>{tn("topics")}</h2>
+        <p className="page-intro">{tg("homeIntro")}</p>
+        {homeGuides.length > 0 ? (
+          <ul className="list-plain" style={{ display: "grid", gap: "0.5rem" }}>
+            {homeGuides.map((article) => (
+              <li key={article.slug}>
+                <Link href={guidePath(article.slug)}>{article.article.title}</Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          // Nothing published yet in this language: an empty list reads as a broken page, so the
+          // section says so and sends the reader to the editorial topics instead.
+          <p className="meta">{tg("empty")}</p>
+        )}
+        <div className="row" style={{ marginTop: "0.75rem" }}>
+          <Link href="/guides" className="btn btn-quiet">
+            {tg("title")} →
+          </Link>
+          <Link href="/gpus" className="btn btn-quiet">
+            {tn("gpus")} →
+          </Link>
+          <Link href="/gpus/vendor" className="btn btn-quiet">
+            {tn("gpuBrands")} →
+          </Link>
+          <Link href="/topics" className="btn btn-quiet">
+            {tg("editorial")} →
+          </Link>
+        </div>
+      </section>
 
       <section className="section">
         <h2>{t("aiPromptTitle")}</h2>
