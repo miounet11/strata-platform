@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-// @ts-expect-error — plain ESM script outside the app's TS project
+// The validators live in a plain ESM script; `allowJs` in tsconfig lets this import typecheck,
+// so the `@ts-expect-error` that used to sit here became an error itself (TS2578) once that
+// option was added.
 import { parseArticle, repairControlChars } from "../../../scripts/content/generate.mjs";
 
 /**

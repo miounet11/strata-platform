@@ -2,8 +2,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getReleases, releaseLead } from "@/lib/releases";
 import { EnrichedImage } from "@/components/EnrichedBlock";
-import { siteMetadata } from "@/lib/seo";
+import { siteMetadata, SITE } from "@/lib/seo";
 import { releasePath } from "@/lib/routes";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
 
 export const revalidate = 1800;
 
@@ -28,8 +29,15 @@ export default async function ReleasesPage({
   const releasesData = getReleases();
   const { releases } = releasesData;
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/releases", pageTitle, { type: "CollectionPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <p className="page-intro">
         {releases[0] ? `${t("latest")} ${releases[0].tag} · ` : ""}

@@ -2,6 +2,8 @@ import { EnrichedCode, EnrichedImage } from "@/components/EnrichedBlock";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getReleases } from "@/lib/releases";
 import { seoMetadata } from "@/lib/seo-messages";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 export const revalidate = 1800;
 
@@ -25,8 +27,15 @@ export default async function InstallPage({
   const home = await getTranslations("home");
   const version = getReleases().releases[0]?.tag ?? "v0.1.40.3";
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/install", pageTitle, { type: "WebPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <EnrichedImage id="install-guide" locale={locale} />
       <section className="card section">

@@ -3,6 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { getLiveTopics, topicText } from "@/lib/topics";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { seoMetadata } from "@/lib/seo-messages";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -23,8 +25,15 @@ export default async function TopicsPage({
   const t = await getTranslations("topics");
   const topics = getLiveTopics(locale);
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/topics", pageTitle, { type: "CollectionPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
       <EnrichedImage id="topics-hero" locale={locale} className="page-visual" />

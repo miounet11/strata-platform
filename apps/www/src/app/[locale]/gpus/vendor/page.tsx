@@ -3,6 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { vendorSummaries, gpuCounts } from "@/lib/gpus";
 import { gpuVendorPath } from "@/lib/routes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -23,9 +25,19 @@ export default async function GpuVendorIndex({ params }: { params: Promise<{ loc
   const t = await getTranslations("gpus");
   const vendors = vendorSummaries();
 
+  const title = t("vendorIndexTitle");
+
   return (
     <div className="container page">
-      <Breadcrumbs label={t("vendorIndexTitle")} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            jsonLdGraph([pageLd(SITE, locale, "/gpus/vendor", title, { description: t("vendorIndexIntro"), type: "CollectionPage" })]),
+          ),
+        }}
+      />
+      <Breadcrumbs label={title} />
       <h1>{t("vendorIndexTitle")}</h1>
       <p className="page-intro">{t("vendorIndexIntro")}</p>
       <p className="meta">{t("summary", { total: gpuCounts.total, verified: gpuCounts.measured, runnable: gpuCounts.runnable })}</p>

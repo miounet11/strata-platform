@@ -12,6 +12,8 @@ import {
 } from "@/lib/gpus";
 import { gpuPath, gpuSeriesPath, gpuVendorPath } from "@/lib/routes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export function generateStaticParams() {
@@ -65,8 +67,20 @@ export default async function GpuVendorPage({
   // The newest family is what most visitors came for; older ones follow in year order.
   const newest = series.slice(0, 3);
 
+  const title = t("vendorPageTitle", { vendor: label, count: list.length });
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            jsonLdGraph([
+              pageLd(SITE, locale, gpuVendorPath(vendorSlug(key)), title, { type: "CollectionPage" }),
+            ]),
+          ),
+        }}
+      />
       {/* `/gpus/vendor` is a real index between the catalogue and each brand. */}
       <Breadcrumbs label={label} parents={[{ href: "/gpus/vendor", text: t("vendorIndexTitle") }]} />
       <h1>{t("vendorPageTitle", { vendor: label, count: list.length })}</h1>

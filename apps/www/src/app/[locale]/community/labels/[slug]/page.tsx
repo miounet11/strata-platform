@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCommunity, getIssue, getLabel, getPull } from "@/lib/community";
-import { siteMetadata } from "@/lib/seo";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE, siteMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   const { labels } = getCommunity();
@@ -38,6 +39,19 @@ export default async function LabelDetailPage({
 
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            jsonLdGraph([
+              pageLd(SITE, locale, `/community/labels/${label.slug}`, `Label: ${label.name}`, {
+                description: label.description || undefined,
+                type: "CollectionPage",
+              }),
+            ]),
+          ),
+        }}
+      />
       <p style={{ color: "var(--muted)" }}>
         <Link href="/community/labels">{t("labels")}</Link> / {label.name}
       </p>

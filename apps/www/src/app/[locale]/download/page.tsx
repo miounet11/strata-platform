@@ -4,6 +4,8 @@ import { EnrichedImage } from "@/components/EnrichedBlock";
 import { engineVariantLabel, engineVariantRank, getDownloads } from "@/lib/downloads";
 import { seoMetadata } from "@/lib/seo-messages";
 import { releasePath } from "@/lib/routes";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 export const revalidate = 1800;
 
@@ -55,8 +57,15 @@ export default async function DownloadPage({
   const { engine, macEngine, syncedAt } = downloads;
   const desktopAssets: DesktopAsset[] = [...(downloads.desktop.assets ?? [])];
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/download", pageTitle, { type: "WebPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
       <p className="meta">

@@ -5,6 +5,8 @@ import { getReleases } from "@/lib/releases";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { seoMetadata } from "@/lib/seo-messages";
 import { releasePath } from "@/lib/routes";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 export const revalidate = 1800;
 
@@ -40,8 +42,15 @@ export default async function ChangelogPage({
   // two release pages that do not exist, so a row only links to a release that is really there.
   const releaseTags = new Set(getReleases().releases.map((release) => release.tag));
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/changelog", pageTitle, { type: "CollectionPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <p className="page-intro">
         {t("intro")}{" "}

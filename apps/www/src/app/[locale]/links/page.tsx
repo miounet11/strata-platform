@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import linksData from "@/data/friendly-links.json";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { seoMetadata } from "@/lib/seo-messages";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 function loc(locale: string, record: Record<string, string>): string {
   return record[locale] ?? record.en ?? "";
@@ -25,8 +27,15 @@ export default async function LinksPage({
   setRequestLocale(locale);
   const t = await getTranslations("links");
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/links", pageTitle, { type: "CollectionPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
       <EnrichedImage id="links-hero" locale={locale} className="page-visual" />

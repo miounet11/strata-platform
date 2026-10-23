@@ -10,6 +10,8 @@ import {
 } from "@/lib/gpus";
 import { gpuPath, gpuSeriesPath, gpuVendorPath } from "@/lib/routes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 import { seoMetadata } from "@/lib/seo-messages";
 
 export function generateStaticParams() {
@@ -67,8 +69,20 @@ export default async function GpuSeriesPage({
   const name = cards[0].series;
   const siblings = seriesOfVendor(key).filter((entry) => entry.slug !== series);
 
+  const title = t("seriesPageTitle", { series: name, count: cards.length });
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            jsonLdGraph([
+              pageLd(SITE, locale, gpuSeriesPath(vendorSlug(key), series), title, { type: "CollectionPage" }),
+            ]),
+          ),
+        }}
+      />
       <Breadcrumbs
         label={name}
         parents={[

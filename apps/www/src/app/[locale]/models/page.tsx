@@ -3,6 +3,8 @@ import { EnrichedCode, EnrichedImage } from "@/components/EnrichedBlock";
 import { ModelActions } from "@/components/ModelActions";
 import modelsData from "@/data/models.json";
 import { seoMetadata } from "@/lib/seo-messages";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -22,8 +24,15 @@ export default async function ModelsPage({
   setRequestLocale(locale);
   const t = await getTranslations("models");
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/models", pageTitle, { type: "CollectionPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <p className="page-intro">
         <a href={modelsData.huggingface} rel="noopener noreferrer">

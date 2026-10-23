@@ -2,6 +2,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getCommunity } from "@/lib/community";
 import { seoMetadata } from "@/lib/seo-messages";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -25,8 +27,15 @@ export default async function PullsListPage({
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
   );
 
+  const pageTitle = t("pullsTitle");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/pulls", pageTitle, { type: "CollectionPage" })])) }}
+      />
+
       <h1>{t("pullsTitle")}</h1>
       <p className="page-intro">
         <Link href="/community">{t("hub")}</Link> · {pulls.length} {t("items")}

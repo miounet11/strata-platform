@@ -17,6 +17,8 @@ import {
 import { formatAge } from "@/lib/time";
 import { formatNumber } from "@/lib/locale";
 import { seoMetadata } from "@/lib/seo-messages";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 export const revalidate = 1800;
 
@@ -47,8 +49,15 @@ export default async function PulsePage({
   const signals = latestSignals(30);
   const quotes = latestGpuQuotes(25);
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/pulse", pageTitle, { type: "WebPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <EnrichedImage id="pulse-signals" locale={locale} />
       <p className="page-intro">{t("intro")}</p>

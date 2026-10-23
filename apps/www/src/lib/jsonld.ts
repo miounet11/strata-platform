@@ -26,3 +26,32 @@ export function jsonLdGraph(nodes: JsonLdNode[], context: Record<string, unknown
 export function nodeId(pageUrl: string, fragment: string) {
   return `${pageUrl}#${fragment}`;
 }
+
+/**
+ * The WebPage node every index and list page needs.
+ *
+ * These pages are a filter or a table, not an article, so they have nothing to describe beyond
+ * themselves. Without a node they carried no structured data at all, and the audit reported 2,780
+ * of them — most of the site by count, since every locale multiplies each index.
+ *
+ * `type` defaults to WebPage but a collection can say `CollectionPage`, which is what a crawler
+ * expects for a list of links rather than a single document.
+ */
+export function pageLd(
+  site: string,
+  locale: string,
+  path: string,
+  name: string,
+  options: { description?: string; type?: string } = {},
+) {
+  const url = `${site}/${locale}${path}`;
+  return {
+    "@type": options.type ?? "WebPage",
+    "@id": nodeId(url, "webpage"),
+    url,
+    name,
+    ...(options.description ? { description: options.description } : {}),
+    inLanguage: locale,
+    isPartOf: { "@type": "WebSite", name: "Strata", url: site },
+  };
+}

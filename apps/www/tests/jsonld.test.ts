@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { jsonLdGraph, nodeId } from "../src/lib/jsonld.ts";
+import { jsonLdGraph, nodeId, pageLd } from "../src/lib/jsonld.ts";
 import { breadcrumbJsonLd } from "../src/lib/breadcrumbs.ts";
 
 const SITE = "https://www.stratat.com";
@@ -69,6 +69,26 @@ test("breadcrumbs: the home crumb keeps its URL even though its path is an empty
   // `path: ""` is the home page. Treating it as absent dropped `item` from the first crumb on all
   // five trails that start at the home page, and Google requires `item` on every entry but the last.
   assert.deepEqual(trailOf(crumb)[0].item, `${SITE}/en`);
+});
+
+test("pageLd: the node points at the localized URL it describes", () => {
+  const node = pageLd(SITE, "de", "/gpus/vendor", "Hersteller");
+
+  assert.equal(node.url, `${SITE}/de/gpus/vendor`);
+  assert.equal(node["@id"], `${SITE}/de/gpus/vendor#webpage`);
+  assert.equal(node.name, "Hersteller");
+  assert.equal(node.inLanguage, "de");
+  assert.equal(node["@type"], "WebPage");
+});
+
+test("pageLd: a collection declares CollectionPage", () => {
+  const node = pageLd(SITE, "en", "/gpus", "GPUs", { type: "CollectionPage" });
+  assert.equal(node["@type"], "CollectionPage");
+});
+
+test("pageLd: an absent description is omitted, not emitted as undefined", () => {
+  const node = pageLd(SITE, "en", "/links", "Links");
+  assert.equal("description" in node, false);
 });
 
 test("skip link: every locale has the nav string it renders", () => {

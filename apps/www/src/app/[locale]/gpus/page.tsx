@@ -4,6 +4,8 @@ import { GpuExplorer } from "@/components/GpuExplorer";
 import { allGpus, gpuCounts, vendorSlug, vendorSummaries } from "@/lib/gpus";
 import { gpuVendorPath } from "@/lib/routes";
 import { seoMetadata } from "@/lib/seo-messages";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -34,8 +36,15 @@ export default async function GpuIndexPage({ params }: { params: Promise<{ local
       evidence: gpu.evidence,
     }));
 
+  const pageTitle = t("title");
+
   return (
     <div className="container container-wide page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/gpus", pageTitle, { type: "CollectionPage" })])) }}
+      />
+
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
       <p className="meta">

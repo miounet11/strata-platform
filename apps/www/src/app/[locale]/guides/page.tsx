@@ -5,7 +5,8 @@ import { routing } from "@/i18n/routing";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getLiveArticles } from "@/lib/articles";
 import { GUIDE_KINDS, guideKindOrder, guidePath } from "@/lib/routes";
-import { siteMetadata } from "@/lib/seo";
+import { siteMetadata, SITE } from "@/lib/seo";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
 
 export const revalidate = 1800;
 
@@ -54,8 +55,15 @@ export default async function GuidesIndexPage({ params }: { params: Promise<{ lo
   // silently disappearing from the only index that links to it.
   const other = articles.filter((article) => !(GUIDE_KINDS as readonly string[]).includes(article.kind));
 
+  const pageTitle = t("title");
+
   return (
     <div className="container page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/guides", pageTitle, { type: "CollectionPage" })])) }}
+      />
+
       <Breadcrumbs label={t("title")} />
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
