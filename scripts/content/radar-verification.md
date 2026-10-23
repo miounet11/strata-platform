@@ -24,16 +24,19 @@
 
 两次运行分别开始于 01:15:54 与 01:27:07，日志第 505–646 行。
 
-| 阶段 | 第一次 | 第二次 |
+| 阶段 | 第一次（01:15:54 → 01:19:45） | 第二次（01:27:07 → …） |
 | --- | --- | --- |
-| radar | `80 raw → 8 on-topic and new → 7 selected` | `80 raw → 1 on-topic and new → 1 selected` |
-| generate (en) | `ok=12` | `ok=1` |
-| generate (zh) | `ok=4` | `ok=0` |
-| images | `generated=1 skipped=793 failed=0` | 同 |
-| verify | `checked 794 article(s)`，`worst cross-locale pair: 0.117` | 同 |
-| publish | `exit=0` | `exit=0` |
+| radar | `80 raw → 8 on-topic and new → 7 selected`，`merged 7 radar item(s)`，`exit=0` | `80 raw → 1 on-topic and new → 1 selected`，`merged 1 radar item(s)`，`exit=0` |
+| generate (en) | `✓ ok=12 skipped=149 failed=0`，`exit=0` | `✓ ok=1 skipped=161 failed=0`，`exit=0` |
+| generate (zh) | `✓ ok=4 skipped=143 failed=0`，`exit=0` | `✓ ok=0 skipped=147 failed=0`，`exit=0` |
+| images | `✓ generated=14 skipped=779 failed=0`，`exit=0` | `✓ generated=1 skipped=793 failed=0`，`exit=0` |
+| verify | `checked 793 article(s)`，`worst cross-locale pair: 0.117 es/rtx5080-coder ~ pt/rx7900xtx-coder`，`✓ all articles pass`，`exit=0` | `checked 794 article(s)`，`worst … 0.117`，`✓ all articles pass`，`exit=0` |
+| publish | `published 16 · already live 292 · still scheduled 485`（en 12 / zh 4），`exit=0` | `published 1 · already live 308 · still scheduled 485`，`exit=0` |
+| indexnow | `200 — 500 urls`，`exit=0` | `exit=0` |
 
-各阶段 `exit=0`。第二次只选出 1 条，是因为第一次已经消费了当天的信号——这是冷却与去重的预期结果，不是失败。
+所有阶段 `exit=0`。第二次只选出 1 条，是因为第一次已经消费了当天的信号——这是冷却与去重的预期结果，不是失败。
+
+第一次的 `generated=14` 与 `published 16 / en 12 / zh 4` 数量不相等，是区间差异：`images.mjs` 只处理本次 `generate` 新写入且缺图的条目，`publish` 统计的是当日所有已满足条件的排期项，其中包含此前已生成、当天首次满足发布条件的条目。这两个数字不能相互校验。
 
 ### 关于 `--no-build`
 
@@ -145,9 +148,7 @@ similarity max=1.000 threshold=0.72 pairs=1975 EXIT=1
 
 `scripts/deploy-www.sh` 同步后两侧 md5 均为 `e87c2f638718ac734589c34fe13bccd0`，生产机 `bash -n` 退出 0。
 
-### 真实部署路径验证
-
-分支测试用的是桩 `node`，只能证明 case 语句正确，不能证明门禁在真实构建产物上跑得通。因此又在生产机执行了一次完整的 `scripts/deploy-www.sh --no-restart`（构建 + 全部门禁，不换目录、不重启），日志 `/tmp/deploy-gate-test.log`：
+### 真实部署路径验证（exit 1：继续）
 
 ```
 radar tests passed
@@ -161,6 +162,17 @@ DEPLOY_EXIT=0
 ```
 
 修复前这一行是 `node` 的 MODULE_NOT_FOUND；修复后它真的读取了 44,475 个页面并给出 1,975 对结果。`--no-restart` 跳过 swap，线上 `.next` 未被动过（`curl https://www.stratat.com/en` 返回 200，`pm2` 中 `strata-www` 仍为 `online`），试跑产生的 10G `.next-build` 已删除，磁盘回到 31%。
+
+### 真实部署路径验证（exit 2：阻断）
+
+只验证"继续"不够，还必须验证阻断是真的。把 `apps/www/scripts/similarity.mjs` 临时替换为 `process.exit(2)`，跑同一条命令（日志 `/tmp/deploy-exit2-test.log`）：
+
+```
+similarity could not run (exit=2) — gate is broken, refusing to deploy
+DEPLOY_EXIT=1
+```
+
+`swap skipped` 从未打印——部署在 similarity 阶段终止。随后从 `/tmp/similarity.mjs.bak` 恢复，`md5sum` 回到 `3473b43d52337350713155e51b32a962`（与开发机一致），`.next-build` 已删除，`https://www.stratat.com/en` 返回 200。
 
 ---
 
