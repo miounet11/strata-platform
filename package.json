@@ -8,6 +8,8 @@
     "dev:api": "pnpm --filter @stratat/api dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
+    "test": "node --test apps/www/tests/*.test.ts scripts/content/*.test.mjs",
+    "check:sitemap": "pnpm --filter @stratat/www check:sitemap",
     "sync:releases": "node scripts/sync-releases.mjs",
     "sync:community": "node scripts/sync-github-community.mjs",
     "sync:creator": "node scripts/sync-creator-social.mjs",
