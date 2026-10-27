@@ -18,6 +18,43 @@ set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT" || exit 1
 
+# One deploy at a time. Both `daily-guides.sh` and `content-grow.mjs` call this script, and the
+# content job's own timer can fire while a manual deploy is running.
+#
+# This is not theoretical: on 2026-10-27 two builds were running against the same `.next-build`
+# at once (06:58 and 07:08). The first died with exit=137 after the box ran out of memory, it left
+# an orphaned `next build` tree holding ~2.5GB, and `.next-build` was being written by two writers
+# — so the patrol numbers measured from it could not be trusted and had to be re-run.
+#
+# Exit 75 (EX_TEMPFAIL) rather than 0: the caller must not conclude that a deploy happened. A
+# second run has to be retried, not silently skipped. `flock -n` fails immediately instead of
+# queueing, because the later run would build the same commit and arrive at the same result.
+#
+# The lock is a production guard, not a portability requirement. The concurrency it prevents is
+# two *scheduled* runs colliding, and those only exist on the host. macOS — where this repo is also
+# checked out and where a dev build is run by hand — has no `flock` binary and no /run/lock, so
+# assuming either would turn every local deploy into an immediate `exit 1`. When the tool is
+# absent the deploy continues unlocked and says so, the same way SKIP_TESTS=1 announces itself.
+if command -v flock >/dev/null 2>&1; then
+  if [ -n "${STRATAT_DEPLOY_LOCK:-}" ]; then
+    LOCK_FILE="$STRATAT_DEPLOY_LOCK"
+  elif [ -d /run/lock ] && [ -w /run/lock ]; then
+    LOCK_FILE=/run/lock/stratat-deploy.lock
+  else
+    LOCK_FILE="${TMPDIR:-/tmp}/stratat-deploy.lock"
+  fi
+  exec 9>"$LOCK_FILE" || {
+    echo "cannot open lock file $LOCK_FILE" >&2
+    exit 1
+  }
+  if ! flock -n 9; then
+    echo "another deploy holds $LOCK_FILE — not starting a second build; retry when it finishes" >&2
+    exit 75
+  fi
+else
+  echo "WARNING: flock not available on this host — deploy lock disabled. Do not run two deploys at once here." >&2
+fi
+
 # The radar tests gate every deploy, because the radar is what puts new pages on the site each
 # morning and a broken scorer fails invisibly: it does not throw, it just selects nothing — which
 # looks exactly like a quiet week, and the only symptom is traffic that never arrives. The build
@@ -79,68 +116,33 @@ else
   fi
 fi
 
-# Score the build against the SEO/accessibility/performance budget. `audit.mjs` exits 1 when any
-# check fails, so this is a hard gate, not a report. Several of its checks (`jsonld-coverage`,
-# `performance-budget`) are currently failing on the live site — see
-# `yyds-2/docs/11-inspiration-yyds-bot.md`. Blocking the deploy on them today would block every
-# deploy, so the gate is advisory until those are fixed: set AUDIT_STRICT=1 to make it blocking.
-if [ "${SKIP_AUDIT:-0}" = "1" ]; then
-  echo "audit SKIPPED (SKIP_AUDIT=1)"
-else
-  NEXT_DIST_DIR=.next-build node scripts/audit.mjs
-  audit_status=$?
-  if [ "$audit_status" -ne 0 ]; then
-    if [ "${AUDIT_STRICT:-0}" = "1" ]; then
-      echo "audit failed (exit=$audit_status) — live site untouched" >&2
-      exit 1
-    fi
-    echo "audit reported failures (exit=$audit_status) — deploy continues, set AUDIT_STRICT=1 to block" >&2
-  fi
-fi
-
-# Near-duplicate page text. `audit.mjs` scores structure — h1 present, JSON-LD present — and says
-# nothing about whether the prose was actually rewritten per entity. On 2026-10-22 this found 1,936
-# pairs above 0.72, 546 of them byte-identical pages reachable at two URLs, from catalog rows that
-# differ only in a chip codename the page never renders.
+# Quality ratchet: score, sitemap parity and near-duplicate pairs against `patrol-baseline.json`.
 #
-# Exit 1 is a finding about the content, so it is advisory for the same reason as audit: those 546
-# are a data problem the pipeline has to fix, and blocking today would block every deploy.
-# SIMILARITY_STRICT=1 makes it blocking.
+# This replaces the two advisory gates (audit, similarity) that used to print "deploy continues" on
+# every failure. Advisory meant the numbers were written to a log on a host nobody is logged into,
+# so 105 pages over the byte budget and 1,936 duplicate pairs accumulated with a green deploy each
+# time. Strict would have blocked every deploy including the ones that fix things. A ratchet blocks
+# only the direction that hurts: today's numbers are the floor, a deploy may hold them or improve
+# them, and `--update` below lowers the floor whenever it does.
 #
-# Exit 2 means the check could not run — no build output, or no page above --min-tokens. That is
-# always fatal: after a successful build it can only mean this gate is broken, and continuing would
-# print a deploy as "duplicates reported, continuing" when nothing was measured at all.
-#
-# Only exit 1 is a finding. Every other non-zero code is the gate failing to run, and on 2026-10-23
-# this mattered: `scripts/similarity.mjs` existed in the workstation checkout but was never synced
-# to the server, so `node` exited 1 with MODULE_NOT_FOUND on every deploy while this branch printed
-# "duplicate pages reported, deploy continues". A missing file and 1,975 duplicate pairs are not the
-# same fact, and the catch-all `*)` was what collapsed them.
-#
-# NEXT_DIST_DIR is `.next-build` because this runs before the swap. The `.next` copy of the server
-# output is pruned after the swap, so this gate cannot be re-run later against a live tree.
-if [ "${SKIP_SIMILARITY:-0}" = "1" ]; then
-  echo "similarity SKIPPED (SKIP_SIMILARITY=1)"
-elif [ ! -f scripts/similarity.mjs ]; then
-  echo "similarity gate missing: scripts/similarity.mjs not found in apps/www — refusing to deploy" >&2
+# Exit 2 means the measurement itself failed (no build output, a gate that could not run) — always
+# fatal, and kept separate from exit 1 so a broken gate cannot read as "a finding, continue".
+if [ "${SKIP_PATROL:-0}" = "1" ]; then
+  echo "patrol SKIPPED (SKIP_PATROL=1)"
+elif [ ! -f scripts/patrol.mjs ]; then
+  echo "patrol gate missing: scripts/patrol.mjs not found in apps/www — refusing to deploy" >&2
   exit 1
 else
-  SITE_DIR=. NEXT_DIST_DIR=.next-build node scripts/similarity.mjs
-  similarity_status=$?
-  case "$similarity_status" in
-    0) ;;
-    1)
-      if [ "${SIMILARITY_STRICT:-0}" = "1" ]; then
-        echo "similarity failed (exit=1) — live site untouched" >&2
-        exit 1
-      fi
-      echo "similarity reported duplicate pages (exit=1) — deploy continues, set SIMILARITY_STRICT=1 to block" >&2
-      ;;
-    *)
-      echo "similarity could not run (exit=$similarity_status) — gate is broken, refusing to deploy" >&2
-      exit 1
-      ;;
-  esac
+  NEXT_DIST_DIR=.next-build node scripts/patrol.mjs
+  patrol_status=$?
+  if [ "$patrol_status" -ne 0 ]; then
+    if [ "$patrol_status" -eq 1 ]; then
+      echo "patrol found a regression against the floor (exit=1) — live site untouched" >&2
+    else
+      echo "patrol could not run (exit=$patrol_status) — gate is broken, live site untouched" >&2
+    fi
+    exit 1
+  fi
 fi
 
 if [ "$NO_RESTART" -eq 1 ]; then
@@ -189,4 +191,28 @@ mv .next-build .next
 pm2 restart strata-www >/dev/null 2>&1
 restart_status=$?
 echo "restart exit=$restart_status"
+
+# Lock in whatever this build improved, now that it is the live tree. Only improvements are
+# written, so a clean deploy leaves the file alone; a regression was already blocked above and
+# can never reach this line. Without this step the floor would drift behind reality and the next
+# genuine regression would be invisible against a stale number.
+#
+# The tree to measure is the copy server.js actually loads: `.next/server` was pruned a few lines
+# above, so pointing at it here would read nothing. A plain `next build` keeps its copy at
+# `standalone/apps/www/.next`, a deploy at `standalone/apps/www/.next-build`; both are accepted.
+if [ "$restart_status" -eq 0 ] && [ "${SKIP_PATROL:-0}" != "1" ]; then
+  LIVE_DIST=""
+  for candidate in .next/standalone/apps/www/.next-build .next/standalone/apps/www/.next; do
+    if [ -d "$candidate/server/app" ]; then
+      LIVE_DIST="$candidate"
+      break
+    fi
+  done
+  if [ -n "$LIVE_DIST" ]; then
+    NEXT_DIST_DIR="$LIVE_DIST" node scripts/patrol.mjs --update || echo "patrol: baseline not updated" >&2
+  else
+    echo "patrol: no live build tree to measure — baseline not updated" >&2
+  fi
+fi
+
 exit "$restart_status"

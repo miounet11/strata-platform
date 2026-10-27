@@ -254,7 +254,12 @@ if [ "${1:-}" != "--no-build" ]; then
   "$ROOT/scripts/deploy-www.sh"
   deploy_status=$?
   echo "deploy exit=$deploy_status"
-  if [ "$deploy_status" -ne 0 ]; then
+  # 75 is deploy-www.sh's "another deploy holds the lock". Nothing was built and nothing is
+  # broken — the content is already published, it just has to wait for the other build. Alerting
+  # here would page someone for a healthy box every time a manual deploy overlaps the timer.
+  if [ "$deploy_status" -eq 75 ]; then
+    echo "WARN: 另一个部署正在进行，本次跳过构建；内容已发布，等待下一次部署上线"
+  elif [ "$deploy_status" -ne 0 ]; then
     fail "站点构建或部署失败（deploy-www.sh exit=$deploy_status），线上仍是上一版" 1
   fi
 fi
