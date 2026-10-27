@@ -164,7 +164,9 @@ SIGN_IDENTITY=""
 SIGN_TIER="none"
 P12_KEYCHAIN=""
 
-if [ "$(uname -s)" = "Darwin" ]; then
+# Apple signing only applies when the *target* is macOS: cross-compiling a Windows or Linux
+# installer on a Mac must not touch the keychain at all.
+if [ "$(uname -s)" = "Darwin" ] && [ "${TARGET#*apple-darwin}" != "$TARGET" ]; then
   # An explicitly supplied p12 wins: it is the only material we know the password for, and a
   # keychain identity we cannot unlock would fail codesign after a full compile.
   if [ -n "${APPLE_SIGNING_IDENTITY:-}" ]; then
@@ -223,13 +225,14 @@ fi
 CONFIG_OVERRIDE="$(node -e '
   const identity = process.argv[1];
   const updater = process.argv[2] === "1";
+  const isMacTarget = process.argv[3].includes("apple-darwin");
   const out = { bundle: {} };
-  if (process.platform === "darwin") {
+  if (isMacTarget) {
     out.bundle.macOS = { signingIdentity: identity || null };
   }
   if (!updater) out.bundle.createUpdaterArtifacts = false;
   console.log(JSON.stringify(out));
-' "$SIGN_IDENTITY" "$([ -n "${TAURI_SIGNING_PRIVATE_KEY:-}" ] && echo 1 || echo 0)")"
+' "$SIGN_IDENTITY" "$([ -n "${TAURI_SIGNING_PRIVATE_KEY:-}" ] && echo 1 || echo 0)" "$TARGET")"
 echo "→ bundle config override: $CONFIG_OVERRIDE"
 
 cleanup_keychain() {
