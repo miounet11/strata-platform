@@ -85,6 +85,58 @@
         "es": "Modelo base que Strata ejecuta en local",
         "pt": "Modelo base que o Strata executa localmente"
       }
+    },
+    {
+      "name": "GPU Unlock",
+      "url": "https://gpu-unlock.com",
+      "description": {
+        "en": "NVIDIA SM speed-select override: build, boot order and checks",
+        "zh": "NVIDIA SM 频率选择覆盖：构建、启动顺序与自检",
+        "ja": "NVIDIA SM 速度選択の上書き：ビルド・起動順・検証",
+        "de": "NVIDIA-SM-Speed-Select-Override: Build, Bootreihenfolge und Prüfungen",
+        "fr": "Override de sélection de vitesse SM NVIDIA : build, ordre de démarrage et vérifications",
+        "es": "Anulación del selector de velocidad SM de NVIDIA: build, orden de arranque y comprobaciones",
+        "pt": "Substituição do seletor de velocidade SM da NVIDIA: build, ordem de boot e verificações"
+      }
+    },
+    {
+      "name": "GPU Unlock Reference",
+      "url": "https://gpuunlock.com",
+      "description": {
+        "en": "Accepted device IDs and same-card measurements",
+        "zh": "模块接受的设备 ID 与同卡实测数据",
+        "ja": "対応デバイス ID と同一カードでの実測値",
+        "de": "Akzeptierte Geräte-IDs und Messwerte derselben Karte",
+        "fr": "Identifiants de périphériques acceptés et mesures sur la même carte",
+        "es": "IDs de dispositivo aceptados y mediciones en la misma tarjeta",
+        "pt": "IDs de dispositivo aceitos e medições na mesma placa"
+      }
+    },
+    {
+      "name": "Android 去广告",
+      "url": "https://www.androidadcleaner.com",
+      "description": {
+        "en": "Ad cleanup for Chinese Android phones over adb, no root",
+        "zh": "用 adb 关闭国产安卓系统广告，不 root",
+        "ja": "adb で中国製 Android の広告を無効化、root 不要",
+        "de": "Werbung auf chinesischen Android-Geräten per adb abschalten, ohne Root",
+        "fr": "Nettoyage des publicités des Android chinois via adb, sans root",
+        "es": "Limpieza de anuncios en Android chinos por adb, sin root",
+        "pt": "Limpeza de anúncios em Androids chineses via adb, sem root"
+      }
+    },
+    {
+      "name": "CleanYourTV",
+      "url": "https://www.cleanyourtv.cc",
+      "description": {
+        "en": "Debloat and de-ad Android TV boxes over adb",
+        "zh": "用 adb 清理 Android TV 盒子",
+        "ja": "adb で Android TV 端末を整理",
+        "de": "Android-TV-Boxen per adb entrümpeln",
+        "fr": "Nettoyer les box Android TV via adb",
+        "es": "Limpiar cajas Android TV por adb",
+        "pt": "Limpar caixas Android TV via adb"
+      }
     }
   ],
   "linkToUs": {
