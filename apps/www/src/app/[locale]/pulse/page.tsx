@@ -15,6 +15,7 @@ import {
   worthReading,
 } from "@/lib/intelligence";
 import { formatAge } from "@/lib/time";
+import { X_FEED, LANE } from "@/lib/page-budget";
 import { formatNumber } from "@/lib/locale";
 import { seoMetadata } from "@/lib/seo-messages";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
@@ -43,11 +44,14 @@ export default async function PulsePage({
   const intake = meta.intake;
   const fresh = worthReading(6);
   const newest = newestXAt();
-  const xFeed = presentSignals(latestXSignals(35));
-  const comparisons = presentSignals(comparisonSignals(25));
-  const upgrades = presentSignals(upgradeSignals(25));
-  const signals = latestSignals(30);
-  const quotes = latestGpuQuotes(25);
+  // Every signal is rendered twice — once as HTML and once in the RSC payload — so the feed cost
+  // about 1 KB of page per entry and pushed the page to 229 KB. These counts are the newest items
+  // in each lane, which is what a pulse page is for; the budget is 180 KB.
+  const xFeed = presentSignals(latestXSignals(X_FEED));
+  const comparisons = presentSignals(comparisonSignals(LANE));
+  const upgrades = presentSignals(upgradeSignals(LANE));
+  const signals = latestSignals(LANE);
+  const quotes = latestGpuQuotes(10);
 
   const pageTitle = t("title");
 

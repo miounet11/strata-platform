@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { GpuExplorer } from "@/components/GpuExplorer";
 import { allGpus, gpuCounts, vendorSlug, vendorSummaries } from "@/lib/gpus";
+import { LISTED } from "@/lib/page-budget";
 import { gpuVendorPath } from "@/lib/routes";
 import { seoMetadata } from "@/lib/seo-messages";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
@@ -21,8 +22,15 @@ export default async function GpuIndexPage({ params }: { params: Promise<{ local
   // The live filter ships every row to the browser, so it gets the cards that can actually run
   // the model. The other 2,800 have no build, no filter value and no reason to cost bytes — they
   // are still published as detail pages and listed under their brand and series below.
-  const rows = allGpus()
+  //
+  // 358 rows cost 229 KB of HTML, over the 180 KB budget, so the filter covers the LISTED cards
+  // with the most memory — the ones people actually narrow down to. The cut is stated on the page
+  // and the brand → series index below links every remaining card's detail page.
+  const runnable = allGpus()
     .filter((gpu) => gpu.runnable || gpu.evidence === "measured")
+    .sort((a, b) => b.vramGb - a.vramGb || b.readingTps - a.readingTps);
+  const rows = runnable
+    .slice(0, LISTED)
     .map((gpu) => ({
       id: gpu.id,
       slug: gpu.slug,
@@ -81,6 +89,12 @@ export default async function GpuIndexPage({ params }: { params: Promise<{ local
           badgeEstimated: t("badgeEstimated"),
         }}
       />
+
+      {runnable.length > rows.length ? (
+        <p className="meta">
+          {t("showingTop", { shown: rows.length, count: runnable.length })}
+        </p>
+      ) : null}
 
       <p className="meta">{t("footer", { count: gpuCounts.estimated })}</p>
 

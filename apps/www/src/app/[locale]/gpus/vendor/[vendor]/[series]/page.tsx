@@ -8,6 +8,7 @@ import {
   vendorLabel,
   vendorSlug,
 } from "@/lib/gpus";
+import { LISTED } from "@/lib/page-budget";
 import { gpuPath, gpuSeriesPath, gpuVendorPath } from "@/lib/routes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
@@ -68,6 +69,9 @@ export default async function GpuSeriesPage({
   const t = await getTranslations("gpus");
   const name = cards[0].series;
   const siblings = seriesOfVendor(key).filter((entry) => entry.slug !== series);
+  // `Radeon` alone is 380 cards. The table stays scannable at 120 rows; the rest keep their own
+  // detail pages and are linked from the brand page, so no card loses its inbound path.
+  const listed = cards.slice(0, LISTED);
 
   const title = t("seriesPageTitle", { series: name, count: cards.length });
 
@@ -106,7 +110,7 @@ export default async function GpuSeriesPage({
           </tr>
         </thead>
         <tbody>
-          {cards.map((gpu) => (
+          {listed.map((gpu) => (
             <tr key={gpu.id}>
               <td>
                 <Link href={gpuPath(gpu.slug)}>{gpu.name}</Link>
@@ -119,6 +123,13 @@ export default async function GpuSeriesPage({
           ))}
         </tbody>
       </table>
+
+      {cards.length > listed.length ? (
+        <p className="meta">
+          {t("showingTop", { shown: listed.length, count: cards.length })} ·{" "}
+          <Link href={gpuVendorPath(vendorSlug(key))}>{vendorLabel[key]}</Link>
+        </p>
+      ) : null}
 
       <h2>{t("otherSeriesHeading")}</h2>
       <ul className="gpu-list">
