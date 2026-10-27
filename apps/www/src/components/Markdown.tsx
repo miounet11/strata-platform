@@ -67,24 +67,28 @@ function BlockNode({ block }: { block: Block }) {
     return block.ordered ? <ol>{items}</ol> : <ul>{items}</ul>;
   }
   return (
-    <table>
-      <thead>
-        <tr>
-          {block.head.map((cell, index) => (
-            <th key={index}>{cell}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {block.rows.map((row, rowIndex) => (
-          <tr key={rowIndex}>
-            {row.map((cell, cellIndex) => (
-              <td key={cellIndex}>{cell}</td>
+    // Wrapped so a wide spec table scrolls inside the column instead of widening the page,
+    // which at 320px pushed the whole document sideways.
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            {block.head.map((cell, index) => (
+              <th key={index}>{cell}</th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {block.rows.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((cell, cellIndex) => (
+                <td key={cellIndex}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

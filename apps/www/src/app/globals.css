@@ -456,6 +456,13 @@ nav a[aria-current="page"] {
 
 /* ---- Cards & grids ---- */
 
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
 .grid-3 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -701,7 +708,66 @@ pre.copy-block {
   max-width: 32rem;
 }
 
-/* ---- Guide index & related links ---- */
+/* ---- Page body ---- */
+
+/* Article prose. The container is 1120px wide, which suits tables and cards but makes a
+   paragraph run ~180 characters per line. Text blocks are capped at a readable measure; the
+   table wrapper is exempt so a wide spec table keeps its columns instead of being squeezed
+   into the text column. */
+.article-body > :is(p, ul, ol, h2, h3, blockquote) {
+  max-width: 46rem;
+}
+
+.article-body > * + * {
+  margin-top: 1rem;
+}
+
+.article-body h2 {
+  margin-top: 2.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.article-body h3 {
+  margin-top: 1.5rem;
+}
+
+.article-body li + li {
+  margin-top: 0.35rem;
+}
+
+.article-body .table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Markdown emits a bare <table>, so it inherits nothing from `.table` (which only the
+   benchmark and model boards opt into). Without these rules a spec table renders with
+   collapsed-to-nothing padding and no borders at all. */
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  margin: 1.25rem 0;
+}
+
+.article-body th,
+.article-body td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.article-body th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.85rem;
+  background: var(--bg-elevated);
+  white-space: nowrap;
+}
+
+/* Guide index & related links */
 
 .guide-list {
   list-style: none;
