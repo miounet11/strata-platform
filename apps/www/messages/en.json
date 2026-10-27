@@ -232,7 +232,9 @@
     "why1": "Every issue has its own address, easy to find and share.",
     "why2": "Each page links to install, models, and releases.",
     "why3": "Synced with GitHub once a day, automatically.",
-    "noDescription": "No description on GitHub."
+    "noDescription": "No description on GitHub.",
+    "showingNewest": "Showing the {shown} most recently updated of {total}.",
+    "seeAllOnGithub": "See all {total} on GitHub"
   },
   "pulse": {
     "title": "What people say",
@@ -434,13 +436,15 @@
     "sharedMemory": "Shared",
     "otherSeriesHeading": "Other series",
     "sameSeries": "More in this series",
-    "mentionedIn": "Guides that mention this card"
+    "mentionedIn": "Guides that mention this card",
+    "showingTop": "Showing {shown} of {count} models, largest memory first. The brand index has the rest."
   },
   "guides": {
     "title": "Guides",
     "intro": "Practical write-ups on running a large model on your own machine: what the numbers mean, which card fits, and what to do when it is slow.",
     "count": "{n} guides",
     "empty": "No guides in this language yet.",
+    "showing": "Showing the newest {shown} of {total}.",
     "related": "Related",
     "relatedIn": "More on {topic}",
     "kinds": {

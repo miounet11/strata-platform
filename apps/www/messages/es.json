@@ -254,7 +254,9 @@
     "why1": "URL estable.",
     "why2": "Docs internos.",
     "why3": "sync:community diario.",
-    "noDescription": "Sin descripción en GitHub."
+    "noDescription": "Sin descripción en GitHub.",
+    "showingNewest": "Se muestran las {shown} actualizaciones más recientes de {total}.",
+    "seeAllOnGithub": "Ver las {total} en GitHub"
   },
   "auth": {
     "loginTitle": "Entrar",
@@ -434,13 +436,15 @@
     "sharedMemory": "Memoria compartida",
     "otherSeriesHeading": "Otras series",
     "sameSeries": "Más de esta serie",
-    "mentionedIn": "Guías que mencionan esta tarjeta"
+    "mentionedIn": "Guías que mencionan esta tarjeta",
+    "showingTop": "Se muestran los {shown} modelos más grandes de {count}, por memoria. El resto está en el índice de marcas."
   },
   "guides": {
     "title": "Guías",
     "intro": "Artículos prácticos para ejecutar un modelo grande en tu propio equipo: qué significan las cifras, qué tarjeta sirve y qué hacer cuando va lento.",
     "count": "{n} guías",
     "empty": "Todavía no hay guías en este idioma.",
+    "showing": "Se muestran las {shown} más recientes de {total}.",
     "related": "Relacionado",
     "relatedIn": "Más sobre «{topic}»",
     "kinds": {

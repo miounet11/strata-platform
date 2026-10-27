@@ -254,7 +254,9 @@
     "why1": "URL estável.",
     "why2": "Docs internos.",
     "why3": "sync:community diário.",
-    "noDescription": "Sem descrição no GitHub."
+    "noDescription": "Sem descrição no GitHub.",
+    "showingNewest": "Mostrando as {shown} atualizações mais recentes de {total}.",
+    "seeAllOnGithub": "Ver todas as {total} no GitHub"
   },
   "auth": {
     "loginTitle": "Entrar",
@@ -434,13 +436,15 @@
     "sharedMemory": "Memória compartilhada",
     "otherSeriesHeading": "Outras séries",
     "sameSeries": "Mais desta série",
-    "mentionedIn": "Guias que mencionam esta placa"
+    "mentionedIn": "Guias que mencionam esta placa",
+    "showingTop": "Mostrando os {shown} maiores de {count} modelos, por memória. O restante está no índice de marcas."
   },
   "guides": {
     "title": "Guias",
     "intro": "Artigos práticos para rodar um modelo grande na sua máquina: o que os números significam, qual placa serve e o que fazer quando fica lento.",
     "count": "{n} guias",
     "empty": "Ainda não há guias neste idioma.",
+    "showing": "Mostrando as {shown} mais recentes de {total}.",
     "related": "Relacionado",
     "relatedIn": "Mais sobre «{topic}»",
     "kinds": {

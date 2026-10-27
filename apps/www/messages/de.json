@@ -254,7 +254,9 @@
     "why1": "Stabile URLs pro Thread.",
     "why2": "Interne Docs verknüpft.",
     "why3": "Täglich sync:community.",
-    "noDescription": "Keine Beschreibung auf GitHub."
+    "noDescription": "Keine Beschreibung auf GitHub.",
+    "showingNewest": "Die {shown} zuletzt aktualisierten von {total} werden angezeigt.",
+    "seeAllOnGithub": "Alle {total} auf GitHub ansehen"
   },
   "auth": {
     "loginTitle": "Anmelden",
@@ -434,13 +436,15 @@
     "sharedMemory": "Geteilter Speicher",
     "otherSeriesHeading": "Weitere Serien",
     "sameSeries": "Weitere Modelle dieser Serie",
-    "mentionedIn": "Anleitungen, die diese Karte nennen"
+    "mentionedIn": "Anleitungen, die diese Karte nennen",
+    "showingTop": "Die {shown} größten von {count} Modellen nach Speicher. Den Rest listet die Markenübersicht."
   },
   "guides": {
     "title": "Anleitungen",
     "intro": "Praxisartikel zum Betrieb eines großen Modells auf dem eigenen Rechner: was die Zahlen bedeuten, welche Karte passt und was bei langsamer Ausgabe hilft.",
     "count": "{n} Anleitungen",
     "empty": "Noch keine Anleitungen in dieser Sprache.",
+    "showing": "Die neuesten {shown} von {total} werden angezeigt.",
     "related": "Verwandtes",
     "relatedIn": "Mehr zu „{topic}“",
     "kinds": {

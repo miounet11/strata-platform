@@ -149,7 +149,9 @@
     "why1": "每条反馈都有独立网址，方便查找。",
     "why2": "顺手链到安装、模型和版本页。",
     "why3": "每天自动和 GitHub 同步一次。",
-    "noDescription": "GitHub 上没有填写描述。"
+    "noDescription": "GitHub 上没有填写描述。",
+    "showingNewest": "显示最近更新的 {shown} 条，共 {total} 条。",
+    "seeAllOnGithub": "在 GitHub 查看全部 {total} 条"
   },
   "pulse": {
     "title": "最新动态",
@@ -434,13 +436,15 @@
     "sharedMemory": "共享内存",
     "otherSeriesHeading": "其他系列",
     "sameSeries": "同系列其他型号",
-    "mentionedIn": "提到这款显卡的指南"
+    "mentionedIn": "提到这款显卡的指南",
+    "showingTop": "按显存从大到小显示 {shown} 个型号，共 {count} 个。完整列表见品牌索引。"
   },
   "guides": {
     "title": "指南",
     "intro": "在自己电脑上跑大模型的实操文章：这些数字是什么意思、哪张卡跑得动、慢了该从哪里查。",
     "count": "{n} 篇",
     "empty": "这个语言还没有指南。",
+    "showing": "显示最新 {shown} 篇，共 {total} 篇。",
     "related": "相关内容",
     "relatedIn": "更多「{topic}」",
     "kinds": {

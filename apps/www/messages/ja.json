@@ -254,7 +254,9 @@
     "why1": "各 issue/PR に固定 URL。",
     "why2": "サイト内ドキュメントへ誘導。",
     "why3": "pnpm sync:community で更新。",
-    "noDescription": "GitHub に説明がありません。"
+    "noDescription": "GitHub に説明がありません。",
+    "showingNewest": "直近に更新された {shown} 件を表示（全 {total} 件）。",
+    "seeAllOnGithub": "GitHub で全 {total} 件を見る"
   },
   "auth": {
     "loginTitle": "ログイン",
@@ -434,13 +436,15 @@
     "sharedMemory": "共有メモリ",
     "otherSeriesHeading": "その他のシリーズ",
     "sameSeries": "同じシリーズの他のモデル",
-    "mentionedIn": "このカードに言及しているガイド"
+    "mentionedIn": "このカードに言及しているガイド",
+    "showingTop": "メモリ容量の大きい順に {shown} モデルを掲げます（全 {count} モデル）。残りはブランド別一覧にあります。"
   },
   "guides": {
     "title": "ガイド",
     "intro": "自分の PC で大型モデルを動かすための実践記事。数字の意味、対応する GPU、遅いときの対処をまとめています。",
     "count": "{n} 件",
     "empty": "この言語のガイドはまだありません。",
+    "showing": "最新 {shown} 件を表示（全 {total} 件）。",
     "related": "関連記事",
     "relatedIn": "「{topic}」をもっと見る",
     "kinds": {

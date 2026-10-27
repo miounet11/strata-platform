@@ -5,6 +5,7 @@ import { routing } from "@/i18n/routing";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getLiveArticles } from "@/lib/articles";
 import { GUIDE_KINDS, guideKindOrder, guidePath } from "@/lib/routes";
+import { GUIDES_LISTED } from "@/lib/page-budget";
 import { siteMetadata, SITE } from "@/lib/seo";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
 
@@ -46,14 +47,19 @@ export default async function GuidesIndexPage({ params }: { params: Promise<{ lo
     (a, b) => guideKindOrder(a.kind) - guideKindOrder(b.kind) || a.order - b.order,
   );
 
-  const groups = GUIDE_KINDS.map((kind) => ({
-    kind,
-    items: articles.filter((article) => article.kind === kind),
-  })).filter((group) => group.items.length > 0);
+  // Each kind lists its newest entries only. The corpus grows without bound, so rendering every
+  // article put this page past the 180 KB budget once the generator passed ~140 guides per
+  // locale — see GUIDES_LISTED in lib/page-budget. Guides not listed here keep their own pages,
+  // and every one of those is in the sitemap, so nothing is orphaned.
+  const groups = GUIDE_KINDS.map((kind) => {
+    const items = articles.filter((article) => article.kind === kind);
+    return { kind, items: items.slice(0, GUIDES_LISTED), total: items.length };
+  }).filter((group) => group.items.length > 0);
 
   // Anything with a kind the model file does not know about still gets listed, rather than
   // silently disappearing from the only index that links to it.
-  const other = articles.filter((article) => !(GUIDE_KINDS as readonly string[]).includes(article.kind));
+  const otherAll = articles.filter((article) => !(GUIDE_KINDS as readonly string[]).includes(article.kind));
+  const other = otherAll.slice(0, GUIDES_LISTED);
 
   const pageTitle = t("title");
 
@@ -82,6 +88,9 @@ export default async function GuidesIndexPage({ params }: { params: Promise<{ lo
               </li>
             ))}
           </ul>
+          {group.total > group.items.length ? (
+            <p className="meta">{t("showing", { shown: group.items.length, total: group.total })}</p>
+          ) : null}
         </section>
       ))}
 
@@ -96,6 +105,9 @@ export default async function GuidesIndexPage({ params }: { params: Promise<{ lo
               </li>
             ))}
           </ul>
+          {otherAll.length > other.length ? (
+            <p className="meta">{t("showing", { shown: other.length, total: otherAll.length })}</p>
+          ) : null}
         </section>
       ) : null}
     </div>

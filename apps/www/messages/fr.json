@@ -254,7 +254,9 @@
     "why1": "URL stable par fil.",
     "why2": "Docs internes.",
     "why3": "sync:community quotidien.",
-    "noDescription": "Aucune description sur GitHub."
+    "noDescription": "Aucune description sur GitHub.",
+    "showingNewest": "Les {shown} dernières mises à jour sur {total}.",
+    "seeAllOnGithub": "Voir les {total} sur GitHub"
   },
   "auth": {
     "loginTitle": "Connexion",
@@ -434,13 +436,15 @@
     "sharedMemory": "Mémoire partagée",
     "otherSeriesHeading": "Autres séries",
     "sameSeries": "Autres modèles de cette série",
-    "mentionedIn": "Guides qui mentionnent cette carte"
+    "mentionedIn": "Guides qui mentionnent cette carte",
+    "showingTop": "Les {shown} plus gros modèles sur {count}, par mémoire. Le reste est dans l'index des marques."
   },
   "guides": {
     "title": "Guides",
     "intro": "Des articles pratiques pour faire tourner un grand modèle sur votre machine : ce que veulent dire les chiffres, quelle carte convient, et quoi faire quand c'est lent.",
     "count": "{n} guides",
     "empty": "Pas encore de guides dans cette langue.",
+    "showing": "Les {shown} plus récents sur {total}.",
     "related": "À lire aussi",
     "relatedIn": "Plus sur « {topic} »",
     "kinds": {
