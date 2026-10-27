@@ -100,8 +100,12 @@ process.on("exit", () => {
   } catch {}
 });
 
+/** Last non-zero status, so a failure alert can name the exit code instead of just "it failed". */
+let lastStatus = 0;
+
 function run(cmd, args, opts = {}) {
   const r = spawnSync(cmd, args, { cwd: ROOT, stdio: "inherit", env: process.env, ...opts });
+  lastStatus = r.status;
   return r.status === 0;
 }
 
@@ -132,7 +136,7 @@ function buildWww() {
   return false;
 }
 
-function alertBuildFailed() {
+function alertBuildFailed(detail = "") {
   const at = new Date().toISOString();
   writeFileSync(FAILED_MARK, `${at}\n`);
   const bar = "!".repeat(72);
@@ -144,6 +148,19 @@ function alertBuildFailed() {
   console.error("[freshness] next run forces one rebuild if the data is unchanged");
   console.error(bar);
   console.error("");
+
+  // The marker above is local to this host and only this script reads it, so it is not a
+  // notification. Fire the webhook without awaiting: the caller (`main`) runs from cron, and a
+  // stalled webhook must not hold the process open past its own work.
+  import("./notify.mjs")
+    .then(({ notifyFeishu }) =>
+      notifyFeishu({
+        stage: "freshness-watch/build",
+        reason: "站点重建连续 3 次失败，线上仍是上一版",
+        raw: `${detail}\n\nmarker: ${FAILED_MARK} @ ${at}`,
+      }),
+    )
+    .catch((error) => console.error(`[freshness] alert failed: ${error.message}`));
 }
 
 function clearBuildFailedMark() {
@@ -244,7 +261,7 @@ if (!changed) {
 
 // ---- 3. rebuild + restart (state advances only after success) -------------
 if (!buildWww()) {
-  alertBuildFailed();
+  alertBuildFailed(`pnpm --filter @stratat/www build exit=${lastStatus}（${BUILD_ATTEMPTS} 次尝试均失败）`);
   process.exit(0);
 }
 appendLog("rebuild-ok", `www build ok (top=${next.topTag})`);
