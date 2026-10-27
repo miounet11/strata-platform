@@ -107,3 +107,26 @@ test("报表写明口径，不把独立 IP 说成人数", () => {
   assert.match(text, /日志始于 2026-10-23/);
   assert.match(text, /当天发帖 0 篇/);
 });
+
+test("当天累计的报文标明截至时刻，完整日不标", () => {
+  const summary = summarize([], { from: "2026-10-22T16:00:00.000Z", to: "2026-10-23T06:00:00.000Z" });
+  const published = { total: 0, byLocale: {}, titles: [] };
+  const partial = formatReport({
+    date: "2026-10-23",
+    range: ["2026-10-22T16:00:00.000Z", "2026-10-23T06:00:00.000Z"],
+    summary,
+    published,
+    logFrom: null,
+    partial: true,
+  });
+  assert.match(partial, /截至 06:00 UTC/);
+
+  const whole = formatReport({
+    date: "2026-10-22",
+    range: ["2026-10-21T16:00:00.000Z", "2026-10-22T16:00:00.000Z"],
+    summary,
+    published,
+    logFrom: null,
+  });
+  assert.doesNotMatch(whole, /截至/);
+});

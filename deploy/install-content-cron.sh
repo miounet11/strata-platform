@@ -13,10 +13,11 @@ MARK="# stratat-content-grow"
  echo "*/30 * * * * cd '$ROOT' && /usr/bin/node scripts/freshness-watch.mjs $MARK-freshness"
  # Quality patrol: measures the live tree and alerts on a regression the deploy gate never saw.
  echo "20 3 * * * '$ROOT/deploy/patrol-daily.sh' $MARK-patrol"
- # Yesterday's traffic and publishing, to Feishu. 16:20 UTC = 00:20 Asia/Shanghai (REPORT_TZ), so
- # the previous local day closed 20 minutes ago. The log files for it are complete at this hour:
- # logrotate runs at 00:00 UTC, so `strata-access.log` holds today-so-far and `.log.1` holds the
- # previous UTC day — together they span the local day being reported.
- echo "20 16 * * * '$ROOT/deploy/daily-report.sh' $MARK-report"
+ # Yesterday's traffic and publishing, to Feishu, twice a day:
+ #   02:00 UTC = 10:00 Asia/Shanghai (REPORT_TZ)
+ #   06:00 UTC = 14:00 Asia/Shanghai
+ # Both runs report the *previous* local day, so the second message repeats the first with the
+ # same window rather than covering a second half-day.
+ echo "0 2,6 * * * '$ROOT/deploy/daily-report.sh' $MARK-report"
 ) | crontab -
 echo "Installed crontab entries ($MARK)."

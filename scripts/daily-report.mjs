@@ -2,14 +2,17 @@
 /**
  * Daily traffic + publishing report for stratat.com.
  *
- *   node scripts/daily-report.mjs                 # yesterday (Asia/Shanghai), print only
- *   node scripts/daily-report.mjs --date 2026-10-22
+ *   node scripts/daily-report.mjs                 # today so far (Asia/Shanghai), print only
+ *   node scripts/daily-report.mjs --date 2026-10-22   # that whole day
  *   node scripts/daily-report.mjs --send          # also push to the Feishu webhook
  *   node scripts/daily-report.mjs --json          # machine-readable, skips the push
  *
  * Run by cron twice a day at 10:00 and 14:00 Asia/Shanghai (02:00 / 06:00 UTC). Both runs report
- * the previous local day, so the two messages carry the same window — the second is a repeat, not
- * a second half-day.
+ * the current local day up to the moment they run, so the 14:00 message covers four more hours than
+ * the 10:00 one — two snapshots of the same day, not two halves.
+ *
+ * An explicit `--date` still means that whole day, which is what a backfill needs. The default is
+ * "today so far" because that is the question the scheduled runs are asking.
  *
  * ── What the numbers can and cannot say ──────────────────────────────────────────────────────
  *
@@ -246,9 +249,11 @@ function topEntries(map, n) {
   return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
 }
 
-export function formatReport({ date, range, summary, published, logFrom }) {
+export function formatReport({ date, range, summary, published, logFrom, partial = false }) {
   const lines = [];
-  lines.push(`功能实测数据（${date} 当天，服务器真实日志）`);
+  // `partial` marks a same-day snapshot. Without it a 10:00 message reading "2026-10-23" invites
+  // being compared against a finished day and looking like a traffic collapse.
+  lines.push(partial ? `Strata 日报 ${date}（截至 ${range[1].slice(11, 16)} UTC）` : `Strata 日报 ${date}`);
   lines.push("");
 
   if (!summary.total) {
@@ -318,16 +323,24 @@ function earliestLogDay() {
 }
 
 async function main() {
-  const date = valueOf("--date") || localDateOf(Date.now() - 86_400_000, REPORT_TZ);
-  const range = utcRangeForLocalDay(date, REPORT_TZ);
+  const explicitDate = valueOf("--date");
+  const date = explicitDate || localDateOf(Date.now(), REPORT_TZ);
+  const [dayStart, dayEnd] = utcRangeForLocalDay(date, REPORT_TZ);
+  // No `--date` means "today, up to now": the 14:00 run should cover four more hours than the
+  // 10:00 one, so the window cannot stop at a fixed day boundary. An explicit date asks for the
+  // whole day and gets it, which is what a backfill or a re-check of a past day needs.
+  const now = Date.now();
+  const from = dayStart;
+  const to = explicitDate ? dayEnd : new Date(Math.min(now, Date.parse(dayEnd))).toISOString();
+  const range = [from, to];
 
   const files = readLogFiles();
   const allLines = files.flatMap((f) => f.text.split("\n"));
-  const summary = summarize(allLines, { from: range[0], to: range[1] });
+  const summary = summarize(allLines, { from, to });
   const published = publishedOn(date);
   const logFrom = earliestLogDay();
 
-  const text = formatReport({ date, range, summary, published, logFrom });
+  const text = formatReport({ date, range, summary, published, logFrom, partial: !explicitDate });
 
   if (has("--json")) {
     console.log(JSON.stringify({
