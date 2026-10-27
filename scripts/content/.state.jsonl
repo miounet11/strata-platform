@@ -1,3 +1,311 @@
 {"id":"en-concept-vram-vs-ram","ok":true,"attempt":1,"ms":8519}
 {"id":"en-concept-what-is-quantization","ok":true,"attempt":1,"ms":10192}
 {"id":"en-concept-what-is-quantization","ok":true,"attempt":1,"ms":13593}
+{"id":"zh-concept-vram-vs-ram","ok":false,"attempt":1,"ms":9194,"error":"body too short (835)"}
+{"id":"zh-concept-what-is-quantization","ok":true,"attempt":1,"ms":10329}
+{"id":"zh-concept-vram-vs-ram","ok":false,"attempt":2,"ms":7997,"error":"Bad control character in string literal in JSON at position 270 (line 4 column 133)"}
+{"id":"zh-concept-vram-vs-ram","ok":true,"attempt":3,"ms":8952}
+{"id":"de-concept-vram-vs-ram","ok":false,"attempt":1,"ms":7136,"error":"Bad control character in string literal in JSON at position 1292 (line 4 column 1057)"}
+{"id":"de-concept-what-is-quantization","ok":false,"attempt":1,"ms":13057,"error":"Bad control character in string literal in JSON at position 2559 (line 4 column 2324)"}
+{"id":"de-concept-vram-vs-ram","ok":false,"attempt":2,"ms":7737,"error":"Expected double-quoted property name in JSON at position 2462 (line 8 column 7)"}
+{"id":"de-concept-what-is-quantization","ok":false,"attempt":2,"ms":5726,"error":"missing faq"}
+{"id":"de-concept-vram-vs-ram","ok":true,"attempt":3,"ms":11329}
+{"id":"de-concept-what-is-quantization","ok":true,"attempt":3,"ms":9036}
+{"id":"ja-concept-vram-vs-ram","ok":false,"attempt":1,"ms":7424,"error":"body too short (839)"}
+{"id":"ja-concept-what-is-quantization","ok":false,"attempt":1,"ms":14198,"error":"missing faq"}
+{"id":"ja-concept-vram-vs-ram","ok":true,"attempt":2,"ms":8827}
+{"id":"ja-concept-what-is-quantization","ok":true,"attempt":2,"ms":12628}
+{"id":"en-hardware-rtx4090-iq3-xxs","ok":true,"attempt":1,"ms":7299}
+{"id":"en-hardware-rtx4090-q2-0","ok":false,"attempt":1,"ms":7484,"error":"Bad control character in string literal in JSON at position 1903 (line 4 column 1646)"}
+{"id":"en-hardware-rtx4090-iq2-xs","ok":false,"attempt":1,"ms":8936,"error":"Expected ',' or '}' after property value in JSON at position 3640 (line 4 column 3376)"}
+{"id":"en-hardware-rtx4090-iq2-xs","ok":true,"attempt":2,"ms":6818}
+{"id":"en-hardware-rtx4090-q2-0","ok":true,"attempt":2,"ms":8513}
+{"id":"en-hardware-rtx4090-ud-iq4-xs","ok":true,"attempt":1,"ms":10457}
+{"id":"en-hardware-rtx5090-q2-0","ok":true,"attempt":1,"ms":11222}
+{"id":"en-hardware-rtx4090-coder","ok":false,"attempt":1,"ms":12057,"error":"Unterminated string in JSON at position 4407 (line 4 column 4145)"}
+{"id":"en-hardware-rtx4090-iq3-s","ok":true,"attempt":1,"ms":12967}
+{"id":"en-hardware-rtx5090-iq2-xs","ok":false,"attempt":1,"ms":5386,"error":"Bad control character in string literal in JSON at position 1601 (line 4 column 1349)"}
+{"id":"en-hardware-rtx5090-iq3-xxs","ok":true,"attempt":1,"ms":11049}
+{"id":"en-hardware-rtx4090-coder","ok":true,"attempt":2,"ms":8914}
+{"id":"en-hardware-rtx5090-iq3-s","ok":true,"attempt":1,"ms":9721}
+{"id":"en-hardware-rtx5090-iq2-xs","ok":true,"attempt":2,"ms":6898}
+{"id":"en-hardware-rtx5090-coder","ok":false,"attempt":1,"ms":6820,"error":"missing faq"}
+{"id":"en-hardware-rtx5080-q2-0","ok":true,"attempt":1,"ms":10089}
+{"id":"en-hardware-rtx5090-ud-iq4-xs","ok":true,"attempt":1,"ms":11657}
+{"id":"en-hardware-rtx5080-iq2-xs","ok":true,"attempt":1,"ms":12774}
+{"id":"en-hardware-rtx5090-coder","ok":true,"attempt":2,"ms":11096}
+{"id":"en-hardware-rtx5080-iq3-xxs","ok":true,"attempt":1,"ms":9604}
+{"id":"en-hardware-rtx5080-iq3-s","ok":true,"attempt":1,"ms":9542}
+{"id":"en-hardware-rtx5080-coder","ok":false,"attempt":1,"ms":8398,"error":"missing faq"}
+{"id":"en-hardware-rtx5080-ud-iq4-xs","ok":true,"attempt":1,"ms":9295}
+{"id":"en-hardware-rtx3090-iq2-xs","ok":true,"attempt":1,"ms":8507}
+{"id":"en-hardware-rtx3090-q2-0","ok":true,"attempt":1,"ms":10948}
+{"id":"en-hardware-rtx5080-coder","ok":true,"attempt":2,"ms":9260}
+{"id":"en-hardware-rtx3090-iq3-xxs","ok":true,"attempt":1,"ms":8005}
+{"id":"en-hardware-rtx3090-iq3-s","ok":true,"attempt":1,"ms":7311}
+{"id":"en-hardware-rtx3090-coder","ok":true,"attempt":1,"ms":9366}
+{"id":"en-hardware-rtx3090-ud-iq4-xs","ok":true,"attempt":1,"ms":7560}
+{"id":"en-hardware-rtx5070-q2-0","ok":true,"attempt":1,"ms":7138}
+{"id":"en-hardware-rtx5070-iq3-xxs","ok":false,"attempt":1,"ms":9335,"error":"Bad control character in string literal in JSON at position 2521 (line 4 column 2302)"}
+{"id":"en-hardware-rtx5070-iq3-s","ok":true,"attempt":1,"ms":8619}
+{"id":"en-hardware-rtx5070-coder","ok":true,"attempt":1,"ms":9113}
+{"id":"en-hardware-rtx5070-ud-iq4-xs","ok":true,"attempt":1,"ms":9940}
+{"id":"en-hardware-rtx5070-iq3-xxs","ok":false,"attempt":2,"ms":10600,"error":"Unterminated string in JSON at position 4675 (line 4 column 4416)"}
+{"id":"en-hardware-rtx4070ti_super-q2-0","ok":false,"attempt":1,"ms":8960,"error":"Bad control character in string literal in JSON at position 2289 (line 4 column 2042)"}
+{"id":"en-hardware-rtx5070-iq2-xs","ok":false,"attempt":1,"ms":24840,"error":"no JSON object in response"}
+{"id":"en-hardware-rtx4070ti_super-iq2-xs","ok":false,"attempt":1,"ms":8943,"error":"Bad control character in string literal in JSON at position 2490 (line 4 column 2258)"}
+{"id":"en-hardware-rtx5070-iq2-xs","ok":true,"attempt":2,"ms":8723}
+{"id":"en-hardware-rtx5070-iq3-xxs","ok":true,"attempt":3,"ms":8646}
+{"id":"en-hardware-rtx4070ti_super-q2-0","ok":false,"attempt":2,"ms":10724,"error":"missing faq"}
+{"id":"en-hardware-rtx4070ti_super-iq2-xs","ok":true,"attempt":2,"ms":7367}
+{"id":"en-hardware-rtx4070ti_super-iq3-xxs","ok":true,"attempt":1,"ms":9173}
+{"id":"en-hardware-rtx4070ti_super-iq3-s","ok":false,"attempt":1,"ms":9640,"error":"Bad control character in string literal in JSON at position 3321 (line 4 column 3040)"}
+{"id":"en-hardware-rtx4070ti_super-coder","ok":false,"attempt":1,"ms":7690,"error":"Expected ',' or '}' after property value in JSON at position 3000 (line 5 column 3)"}
+{"id":"en-hardware-rtx4070ti_super-q2-0","ok":true,"attempt":3,"ms":10824}
+{"id":"en-hardware-rtx4070ti_super-ud-iq4-xs","ok":true,"attempt":1,"ms":7950}
+{"id":"en-hardware-rtx4070ti_super-iq3-s","ok":true,"attempt":2,"ms":8388}
+{"id":"en-hardware-rtx4070ti_super-coder","ok":false,"attempt":2,"ms":7342,"error":"missing faq"}
+{"id":"en-hardware-rx7900xtx-iq2-xs","ok":true,"attempt":1,"ms":7134}
+{"id":"en-hardware-rx7900xtx-q2-0","ok":true,"attempt":1,"ms":8957}
+{"id":"en-hardware-rx7900xtx-iq3-xxs","ok":true,"attempt":1,"ms":8450}
+{"id":"en-hardware-rtx4070ti_super-coder","ok":true,"attempt":3,"ms":8415}
+{"id":"en-hardware-rx7900xtx-coder","ok":true,"attempt":1,"ms":9165}
+{"id":"en-hardware-rx7900xtx-iq3-s","ok":true,"attempt":1,"ms":11390}
+{"id":"en-hardware-rx7900xtx-ud-iq4-xs","ok":true,"attempt":1,"ms":8158}
+{"id":"en-hardware-rx9070xt_16gb-iq2-xs","ok":true,"attempt":1,"ms":8912}
+{"id":"en-hardware-rx9070xt_16gb-iq3-s","ok":false,"attempt":1,"ms":5957,"error":"missing faq"}
+{"id":"en-hardware-rx9070xt_16gb-q2-0","ok":true,"attempt":1,"ms":9944}
+{"id":"en-hardware-rx9070xt_16gb-iq3-xxs","ok":true,"attempt":1,"ms":9809}
+{"id":"en-hardware-rx9070xt_16gb-ud-iq4-xs","ok":true,"attempt":1,"ms":7402}
+{"id":"en-hardware-rx9070xt_16gb-coder","ok":true,"attempt":1,"ms":8451}
+{"id":"en-hardware-rx9070xt_16gb-iq3-s","ok":true,"attempt":2,"ms":6856}
+{"id":"en-hardware-rtx4070-q2-0","ok":true,"attempt":1,"ms":12862}
+{"id":"en-hardware-rtx4070-iq3-s","ok":true,"attempt":1,"ms":6746}
+{"id":"en-hardware-rtx4070-iq2-xs","ok":true,"attempt":1,"ms":8686}
+{"id":"en-hardware-rtx4070-iq3-xxs","ok":true,"attempt":1,"ms":8888}
+{"id":"en-hardware-rtx4070-coder","ok":false,"attempt":1,"ms":6211,"error":"missing faq"}
+{"id":"en-hardware-rtx4070-ud-iq4-xs","ok":false,"attempt":1,"ms":7544,"error":"missing faq"}
+{"id":"en-hardware-rtx3090ti-q2-0","ok":false,"attempt":1,"ms":7662,"error":"Unexpected non-whitespace character after JSON at position 2456 (line 5 column 2)"}
+{"id":"en-hardware-rtx3090ti-iq2-xs","ok":true,"attempt":1,"ms":9106}
+{"id":"en-hardware-rtx4070-coder","ok":true,"attempt":2,"ms":8222}
+{"id":"en-hardware-rtx4070-ud-iq4-xs","ok":true,"attempt":2,"ms":9510}
+{"id":"en-hardware-rtx3090ti-iq3-xxs","ok":true,"attempt":1,"ms":8522}
+{"id":"en-hardware-rtx3090ti-q2-0","ok":true,"attempt":2,"ms":11196}
+{"id":"en-hardware-rtx3090ti-iq3-s","ok":true,"attempt":1,"ms":7413}
+{"id":"en-hardware-rtx3090ti-coder","ok":false,"attempt":1,"ms":7580,"error":"Bad control character in string literal in JSON at position 2825 (line 4 column 2581)"}
+{"id":"en-hardware-rtx3090ti-ud-iq4-xs","ok":true,"attempt":1,"ms":8316}
+{"id":"en-hardware-rtxpro6000-q2-0","ok":false,"attempt":1,"ms":8697,"error":"Bad control character in string literal in JSON at position 1987 (line 4 column 1740)"}
+{"id":"en-hardware-rtxpro6000-iq2-xs","ok":true,"attempt":1,"ms":7569}
+{"id":"en-hardware-rtxpro6000-iq3-xxs","ok":true,"attempt":1,"ms":9426}
+{"id":"en-hardware-rtx3090ti-coder","ok":true,"attempt":2,"ms":10588}
+{"id":"en-hardware-rtxpro6000-iq3-s","ok":true,"attempt":1,"ms":8921}
+{"id":"en-hardware-rtxpro6000-q2-0","ok":true,"attempt":2,"ms":8899}
+{"id":"en-hardware-rtxpro6000-coder","ok":false,"attempt":1,"ms":8325,"error":"Bad control character in string literal in JSON at position 2338 (line 4 column 2087)"}
+{"id":"en-hardware-rtxpro6000-ud-iq4-xs","ok":true,"attempt":1,"ms":8053}
+{"id":"en-hardware-macstudio_m5ultra_96-q2-0","ok":true,"attempt":1,"ms":7986}
+{"id":"en-hardware-macstudio_m5ultra_96-iq2-xs","ok":false,"attempt":1,"ms":10044,"error":"Bad control character in string literal in JSON at position 1966 (line 4 column 1734)"}
+{"id":"en-hardware-macstudio_m5ultra_96-iq3-s","ok":false,"attempt":1,"ms":7118,"error":"missing faq"}
+{"id":"en-hardware-macstudio_m5ultra_96-iq3-xxs","ok":false,"attempt":1,"ms":8730,"error":"Expected ',' or '}' after property value in JSON at position 559 (line 4 column 295)"}
+{"id":"en-hardware-rtxpro6000-coder","ok":true,"attempt":2,"ms":8109}
+{"id":"en-hardware-macstudio_m5ultra_96-iq2-xs","ok":true,"attempt":2,"ms":9038}
+{"id":"en-hardware-macstudio_m5ultra_96-coder","ok":true,"attempt":1,"ms":7699}
+{"id":"en-hardware-macstudio_m5ultra_96-iq3-s","ok":true,"attempt":2,"ms":8144}
+{"id":"en-hardware-macstudio_m5ultra_96-iq3-xxs","ok":true,"attempt":2,"ms":9020}
+{"id":"en-hardware-macstudio_m5ultra_96-ud-iq4-xs","ok":true,"attempt":1,"ms":7116}
+{"id":"en-task-offline-deployment","ok":true,"attempt":1,"ms":5624}
+{"id":"en-task-local-coding-assistant","ok":false,"attempt":1,"ms":8888,"error":"Expected ',' or '}' after property value in JSON at position 3798 (line 4 column 3524)"}
+{"id":"en-task-dual-gpu-setup","ok":true,"attempt":1,"ms":8242}
+{"id":"en-task-long-context-local","ok":false,"attempt":1,"ms":5981,"error":"Expected ',' or '}' after property value in JSON at position 655 (line 4 column 474)"}
+{"id":"en-task-laptop-igpu","ok":true,"attempt":1,"ms":7040}
+{"id":"en-task-local-coding-assistant","ok":true,"attempt":2,"ms":5092}
+{"id":"en-task-amd-rocm","ok":true,"attempt":1,"ms":6717}
+{"id":"en-task-long-context-local","ok":false,"attempt":2,"ms":5919,"error":"missing faq"}
+{"id":"en-task-privacy-audit","ok":true,"attempt":1,"ms":7795}
+{"id":"en-task-api-compatibility","ok":true,"attempt":1,"ms":8832}
+{"id":"en-task-windows-vs-linux","ok":false,"attempt":1,"ms":7399,"error":"Bad control character in string literal in JSON at position 2011 (line 4 column 1747)"}
+{"id":"en-task-long-context-local","ok":true,"attempt":3,"ms":6920}
+{"id":"en-task-serving-multiple-users","ok":true,"attempt":1,"ms":7349}
+{"id":"en-task-windows-vs-linux","ok":false,"attempt":2,"ms":5341,"error":"missing faq"}
+{"id":"en-task-context-caching","ok":true,"attempt":1,"ms":9905}
+{"id":"en-task-batch-processing","ok":true,"attempt":1,"ms":7500}
+{"id":"en-task-embedding-search","ok":true,"attempt":1,"ms":7843}
+{"id":"en-task-fine-tune-vs-prompt","ok":false,"attempt":1,"ms":5391,"error":"Bad control character in string literal in JSON at position 1361 (line 4 column 1103)"}
+{"id":"en-task-windows-vs-linux","ok":true,"attempt":3,"ms":8135}
+{"id":"en-task-cost-comparison","ok":true,"attempt":1,"ms":6143}
+{"id":"en-task-model-upgrades","ok":true,"attempt":1,"ms":9027}
+{"id":"en-task-fine-tune-vs-prompt","ok":true,"attempt":2,"ms":6468}
+{"id":"en-task-noise-and-heat","ok":true,"attempt":1,"ms":7904}
+{"id":"en-task-remote-access","ok":false,"attempt":1,"ms":8127,"error":"Bad control character in string literal in JSON at position 2439 (line 4 column 2198)"}
+{"id":"en-task-backup-models","ok":true,"attempt":1,"ms":8072}
+{"id":"en-task-first-week","ok":true,"attempt":1,"ms":6363}
+{"id":"en-compare-rtx-4090-vs-rtx-5090","ok":true,"attempt":1,"ms":8933}
+{"id":"en-task-remote-access","ok":true,"attempt":2,"ms":8121}
+{"id":"en-compare-rtx-4090-vs-rtx-5080","ok":true,"attempt":1,"ms":8493}
+{"id":"en-compare-rtx-4090-vs-rtx-3090","ok":true,"attempt":1,"ms":11087}
+{"id":"en-compare-rtx-5080-vs-rtx-4070-ti-super-16gb","ok":false,"attempt":1,"ms":8043,"error":"title looks like a slug, not a sentence: rtx-5080-vs-rtx-4070-ti-super-16gb"}
+{"id":"en-compare-rtx-5090-vs-rtx-5080","ok":true,"attempt":1,"ms":15796}
+{"id":"en-compare-rtx-3090-vs-rtx-3090-ti","ok":true,"attempt":1,"ms":13861}
+{"id":"en-compare-amd-radeon-rx-7900-xtx-vs-amd-radeon-rx-9070-xt-16gb","ok":false,"attempt":1,"ms":11533,"error":"Bad control character in string literal in JSON at position 2385 (line 4 column 2068)"}
+{"id":"en-compare-rtx-5080-vs-rtx-4070-ti-super-16gb","ok":false,"attempt":2,"ms":9421,"error":"Bad control character in string literal in JSON at position 2106 (line 4 column 1858)"}
+{"id":"en-compare-amd-radeon-rx-7900-xtx-vs-amd-radeon-rx-6900-xt-16gb","ok":false,"attempt":1,"ms":5658,"error":"missing faq"}
+{"id":"en-compare-rtx-4090-vs-amd-radeon-rx-7900-xtx","ok":true,"attempt":1,"ms":7361}
+{"id":"en-compare-amd-radeon-rx-7900-xtx-vs-amd-radeon-rx-9070-xt-16gb","ok":true,"attempt":2,"ms":9003}
+{"id":"en-compare-amd-radeon-rx-7900-xtx-vs-amd-radeon-rx-6900-xt-16gb","ok":true,"attempt":2,"ms":7695}
+{"id":"en-compare-rtx-5090-vs-amd-radeon-rx-9070-xt-16gb","ok":false,"attempt":1,"ms":8019,"error":"title looks like a slug, not a sentence: rtx-5090-vs-amd-radeon-rx-9070-xt-16gb"}
+{"id":"en-compare-rtx-5080-vs-rtx-4070-ti-super-16gb","ok":true,"attempt":3,"ms":9455}
+{"id":"en-compare-rtx-5070-ti-vs-amd-radeon-rx-7900-xtx","ok":false,"attempt":1,"ms":7558,"error":"title looks like a slug, not a sentence: rtx-5070-ti-vs-amd-radeon-rx-7900-xtx"}
+{"id":"en-compare-rtx-pro-6000-blackwell-vs-rtx-4090","ok":false,"attempt":1,"ms":8335,"error":"title looks like a slug, not a sentence: rtx-pro-6000-blackwell-vs-rtx-4090"}
+{"id":"en-compare-rtx-5090-vs-amd-radeon-rx-9070-xt-16gb","ok":true,"attempt":2,"ms":6464}
+{"id":"en-compare-rtx-5070-ti-vs-amd-radeon-rx-7900-xtx","ok":true,"attempt":2,"ms":7107}
+{"id":"en-compare-mac-studio-m5-ultra-96-gb-vs-rtx-4090","ok":true,"attempt":1,"ms":10546}
+{"id":"en-compare-rtx-3090-vs-2x-rtx-3090-24-gb","ok":true,"attempt":1,"ms":9356}
+{"id":"en-compare-rtx-pro-6000-blackwell-vs-rtx-5090","ok":false,"attempt":1,"ms":6181,"error":"title looks like a slug, not a sentence: rtx-pro-6000-blackwell-vs-rtx-5090"}
+{"id":"en-troubleshoot-cuda-out-of-memory","ok":true,"attempt":1,"ms":6387}
+{"id":"en-compare-rtx-pro-6000-blackwell-vs-rtx-4090","ok":true,"attempt":2,"ms":11537}
+{"id":"en-troubleshoot-model-too-slow","ok":true,"attempt":1,"ms":6506}
+{"id":"en-troubleshoot-gpu-not-detected","ok":true,"attempt":1,"ms":6655}
+{"id":"en-compare-rtx-pro-6000-blackwell-vs-rtx-5090","ok":true,"attempt":2,"ms":6611}
+{"id":"en-troubleshoot-installer-blocked","ok":true,"attempt":1,"ms":8276}
+{"id":"en-troubleshoot-port-in-use","ok":true,"attempt":1,"ms":6714}
+{"id":"en-troubleshoot-output-gibberish","ok":false,"attempt":1,"ms":7635,"error":"Bad control character in string literal in JSON at position 2411 (line 4 column 2158)"}
+{"id":"en-troubleshoot-context-truncated","ok":false,"attempt":1,"ms":7775,"error":"Bad control character in string literal in JSON at position 1499 (line 4 column 1266)"}
+{"id":"en-troubleshoot-first-token-slow","ok":false,"attempt":1,"ms":5781,"error":"Bad control character in string literal in JSON at position 1764 (line 4 column 1519)"}
+{"id":"en-troubleshoot-amd-fallback","ok":false,"attempt":1,"ms":5341,"error":"Expected double-quoted property name in JSON at position 1715 (line 8 column 7)"}
+{"id":"en-troubleshoot-output-gibberish","ok":true,"attempt":2,"ms":7299}
+{"id":"en-troubleshoot-context-truncated","ok":true,"attempt":2,"ms":6189}
+{"id":"en-troubleshoot-first-token-slow","ok":true,"attempt":2,"ms":6991}
+{"id":"en-troubleshoot-update-failed","ok":true,"attempt":1,"ms":5912}
+{"id":"en-troubleshoot-disk-full","ok":true,"attempt":1,"ms":6494}
+{"id":"en-troubleshoot-amd-fallback","ok":true,"attempt":2,"ms":11217}
+{"id":"en-troubleshoot-wrong-answer","ok":true,"attempt":1,"ms":6963}
+{"id":"en-troubleshoot-fan-noise","ok":false,"attempt":1,"ms":7126,"error":"Bad control character in string literal in JSON at position 2247 (line 4 column 1991)"}
+{"id":"en-troubleshoot-multi-user-queue","ok":true,"attempt":1,"ms":7886}
+{"id":"en-troubleshoot-uninstall-clean","ok":false,"attempt":1,"ms":7103,"error":"Bad control character in string literal in JSON at position 1424 (line 4 column 1180)"}
+{"id":"en-local-us-electricity-cost","ok":true,"attempt":1,"ms":8088}
+{"id":"en-troubleshoot-uninstall-clean","ok":false,"attempt":2,"ms":7127,"error":"Bad control character in string literal in JSON at position 2172 (line 4 column 1919)"}
+{"id":"en-troubleshoot-fan-noise","ok":true,"attempt":2,"ms":8586}
+{"id":"en-local-comcast-bandwidth","ok":true,"attempt":1,"ms":9627}
+{"id":"en-local-which-gpu-to-buy-us","ok":false,"attempt":1,"ms":14331,"error":"Bad control character in string literal in JSON at position 2924 (line 4 column 2661)"}
+{"id":"en-local-sales-tax-on-gpus","ok":true,"attempt":1,"ms":6342}
+{"id":"en-troubleshoot-uninstall-clean","ok":true,"attempt":3,"ms":7384}
+{"id":"en-local-warranty-returns","ok":true,"attempt":1,"ms":6811}
+{"id":"en-local-micro-center-pickup","ok":true,"attempt":1,"ms":6636}
+{"id":"en-local-best-buy-returns","ok":true,"attempt":1,"ms":5968}
+{"id":"en-local-which-gpu-to-buy-us","ok":true,"attempt":2,"ms":12541}
+{"id":"en-local-newegg-bundles","ok":true,"attempt":1,"ms":10653}
+{"id":"en-local-renters-setup","ok":true,"attempt":1,"ms":6334}
+{"id":"en-local-state-power-rates","ok":false,"attempt":1,"ms":9092,"error":"Bad control character in string literal in JSON at position 706 (line 4 column 426)"}
+{"id":"en-local-dorm-room-limits","ok":true,"attempt":1,"ms":8336}
+{"id":"en-local-apartment-power-budget","ok":true,"attempt":1,"ms":8015}
+{"id":"en-local-usb4-egpu","ok":true,"attempt":1,"ms":7639}
+{"id":"en-local-state-power-rates","ok":false,"attempt":2,"ms":8305,"error":"Bad control character in string literal in JSON at position 2618 (line 4 column 2353)"}
+{"id":"en-local-wfh-stipend","ok":false,"attempt":1,"ms":5996,"error":"missing faq"}
+{"id":"en-concept-tokens-per-second","ok":true,"attempt":1,"ms":6119}
+{"id":"en-local-average-american-bill","ok":true,"attempt":1,"ms":7332}
+{"id":"en-concept-context-window","ok":true,"attempt":1,"ms":6432}
+{"id":"en-local-state-power-rates","ok":true,"attempt":3,"ms":7915}
+{"id":"en-local-wfh-stipend","ok":true,"attempt":2,"ms":8437}
+{"id":"en-concept-moe-explained","ok":true,"attempt":1,"ms":7969}
+{"id":"en-concept-kv-cache","ok":true,"attempt":1,"ms":6547}
+{"id":"en-concept-open-weights","ok":false,"attempt":1,"ms":6285,"error":"Expected double-quoted property name in JSON at position 3131 (line 16 column 7)"}
+{"id":"en-concept-temperature","ok":true,"attempt":1,"ms":7250}
+{"id":"en-concept-gpu-bandwidth","ok":true,"attempt":1,"ms":6686}
+{"id":"en-concept-local-vs-cloud","ok":true,"attempt":1,"ms":8070}
+{"id":"en-concept-open-weights","ok":true,"attempt":2,"ms":8121}
+{"id":"en-hardware-rtx5090-iq2-xs","ok":false,"attempt":1,"ms":7537,"error":"missing faq"}
+{"id":"en-hardware-rx7900xtx-iq2-xs","ok":false,"attempt":1,"ms":10226,"error":"missing faq"}
+{"id":"en-hardware-rx9070xt_16gb-iq2-xs","ok":true,"attempt":1,"ms":11907}
+{"id":"en-task-local-coding-assistant","ok":false,"attempt":1,"ms":13567,"error":"title repeats the slug: Local Coding Assistant Setup Guide for Stratat"}
+{"id":"en-hardware-rtx5090-iq2-xs","ok":true,"attempt":2,"ms":10533}
+{"id":"en-task-offline-deployment","ok":true,"attempt":1,"ms":8158}
+{"id":"en-hardware-rx7900xtx-iq2-xs","ok":false,"attempt":2,"ms":12911,"error":"Expected ',' or '}' after property value in JSON at position 492 (line 4 column 257)"}
+{"id":"en-task-laptop-igpu","ok":false,"attempt":1,"ms":8472,"error":"title repeats the slug: How to Run Local AI on Laptop iGPU with Stratat"}
+{"id":"en-task-dual-gpu-setup","ok":false,"attempt":1,"ms":9619,"error":"Expected double-quoted property name in JSON at position 3253 (line 8 column 7)"}
+{"id":"en-task-local-coding-assistant","ok":false,"attempt":2,"ms":14236,"error":"title repeats the slug: Set Up Your Local Coding Assistant with Stratat for Secure Dev Work"}
+{"id":"en-hardware-rx7900xtx-iq2-xs","ok":true,"attempt":3,"ms":9915}
+{"id":"en-task-laptop-igpu","ok":false,"attempt":2,"ms":14702,"error":"title repeats the slug: How to Run Local AI on Laptop iGPU with Stratat"}
+{"id":"en-task-amd-rocm","ok":false,"attempt":1,"ms":7717,"error":"Bad control character in string literal in JSON at position 539 (line 4 column 311)"}
+{"id":"en-task-amd-rocm","ok":false,"attempt":2,"ms":7124,"error":"title repeats the slug: How to Set Up AMD ROCm for Local AI on Stratat"}
+{"id":"en-task-dual-gpu-setup","ok":true,"attempt":2,"ms":25773}
+{"id":"en-task-laptop-igpu","ok":false,"attempt":3,"ms":9916,"error":"title repeats the slug: How to Run Local AI on Laptop iGPU with Stratat"}
+{"id":"en-task-local-coding-assistant","ok":false,"attempt":3,"ms":28996,"error":"title repeats the slug: How to Set Up Local Coding Assistant with Stratat Engine"}
+{"id":"en-task-privacy-audit","ok":false,"attempt":1,"ms":8728,"error":"title repeats the slug: How to run a privacy audit with Stratat's local AI engine"}
+{"id":"en-task-amd-rocm","ok":false,"attempt":3,"ms":8412,"error":"title repeats the slug: AMD ROCm Setup Guide for Stratat Local AI"}
+{"id":"en-task-privacy-audit","ok":false,"attempt":2,"ms":6907,"error":"title repeats the slug: Privacy Audit Guide for Local AI Models"}
+{"id":"en-task-context-caching","ok":false,"attempt":1,"ms":10844,"error":"title repeats the slug: How to Optimize Context Caching for Local AI Models"}
+{"id":"en-task-embedding-search","ok":false,"attempt":1,"ms":8139,"error":"title repeats the slug: How to Build an Embedding Search System with Stratat"}
+{"id":"en-task-api-compatibility","ok":false,"attempt":1,"ms":16771,"error":"title repeats the slug: Guide to API Compatibility with Stratat Local AI Models"}
+{"id":"en-task-api-compatibility","ok":false,"attempt":2,"ms":7143,"error":"title repeats the slug: How to Use API Compatibility with Strata Local Models"}
+{"id":"en-task-embedding-search","ok":false,"attempt":2,"ms":8322,"error":"title repeats the slug: How to Build an Embedding Search System with Stratat"}
+{"id":"en-task-context-caching","ok":false,"attempt":2,"ms":9633,"error":"title repeats the slug: How to Use Context Caching in Stratat for Local AI"}
+{"id":"en-task-privacy-audit","ok":false,"attempt":3,"ms":13770,"error":"title repeats the slug: How to Run a Privacy Audit on Local AI Models"}
+{"id":"en-task-embedding-search","ok":false,"attempt":3,"ms":13405,"error":"title repeats the slug: How to Run Local Embedding Search with Stratat"}
+{"id":"en-task-api-compatibility","ok":false,"attempt":3,"ms":13882,"error":"missing faq"}
+{"id":"en-task-cost-comparison","ok":true,"attempt":1,"ms":16118}
+{"id":"en-task-context-caching","ok":false,"attempt":3,"ms":27999,"error":"title repeats the slug: Stratat Guide: Mastering Context Caching for Local AI"}
+{"id":"en-compare-rtx-4090-vs-rtx-5090","ok":false,"attempt":1,"ms":11755,"error":"title repeats the slug: RTX 4090 vs RTX 5090 for Local AI: Real Speed and Cost"}
+{"id":"en-task-remote-access","ok":false,"attempt":1,"ms":16608,"error":"title repeats the slug: How to Enable Remote Access to Your Local AI Model"}
+{"id":"en-compare-rtx-4090-vs-rtx-5080","ok":false,"attempt":1,"ms":9538,"error":"title repeats the slug: RTX 4090 vs RTX 5080: Local AI Inference Showdown"}
+{"id":"en-task-noise-and-heat","ok":false,"attempt":1,"ms":27168,"error":"title repeats the slug: How to manage noise and heat when running local AI models on Stratat"}
+{"id":"en-task-remote-access","ok":false,"attempt":2,"ms":10445,"error":"title repeats the slug: How to Enable Remote Access to Your Local Stratat AI Model"}
+{"id":"en-task-noise-and-heat","ok":false,"attempt":2,"ms":7517,"error":"title repeats the slug: Manage Noise and Heat When Running Local AI Models"}
+{"id":"en-compare-rtx-4090-vs-rtx-5090","ok":false,"attempt":2,"ms":23789,"error":"title repeats the slug: RTX 4090 vs RTX 5090: Local AI Inference Hardware Guide"}
+{"id":"en-task-remote-access","ok":false,"attempt":3,"ms":8795,"error":"title repeats the slug: How to Enable Remote Access for Your Local Stratat Engine"}
+{"id":"en-compare-rtx-4090-vs-rtx-5080","ok":false,"attempt":2,"ms":19656,"error":"body needs at least 2 headings, got 0"}
+{"id":"en-task-noise-and-heat","ok":false,"attempt":3,"ms":6198,"error":"missing faq"}
+{"id":"en-compare-rtx-4090-vs-rtx-5090","ok":false,"attempt":3,"ms":8647,"error":"title repeats the slug: RTX 4090 vs RTX 5090: Local AI Benchmarks & Cost"}
+{"id":"en-compare-rtx-4090-vs-rtx-3090","ok":false,"attempt":1,"ms":9382,"error":"title repeats the slug: RTX 4090 vs RTX 3090 for Stratat Local Inference"}
+{"id":"en-compare-rtx-4090-vs-rtx-5080","ok":true,"attempt":3,"ms":9601}
+{"id":"en-compare-rtx-4090-vs-rtx-3090","ok":false,"attempt":2,"ms":10018,"error":"title repeats the slug: RTX 4090 vs RTX 3090: Local AI Inference Benchmarks and Cost Analysis"}
+{"id":"en-compare-rtx-5070-ti-vs-amd-radeon-rx-7900-xtx","ok":false,"attempt":1,"ms":9050,"error":"title repeats the slug: RTX 5070 Ti vs AMD Radeon RX 7900 XTX: Local AI Comparison"}
+{"id":"en-compare-rtx-4090-vs-amd-radeon-rx-7900-xtx","ok":false,"attempt":1,"ms":12801,"error":"title repeats the slug: RTX 4090 vs AMD Radeon RX 7900 XTX: Local AI Benchmarks"}
+{"id":"en-compare-rtx-4090-vs-amd-radeon-rx-7900-xtx","ok":false,"attempt":2,"ms":7849,"error":"missing faq"}
+{"id":"en-compare-rtx-5070-ti-vs-amd-radeon-rx-7900-xtx","ok":true,"attempt":2,"ms":10453}
+{"id":"en-compare-rtx-5090-vs-rtx-5080","ok":false,"attempt":1,"ms":29203,"error":"title repeats the slug: RTX 5090 vs RTX 5080: Which GPU Wins for Local AI?"}
+{"id":"en-compare-rtx-4090-vs-rtx-3090","ok":true,"attempt":3,"ms":10837}
+{"id":"en-troubleshoot-model-too-slow","ok":true,"attempt":1,"ms":11107}
+{"id":"en-troubleshoot-cuda-out-of-memory","ok":false,"attempt":1,"ms":26271,"error":"title repeats the slug: Fix CUDA Out of Memory Errors on Local AI Models"}
+{"id":"en-troubleshoot-disk-full","ok":false,"attempt":1,"ms":19754,"error":"title repeats the slug: Disk Full Error Fixing Your Stratat Local AI Setup"}
+{"id":"en-troubleshoot-cuda-out-of-memory","ok":false,"attempt":2,"ms":9353,"error":"title repeats the slug: Resolve CUDA Out of Memory Errors on Local AI Desktop App"}
+{"id":"en-compare-rtx-5090-vs-rtx-5080","ok":false,"attempt":2,"ms":36151,"error":"title repeats the slug: RTX 5090 vs RTX 5080: Local AI GPU Comparison for Stratat"}
+{"id":"en-troubleshoot-disk-full","ok":false,"attempt":2,"ms":7477,"error":"title repeats the slug: Fix Disk Full Error on Stratat: Local AI Troubleshooting"}
+{"id":"en-compare-rtx-4090-vs-amd-radeon-rx-7900-xtx","ok":false,"attempt":3,"ms":39180,"error":"Bad control character in string literal in JSON at position 2005 (line 4 column 1769)"}
+{"id":"en-troubleshoot-cuda-out-of-memory","ok":false,"attempt":3,"ms":6299,"error":"title repeats the slug: Fixing CUDA Out of Memory Errors on Stratat Desktop"}
+{"id":"en-compare-rtx-5090-vs-rtx-5080","ok":false,"attempt":3,"ms":8111,"error":"title repeats the slug: RTX 5090 vs RTX 5080: Local AI Inference Showdown"}
+{"id":"en-troubleshoot-disk-full","ok":false,"attempt":3,"ms":8566,"error":"title repeats the slug: Fix Disk Full Errors When Running Large AI Models Locally"}
+{"id":"en-troubleshoot-wrong-answer","ok":false,"attempt":1,"ms":10494,"error":"Bad control character in string literal in JSON at position 2499 (line 4 column 2260)"}
+{"id":"en-troubleshoot-fan-noise","ok":false,"attempt":1,"ms":10519,"error":"title repeats the slug: Fixing Fan Noise When Running Large AI Models Locally"}
+{"id":"en-troubleshoot-wrong-answer","ok":false,"attempt":2,"ms":6489,"error":"title repeats the slug: Strat Troubleshooting: Why the AI Model Returns Wrong Answers"}
+{"id":"en-local-comcast-bandwidth","ok":true,"attempt":1,"ms":10620}
+{"id":"en-local-warranty-returns","ok":false,"attempt":1,"ms":8333,"error":"title repeats the slug: Warranty Returns Guide for Stratat Desktop AI Hardware Users"}
+{"id":"en-troubleshoot-fan-noise","ok":false,"attempt":2,"ms":7878,"error":"title repeats the slug: Strata Engine Fan Noise Troubleshooting Guide"}
+{"id":"en-local-warranty-returns","ok":false,"attempt":2,"ms":6160,"error":"missing faq"}
+{"id":"en-troubleshoot-wrong-answer","ok":false,"attempt":3,"ms":6709,"error":"title repeats the slug: Why your Stratat local AI returns wrong answers"}
+{"id":"en-local-best-buy-returns","ok":false,"attempt":1,"ms":10647,"error":"title looks like a slug, not a sentence: best-buy-returns-policy-guide"}
+{"id":"en-troubleshoot-fan-noise","ok":false,"attempt":3,"ms":8699,"error":"title repeats the slug: Stratat Fan Noise Troubleshooting: Fix Local AI Overheating"}
+{"id":"en-local-best-buy-returns","ok":false,"attempt":2,"ms":7173,"error":"missing faq"}
+{"id":"en-local-warranty-returns","ok":false,"attempt":3,"ms":15022,"error":"Expected ',' or '}' after property value in JSON at position 2790 (line 4 column 2561)"}
+{"id":"en-local-best-buy-returns","ok":false,"attempt":3,"ms":9408,"error":"title repeats the slug: Best Buy Returns Policy Guide for 2024"}
+{"id":"en-local-state-power-rates","ok":false,"attempt":1,"ms":9287,"error":"Bad control character in string literal in JSON at position 2449 (line 4 column 2199)"}
+{"id":"en-local-newegg-bundles","ok":false,"attempt":1,"ms":24270,"error":"Bad control character in string literal in JSON at position 2641 (line 4 column 2393)"}
+{"id":"en-local-state-power-rates","ok":true,"attempt":2,"ms":8848}
+{"id":"en-local-renters-setup","ok":false,"attempt":1,"ms":14188,"error":"title repeats the slug: Renters Setup Guide for Local AI: Power & Network"}
+{"id":"en-local-average-american-bill","ok":false,"attempt":1,"ms":10207,"error":"title looks like a slug, not a sentence: average-american-bill"}
+{"id":"en-concept-what-is-quantization","ok":false,"attempt":1,"ms":8652,"error":"title repeats the slug: What Is Quantization in Local LLM Deployment"}
+{"id":"en-local-average-american-bill","ok":false,"attempt":2,"ms":6862,"error":"title looks like a slug, not a sentence: average-american-bill"}
+{"id":"en-local-renters-setup","ok":false,"attempt":2,"ms":14915,"error":"title repeats the slug: Renters Setup for Local AI: Cost and Connectivity Guide"}
+{"id":"en-concept-what-is-quantization","ok":false,"attempt":2,"ms":12241,"error":"title repeats the slug: What is Quantization in Local LLM Deployment"}
+{"id":"en-local-average-american-bill","ok":false,"attempt":3,"ms":12841,"error":"title looks like a slug, not a sentence: average-american-bill"}
+{"id":"en-local-newegg-bundles","ok":true,"attempt":2,"ms":31277}
+{"id":"en-local-renters-setup","ok":false,"attempt":3,"ms":10212,"error":"title repeats the slug: Renters Setup for Local AI: Power and Network Limits"}
+{"id":"en-concept-vram-vs-ram","ok":true,"attempt":1,"ms":11414}
+{"id":"en-concept-context-window","ok":false,"attempt":1,"ms":10354,"error":"title repeats the slug: What Is Context Window in Local LLMs"}
+{"id":"en-concept-what-is-quantization","ok":false,"attempt":3,"ms":19342,"error":"Expected ':' after property name in JSON at position 2230 (line 13 column 5)"}
+{"id":"en-concept-temperature","ok":false,"attempt":1,"ms":8258,"error":"title repeats the slug: Understanding Temperature in Local LLMs"}
+{"id":"en-concept-context-window","ok":false,"attempt":2,"ms":11673,"error":"title repeats the slug: Understanding Context Window Limits in Local LLMs"}
+{"id":"en-concept-temperature","ok":false,"attempt":2,"ms":18328,"error":"title repeats the slug: Understanding Temperature in Local LLMs for Stratat"}
+{"id":"en-concept-local-vs-cloud","ok":false,"attempt":1,"ms":26536,"error":"title repeats the slug: Local vs Cloud LLM: Latency, Privacy, and Cost"}
+{"id":"en-concept-context-window","ok":false,"attempt":3,"ms":7856,"error":"Bad control character in string literal in JSON at position 1958 (line 4 column 1711)"}
+{"id":"en-concept-local-vs-cloud","ok":false,"attempt":2,"ms":7484,"error":"title repeats the slug: Local vs Cloud LLM: Cost, Privacy, and Control"}
+{"id":"en-concept-temperature","ok":false,"attempt":3,"ms":15877,"error":"title repeats the slug: Understanding Temperature in Local LLM Inference"}
+{"id":"en-concept-local-vs-cloud","ok":false,"attempt":3,"ms":8912,"error":"title repeats the slug: Local vs Cloud LLM: A Privacy and Cost Breakdown for Developers"}
