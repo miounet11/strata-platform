@@ -38,3 +38,17 @@ apps/www/.dashboard-secret
 
 # Site factory: its own repository (loututu114-pixel/yyds), versioned separately
 .factory/
+yyds-2/
+.tmp-yyds/
+.tmp-yyds-bot/
+
+# A literal `~/` directory created by an unexpanded shell path. It holds ~/.clavue-secrets and
+# ~/.ssh under this name, so committing it would publish credentials.
+~/
+
+# The server keeps its own patrol floor, rewritten by its own deploys (sync-and-deploy.sh
+# excludes it). A workstation copy would only drift from the host it measures.
+apps/www/patrol-baseline.json
+
+# pnpm is the package manager (pnpm-lock.yaml); this file came from an accidental `npm install`.
+package-lock.json
