@@ -26,6 +26,7 @@ rsync -avz --delete \
   --exclude apps/desktop/src-tauri/target \
   --exclude .git \
   --exclude apps/api/data \
+  --exclude apps/www/patrol-baseline.json \
   -e "$RSYNC_SSH" \
   "$ROOT/" "$USER@$HOST:/opt/stratat/"
 
