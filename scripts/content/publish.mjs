@@ -36,6 +36,8 @@ const manifest = existsSync(MANIFEST)
   : {};
 
 let live = 0, pending = 0, already = 0, noImage = 0;
+/** Due today (or overdue) but held back for a missing hero image. */
+const blockedByImage = [];
 const byLocale = {};
 
 for (const entry of readdirSync(OUT, { withFileTypes: true })) {
@@ -50,7 +52,11 @@ for (const entry of readdirSync(OUT, { withFileTypes: true })) {
     const due = all || !item.publishAt || item.publishAt <= today;
     if (!due) { pending++; continue; }
 
-    if (!manifest[`guide-${item.slug}`]?.path) { noImage++; continue; }
+    if (!manifest[`guide-${item.slug}`]?.path) {
+      noImage++;
+      blockedByImage.push({ slug: item.slug, locale: item.locale, publishAt: item.publishAt });
+      continue;
+    }
 
     item.status = "live";
     item.publishedAt = today;
@@ -64,3 +70,15 @@ const mode = dryRun ? "would publish" : "published";
 console.log(`${mode} ${live} · already live ${already} · still scheduled ${pending} · waiting for image ${noImage}`);
 for (const [locale, n] of Object.entries(byLocale).sort()) console.log(`  ${locale}: ${n}`);
 if (dryRun) console.log("(dry run — nothing written)");
+
+// A day where articles were due and every one of them was held back is not a quiet day — it is
+// the pipeline starving. On 2026-10-22 this printed `published 0 · waiting for image 131` and
+// exited 0, so the run looked healthy while nothing shipped. Say it in a form the caller can act
+// on, and name a sample so the reason is visible without opening the article files.
+if (!dryRun && live === 0 && blockedByImage.length > 0) {
+  console.log(`STARVED blocked_by_image=${blockedByImage.length}`);
+  for (const b of blockedByImage.slice(0, 5)) {
+    console.log(`  held ${b.locale}/${b.slug} (due ${b.publishAt})`);
+  }
+  if (blockedByImage.length > 5) console.log(`  … ${blockedByImage.length - 5} more`);
+}
