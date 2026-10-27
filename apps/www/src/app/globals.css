@@ -234,6 +234,25 @@ nav a[aria-current="page"] {
   font-weight: 600;
 }
 
+/* Touch targets. The 29px rows below already clear WCAG 2.5.8's 24x24 minimum, and inline
+   links in prose are exempt from it, but a 29px row is still a poor thumb target. Coarse
+   pointers get the 44px target; desktop keeps the tighter rhythm the header is designed
+   around, so the visual language does not change where it was already fine. */
+@media (pointer: coarse) {
+  .logo,
+  nav a,
+  .nav-more summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .footer-grid ul a {
+    display: inline-block;
+    padding: 0.6rem 0;
+  }
+}
+
 .nav-more {
   position: relative;
 }
