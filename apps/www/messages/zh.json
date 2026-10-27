@@ -437,7 +437,11 @@
     "otherSeriesHeading": "其他系列",
     "sameSeries": "同系列其他型号",
     "mentionedIn": "提到这款显卡的指南",
-    "showingTop": "按显存从大到小显示 {shown} 个型号，共 {count} 个。完整列表见品牌索引。"
+    "showingTop": "按显存从大到小显示 {shown} 个型号，共 {count} 个。完整列表见品牌索引。",
+    "specChip": "芯片代号",
+    "specProcess": "制程",
+    "specMemoryType": "显存类型",
+    "specBus": "总线接口"
   },
   "guides": {
     "title": "指南",

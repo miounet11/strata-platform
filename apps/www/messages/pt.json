@@ -437,7 +437,11 @@
     "otherSeriesHeading": "Outras séries",
     "sameSeries": "Mais desta série",
     "mentionedIn": "Guias que mencionam esta placa",
-    "showingTop": "Mostrando os {shown} maiores de {count} modelos, por memória. O restante está no índice de marcas."
+    "showingTop": "Mostrando os {shown} maiores de {count} modelos, por memória. O restante está no índice de marcas.",
+    "specChip": "Chip GPU",
+    "specProcess": "Processo",
+    "specMemoryType": "Tipo de memória",
+    "specBus": "Interface de barramento"
   },
   "guides": {
     "title": "Guias",

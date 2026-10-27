@@ -437,7 +437,11 @@
     "otherSeriesHeading": "その他のシリーズ",
     "sameSeries": "同じシリーズの他のモデル",
     "mentionedIn": "このカードに言及しているガイド",
-    "showingTop": "メモリ容量の大きい順に {shown} モデルを掲げます（全 {count} モデル）。残りはブランド別一覧にあります。"
+    "showingTop": "メモリ容量の大きい順に {shown} モデルを掲げます（全 {count} モデル）。残りはブランド別一覧にあります。",
+    "specChip": "GPU チップ",
+    "specProcess": "製造プロセス",
+    "specMemoryType": "メモリ規格",
+    "specBus": "バスインターフェース"
   },
   "guides": {
     "title": "ガイド",

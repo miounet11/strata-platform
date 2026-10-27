@@ -163,10 +163,38 @@ export default async function GpuPage({
       <h2>{t("specs")}</h2>
       <table>
         <tbody>
+          {/* The silicon, the process and the memory form factor are what tell two cards with the
+              same board name apart. They used to live only in gpus.json, so /gpus/<slug> and
+              /gpus/<slug>-2 for a chip collision rendered byte-identical bodies and scored 1.000
+              in scripts/similarity.mjs — 51 of the 68 such pairs differed in nothing else. */}
+          {gpu.gpuName ? (
+            <tr>
+              <th>{t("specChip")}</th>
+              <td>{gpu.gpuName}</td>
+            </tr>
+          ) : null}
+          {gpu.process ? (
+            <tr>
+              <th>{t("specProcess")}</th>
+              <td>{gpu.process}</td>
+            </tr>
+          ) : null}
           <tr>
             <th>{t("specVram")}</th>
             <td>{gpu.vramGb} GB</td>
           </tr>
+          {gpu.memoryType ? (
+            <tr>
+              <th>{t("specMemoryType")}</th>
+              <td>{gpu.memoryType}</td>
+            </tr>
+          ) : null}
+          {gpu.bus ? (
+            <tr>
+              <th>{t("specBus")}</th>
+              <td>{gpu.bus}</td>
+            </tr>
+          ) : null}
           <tr>
             <th>{t("specBandwidth")}</th>
             <td>{gpu.bandwidthGbs} GB/s</td>

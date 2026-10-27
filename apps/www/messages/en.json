@@ -437,7 +437,11 @@
     "otherSeriesHeading": "Other series",
     "sameSeries": "More in this series",
     "mentionedIn": "Guides that mention this card",
-    "showingTop": "Showing {shown} of {count} models, largest memory first. The brand index has the rest."
+    "showingTop": "Showing {shown} of {count} models, largest memory first. The brand index has the rest.",
+    "specChip": "GPU chip",
+    "specProcess": "Process",
+    "specMemoryType": "Memory type",
+    "specBus": "Bus interface"
   },
   "guides": {
     "title": "Guides",

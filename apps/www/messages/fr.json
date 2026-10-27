@@ -437,7 +437,11 @@
     "otherSeriesHeading": "Autres séries",
     "sameSeries": "Autres modèles de cette série",
     "mentionedIn": "Guides qui mentionnent cette carte",
-    "showingTop": "Les {shown} plus gros modèles sur {count}, par mémoire. Le reste est dans l'index des marques."
+    "showingTop": "Les {shown} plus gros modèles sur {count}, par mémoire. Le reste est dans l'index des marques.",
+    "specChip": "Puce GPU",
+    "specProcess": "Gravure",
+    "specMemoryType": "Type de mémoire",
+    "specBus": "Interface de bus"
   },
   "guides": {
     "title": "Guides",

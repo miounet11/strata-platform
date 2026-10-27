@@ -437,7 +437,11 @@
     "otherSeriesHeading": "Otras series",
     "sameSeries": "Más de esta serie",
     "mentionedIn": "Guías que mencionan esta tarjeta",
-    "showingTop": "Se muestran los {shown} modelos más grandes de {count}, por memoria. El resto está en el índice de marcas."
+    "showingTop": "Se muestran los {shown} modelos más grandes de {count}, por memoria. El resto está en el índice de marcas.",
+    "specChip": "Chip GPU",
+    "specProcess": "Proceso",
+    "specMemoryType": "Tipo de memoria",
+    "specBus": "Interfaz de bus"
   },
   "guides": {
     "title": "Guías",

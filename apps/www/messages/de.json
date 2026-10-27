@@ -437,7 +437,11 @@
     "otherSeriesHeading": "Weitere Serien",
     "sameSeries": "Weitere Modelle dieser Serie",
     "mentionedIn": "Anleitungen, die diese Karte nennen",
-    "showingTop": "Die {shown} größten von {count} Modellen nach Speicher. Den Rest listet die Markenübersicht."
+    "showingTop": "Die {shown} größten von {count} Modellen nach Speicher. Den Rest listet die Markenübersicht.",
+    "specChip": "GPU-Chip",
+    "specProcess": "Fertigung",
+    "specMemoryType": "Speichertyp",
+    "specBus": "Busschnittstelle"
   },
   "guides": {
     "title": "Anleitungen",
