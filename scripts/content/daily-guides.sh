@@ -52,6 +52,40 @@ fail() {
   exit "${2:-1}"
 }
 
+# Keep a timestamped copy of the article corpus before anything publishes.
+#
+# There is no other recovery path. `scripts/content/out/` is the only copy of every generated
+# article — it is not in git (the tree is 6.3 MB per snapshot and rewritten daily), and the
+# build reads it in place. An `rsync --delete` from a workstation, a bad generate run, or a
+# mistaken cleanup therefore destroys articles permanently. cleanyourtv hit exactly this case
+# and its runner notes it by name; this host had no equivalent.
+#
+# Retention is 20 copies. At 6.3 MB each that is ~126 MB against 75 GB free, so the cost is
+# noise, while 20 days is long enough to notice a loss and recover it.
+#
+# Snapshots live under /var/lib, not the repo: `deploy-www.sh` and any future `git clean` must
+# never be able to reach them.
+SNAPSHOT_ROOT=/var/lib/stratat-content-snapshots
+SNAPSHOT_KEEP=20
+
+snapshot_content() {
+  local dir count
+  [ -d "$ROOT/scripts/content/out" ] || { echo "WARNING: content/out missing — no snapshot taken"; return 0; }
+  dir="$SNAPSHOT_ROOT/$(date -u +%Y%m%dT%H%M%SZ)"
+  mkdir -p "$dir" || { echo "WARNING: cannot create $dir — no snapshot taken"; return 0; }
+  rsync -a "$ROOT/scripts/content/out/" "$dir/" || {
+    # Not fatal: a snapshot failing must not stop today's publication. It is reported so the
+    # loss of the recovery path is visible rather than silently assumed.
+    echo "WARNING: content snapshot incomplete at $dir"
+    return 0
+  }
+  count=$(find "$dir" -name '*.json' | wc -l)
+  echo "content snapshot: $dir ($count articles)"
+  # `ls -d */` sorts lexically, and the directory name is a UTC timestamp, so the oldest copies
+  # are first. Deleting only beyond the newest SNAPSHOT_KEEP keeps a rolling window.
+  ls -1d "$SNAPSHOT_ROOT"/*/ 2>/dev/null | sort | head -n "-$SNAPSHOT_KEEP" | xargs -r rm -rf
+}
+
 # Sending must never be able to mask the original failure. If curl or DNS is down, the alert is
 # lost but the exit code and the log tail are still on disk, so the job reports the same failure
 # with or without the webhook.
@@ -228,6 +262,8 @@ echo "verify exit=$verify_status (media base: ${NEXT_PUBLIC_MEDIA_BASE:-<local p
 if [ "$verify_status" -ne 0 ]; then
   fail "内容质量门禁未通过（verify.mjs exit=$verify_status），本次不发布" 1
 fi
+
+snapshot_content
 
 publish_out=$(/usr/bin/node scripts/content/publish.mjs 2>&1)
 publish_status=$?

@@ -43,9 +43,12 @@ if command -v flock >/dev/null 2>&1; then
   else
     LOCK_FILE="${TMPDIR:-/tmp}/stratat-deploy.lock"
   fi
+  # 74 is EX_IOERR, kept distinct from 1 (the build failed) and 75 (the lock is held). An
+  # unwritable lock path is a misconfiguration, not a broken build, and it must not fall back to a
+  # different file: two deploys using different lock paths would not exclude each other at all.
   exec 9>"$LOCK_FILE" || {
-    echo "cannot open lock file $LOCK_FILE" >&2
-    exit 1
+    echo "cannot open lock file $LOCK_FILE — check STRATAT_DEPLOY_LOCK; live site untouched" >&2
+    exit 74
   }
   if ! flock -n 9; then
     echo "another deploy holds $LOCK_FILE — not starting a second build; retry when it finishes" >&2
