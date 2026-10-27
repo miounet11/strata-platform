@@ -138,8 +138,16 @@ on_exit() {
 }
 trap on_exit EXIT
 
-if [ -z "${CONTENT_LLM_API_KEY:-}" ]; then
-  fail "CONTENT_LLM_API_KEY 未设置（应写在 $ROOT/.env），已拒绝运行" 1
+# Run the full precondition check before any generation. This replaces the API-key-only guard
+# that used to live here: a key being present says nothing about whether the endpoint answers or
+# whether the model is still served, and those two failures cost an hour of per-article retries
+# before the publish gate finally reports "nothing written". preflight also covers the local
+# inputs generation reads in place (plan.json, out/, media, disk), whose absence fails the same
+# late way.
+/usr/bin/node scripts/content/preflight.mjs
+preflight_status=$?
+if [ "$preflight_status" -ne 0 ]; then
+  fail "前置检查未通过（preflight.mjs exit=$preflight_status），已拒绝运行" 1
 fi
 export CONTENT_CONCURRENCY="${CONTENT_CONCURRENCY:-3}"
 
