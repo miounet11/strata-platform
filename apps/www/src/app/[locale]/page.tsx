@@ -58,7 +58,7 @@ export default async function HomePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([jsonLd])) }}
       />
-      <p className="badge">{version}</p>
+      <p className="eyebrow">{version}</p>
       <h1>{t("heroTitle")}</h1>
       <p className="lead">{t("heroSub")}</p>
       <div className="hero-actions">

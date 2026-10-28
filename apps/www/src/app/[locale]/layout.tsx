@@ -29,6 +29,18 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
+      <head>
+        {/* The body face is read on every paint, so it is fetched ahead of the stylesheet's
+            own request rather than discovered late. `crossOrigin` is required even same-origin:
+            font requests are always CORS-mode and would otherwise be fetched twice. */}
+        <link
+          rel="preload"
+          href="/fonts/inter-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         <NextIntlClientProvider messages={messages}>
           {/* Keyboard users must be able to jump the header on every page; `main` carries
