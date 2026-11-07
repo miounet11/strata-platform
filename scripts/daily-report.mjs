@@ -29,10 +29,11 @@
  * a single page load fires several of them, and counting them inflates traffic by an amount that
  * varies with how much JS the visitor ran.
  */
-import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { createReadStream, readFileSync, readdirSync, existsSync } from "node:fs";
+import { StringDecoder } from "node:string_decoder";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gunzipSync } from "node:zlib";
+import { createGunzip } from "node:zlib";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const LOG_DIR = process.env.STRATA_LOG_DIR || "/var/log/nginx";
@@ -123,49 +124,137 @@ function within(t, from, to) {
   return ms >= Date.parse(from) && ms < Date.parse(to);
 }
 
-function readLogFiles() {
-  if (!existsSync(LOG_DIR)) return [];
-  const names = readdirSync(LOG_DIR)
+/**
+ * Access logs in rotation order: the live file first, then `.1`, `.2`, … oldest last.
+ * The report reads them as a stream; a 90MB set of rotated logs never exists in memory at once.
+ */
+function logFileNames(dir = LOG_DIR, failures = null) {
+  if (!existsSync(dir)) return [];
+  let entries;
+  try {
+    entries = readdirSync(dir);
+  } catch (error) {
+    // `existsSync` can pass and the read still fail (permissions, a race with rotation). Reporting
+    // zero traffic is better than throwing out of cron, but a permission error is a real fault and
+    // is surfaced through `failures` so the run does not look successful.
+    console.error(`[report] cannot list ${dir}: ${error.message}`);
+    if (!ROTATION_RACE.has(error.code)) {
+      failures?.push({ file: dir, code: error.code || "EUNKNOWN", message: error.message });
+    }
+    return [];
+  }
+  return entries
     .filter((n) => n === "strata-access.log" || /^strata-access\.log\.\d+(?:\.gz)?$/.test(n))
     .sort((a, b) => {
       const rank = (n) => (n.endsWith("strata-access.log") ? 0 : Number(n.match(/\.(\d+)/)[1]));
-      return rank(a) - rank(b);
+      // Two files can share a rotation number (`.2` and `.2.gz` exist together if a rotation
+      // failed midway). Tie-break explicitly: plain before gz, then by name, so the read order
+      // never depends on `readdirSync` order and two runs cannot disagree about the same logs.
+      return rank(a) - rank(b) || a.localeCompare(b);
     });
-  const out = [];
-  for (const name of names) {
-    const full = join(LOG_DIR, name);
-    try {
-      const raw = name.endsWith(".gz") ? gunzipSync(readFileSync(full)) : readFileSync(full);
-      out.push({ name, text: raw.toString("utf8") });
-    } catch (error) {
-      // A half-written gz from a rotation in flight is not a reason to lose the report.
-      console.error(`[report] skipped ${name}: ${error.message}`);
-    }
-  }
-  return out;
 }
 
-export function summarize(lines, { from, to }) {
+function openLogStream(name, dir = LOG_DIR) {
+  const source = createReadStream(join(dir, name));
+  if (!name.endsWith(".gz")) return { source, stream: source };
+  const gunzip = createGunzip();
+  // A read error on `source` is not forwarded to a pipe destination on its own, and this stream
+  // is what the caller iterates. Destroying the gunzip with that error makes the async loop throw
+  // instead of hanging on a half-read file. (Destroying `source` alone would not: for a plain log
+  // it *is* the iterated stream, and for a gz it leaves the gunzip waiting for chunks forever.)
+  source.on("error", (error) => gunzip.destroy(error));
+  return { source, stream: source.pipe(gunzip) };
+}
+
+/**
+ * Yields one line at a time across every rotated file, decompressing gz on the fly.
+ *
+ * Buffering is one incomplete line plus one stream chunk: a 180MB rotated set is never held in
+ * memory. `StringDecoder` (never a bare `chunk.toString()`) is what makes that safe — it keeps a
+ * split multi-byte UTF-8 sequence across a chunk boundary instead of emitting U+FFFD, which no
+ * later step could repair. A trailing `\r` is stripped so CRLF logs parse the same as LF ones.
+ */
+/**
+ * Errors that mean "this file was rotated away under us" rather than "this report is wrong".
+ * Those are expected on a live server and stay quiet; anything else (EACCES, a truncated gz,
+ * EIO) means part of the day is missing from the totals and has to be visible.
+ */
+const ROTATION_RACE = new Set(["ENOENT", "ENOTDIR", "ESTALE"]);
+
+export function isExpectedLogError(error) {
+  return ROTATION_RACE.has(error?.code) || /unexpected end of file/i.test(error?.message || "");
+}
+
+/**
+ * @param {object} [options]
+ * @param {string} [options.dir]
+ * @param {Error[]} [options.failures] collects files that could not be read for a non-race reason,
+ *   so the caller can surface them instead of silently reporting a smaller day.
+ */
+export async function* readLogLines({ dir = LOG_DIR, failures = null } = {}) {
+  for (const name of logFileNames(dir, failures)) {
+    let source = null;
+    let stream = null;
+    const decoder = new StringDecoder("utf8");
+    let partial = "";
+    try {
+      ({ source, stream } = openLogStream(name, dir));
+      for await (const chunk of stream) {
+        partial += decoder.write(chunk);
+        const lines = partial.split("\n");
+        partial = lines.pop();
+        for (const line of lines) yield line.endsWith("\r") ? line.slice(0, -1) : line;
+      }
+      partial += decoder.end();
+      if (partial) yield partial.endsWith("\r") ? partial.slice(0, -1) : partial;
+    } catch (error) {
+      // The partial line belongs to the file that failed, so it is dropped with the file and
+      // never leaks into the next one. The decoder dies with its file too — it is created inside
+      // this loop on purpose, so a retained multi-byte sequence cannot prefix the next file.
+      partial = "";
+      if (isExpectedLogError(error)) {
+        console.error(`[report] skipped ${name} (rotation race): ${error.message}`);
+      } else {
+        console.error(`[report] could not read ${name}: ${error.message}`);
+        failures?.push({ file: name, code: error.code || "EUNKNOWN", message: error.message });
+      }
+    } finally {
+      // `stream`/`source` stay null when the open itself threw — guard before destroying.
+      stream?.destroy();
+      source?.destroy();
+    }
+  }
+}
+
+
+/**
+ * Folds one raw log line into the running totals. Split out from `summarize` so the streaming
+ * reader can feed lines in without ever holding the whole day — or the whole rotated log set —
+ * as an array of strings in memory.
+ */
+export function createAccumulator({ from, to }) {
+  const fromMs = Date.parse(from);
+  const toMs = Date.parse(to);
   const bots = { requests: 0, ips: new Set(), byName: new Map() };
   const humans = { requests: 0, ips: new Set() };
   const pages = new Map();
   const statuses = new Map();
-  let malformed = 0;
-  let total = 0;
+  const acc = { total: 0, malformed: 0 };
 
-  for (const line of lines) {
-    if (!line.trim()) continue;
+  const add = (line) => {
+    if (!line || !line.trim()) return;
     let row;
     try {
       row = JSON.parse(line);
     } catch {
-      malformed++;
-      continue;
+      acc.malformed++;
+      return;
     }
-    if (!within(row.t, from, to)) continue;
-    total++;
+    const t = Date.parse(row.t);
+    if (Number.isNaN(t) || t < fromMs || t >= toMs) return;
+    acc.total++;
 
-    if (!isPageView(row.uri)) continue;
+    if (!isPageView(row.uri)) return;
 
     const ip = row.ip || "-";
     const ua = row.ua || "";
@@ -183,16 +272,24 @@ export function summarize(lines, { from, to }) {
       humans.requests++;
       humans.ips.add(ip);
     }
-  }
+  };
 
-  return {
-    total,
-    malformed,
+  const result = () => ({
+    total: acc.total,
+    malformed: acc.malformed,
     bots: { requests: bots.requests, ips: bots.ips.size, byName: bots.byName },
     humans: { requests: humans.requests, ips: humans.ips.size },
     pages,
     statuses,
-  };
+  });
+
+  return { add, result };
+}
+
+export function summarize(lines, { from, to }) {
+  const acc = createAccumulator({ from, to });
+  for (const line of lines) acc.add(line);
+  return acc.result();
 }
 
 const BOT_NAMES = [
@@ -305,21 +402,31 @@ export function formatReport({ date, range, summary, published, logFrom, partial
   return lines.join("\n");
 }
 
-function earliestLogDay() {
-  const files = readLogFiles();
+/**
+ * One pass over every rotated file: folds each retained line into the accumulators and remembers
+ * the oldest timestamp seen. The previous version read the whole log set twice, which is what
+ * pushed the report past the heap limit.
+ */
+export async function collect({ from, to, dir = LOG_DIR }) {
+  const acc = createAccumulator({ from, to });
+  const failures = [];
   let earliest = null;
-  for (const { text } of files) {
-    for (const line of text.split("\n")) {
-      if (!line.trim()) continue;
-      try {
-        const t = JSON.parse(line).t;
-        if (t && (!earliest || t < earliest)) earliest = t;
-      } catch {
-        /* ignore */
-      }
-    }
+  for await (const line of readLogLines({ dir, failures })) {
+    if (!line || !line.trim()) continue;
+    acc.add(line);
+    const i = line.indexOf('"t":"');
+    if (i === -1) continue;
+    const start = i + 5;
+    const end = line.indexOf('"', start);
+    if (end === -1) continue;
+    const t = line.slice(start, end);
+    if (!earliest || t < earliest) earliest = t;
   }
-  return earliest ? localDateOf(Date.parse(earliest), REPORT_TZ) : null;
+  return {
+    summary: acc.result(),
+    logFrom: earliest ? localDateOf(Date.parse(earliest), REPORT_TZ) : null,
+    failures,
+  };
 }
 
 async function main() {
@@ -334,11 +441,15 @@ async function main() {
   const to = explicitDate ? dayEnd : new Date(Math.min(now, Date.parse(dayEnd))).toISOString();
   const range = [from, to];
 
-  const files = readLogFiles();
-  const allLines = files.flatMap((f) => f.text.split("\n"));
-  const summary = summarize(allLines, { from, to });
+  const { summary, logFrom, failures } = await collect({ from, to });
   const published = publishedOn(date);
-  const logFrom = earliestLogDay();
+
+  // A file that could not be read means the day is under-counted. Say so loudly and make the
+  // exit code non-zero, so cron mail / the caller notices instead of trusting a smaller number.
+  if (failures.length) {
+    console.error(`[report] ${failures.length} log file(s) unreadable; totals are incomplete`);
+    for (const f of failures) console.error(`  ${f.file} (${f.code}): ${f.message}`);
+  }
 
   const text = formatReport({ date, range, summary, published, logFrom, partial: !explicitDate });
 
@@ -350,10 +461,13 @@ async function main() {
       bots: { requests: summary.bots.requests, ips: summary.bots.ips, byName: Object.fromEntries(summary.bots.byName) },
       published: { total: published.total, byLocale: published.byLocale },
       logFrom,
+      failures,
     }, null, 2));
   } else {
     console.log(text);
   }
+
+  if (failures.length) process.exitCode = 1;
 
   if (has("--send")) {
     const { notifyFeishu } = await import("./notify.mjs");
