@@ -20,6 +20,7 @@ import { spawnSync } from "node:child_process";
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { compareState } from "./freshness-state.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const STATE = join(ROOT, ".freshness-state.json");
@@ -27,7 +28,11 @@ const LOCK = join(ROOT, ".freshness.lock");
 const FAILED_MARK = join(ROOT, ".freshness-build-failed");
 const RELEASES = join(ROOT, "apps/www/src/data/releases.json");
 const FRESHNESS_LOG = join(ROOT, ".logs", "freshness.log");
-const BUILD_ATTEMPTS = 3;
+// One attempt per run. A full build exceeds 40 minutes on the production box, so retrying 60s
+// after an OOM just starts the same doomed build again and the retry itself competes for the memory
+// that killed the first one. `.freshness-build-failed` already forces the next scheduled run to
+// rebuild, which is a natural back-off at the cron interval instead of a tight loop.
+const BUILD_ATTEMPTS = 1;
 const BUILD_RETRY_MS = 60_000;
 
 const log = (...a) => console.log("[freshness]", ...a);
@@ -109,6 +114,22 @@ function run(cmd, args, opts = {}) {
   return r.status === 0;
 }
 
+// Capture instead of inherit, so the caller can log what a helper reported. Used where the exit
+// code alone is not enough to tell a success from a silent no-op (IndexNow submissions).
+function runCapture(cmd, args, opts = {}) {
+  const r = spawnSync(cmd, args, {
+    cwd: ROOT,
+    encoding: "utf8",
+    env: process.env,
+    ...opts,
+  });
+  return {
+    code: r.status ?? 1,
+    stdout: r.stdout ?? "",
+    stderr: r.stderr ?? "",
+  };
+}
+
 function readJson(path) {
   try {
     return JSON.parse(readFileSync(path, "utf8"));
@@ -122,14 +143,21 @@ function sleepMs(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
+// Deploy through `deploy-www.sh`, never `pnpm build` directly.
+//
+// `pnpm --filter @stratat/www build` writes into `apps/www/.next`, which is the exact tree the
+// live pm2 process is serving from. A build that dies part-way (OOM, killed, timed out) therefore
+// leaves the running site without `server.js` and every request 502s — that is what took the site
+// down on 2026-10-30. deploy-www.sh builds into `.next-build` and only renames it into place after
+// the build, sitemap check and patrol gate all pass, so a failed build leaves the live tree alone.
 function buildWww() {
   for (let attempt = 1; attempt <= BUILD_ATTEMPTS; attempt++) {
-    if (run("pnpm", ["--filter", "@stratat/www", "build"])) return true;
+    if (run("bash", ["scripts/deploy-www.sh"])) return true;
     const detail = `ERROR: www build failed (attempt ${attempt}/${BUILD_ATTEMPTS})`;
     log(detail);
     if (attempt === BUILD_ATTEMPTS) appendLog("rebuild-fail", detail);
     if (attempt < BUILD_ATTEMPTS) {
-      log("retrying www build in 60s…");
+      log(`retrying www build (${attempt}/${BUILD_ATTEMPTS})…`);
       sleepMs(BUILD_RETRY_MS);
     }
   }
@@ -142,7 +170,7 @@ function alertBuildFailed(detail = "") {
   const bar = "!".repeat(72);
   console.error("");
   console.error(bar);
-  console.error("[freshness] ALERT: www build failed after 3 attempts");
+  console.error(`[freshness] ALERT: www build failed after ${BUILD_ATTEMPTS} attempt(s)`);
   console.error("[freshness] state NOT advanced — previous site build stays live");
   console.error(`[freshness] wrote .freshness-build-failed (${at})`);
   console.error("[freshness] next run forces one rebuild if the data is unchanged");
@@ -172,6 +200,16 @@ function clearBuildFailedMark() {
   }
 }
 
+/**
+ * The identity of the data, not just its size.
+ *
+ * Comparing counts alone was wrong: the changelog feed is a sliding window over an RSS source,
+ * so publishing new entries legitimately drops old ones and can leave the count lower than
+ * before. The watcher read that as "the sync broke, skip the rebuild" and the site stayed on
+ * v0.2.7 for eleven days while v0.2.8–v0.2.12 sat in the data files.
+ *
+ * The rules live in `freshness-state.mjs` so they can be tested without running a build.
+ */
 function fingerprint() {
   const rel = readJson(RELEASES);
   const releases = rel?.releases ?? [];
@@ -180,11 +218,15 @@ function fingerprint() {
     .sort((a, b) => String(b.publishedAt ?? "").localeCompare(String(a.publishedAt ?? "")))[0];
   const changelog = readJson(join(ROOT, "apps/www/src/data/changelog.json"));
   const items = changelog?.items ?? [];
+  const releaseTags = releases.map((r) => r.tag).filter(Boolean).sort();
+  const changelogIds = items.map((i) => i.id).filter(Boolean).sort();
   return {
     topTag: top?.tag ?? "",
     releaseCount: releases.length,
     changelogTop: items[0]?.id ?? "",
     changelogCount: items.length,
+    releaseTags,
+    changelogIds,
   };
 }
 
@@ -219,24 +261,15 @@ if (process.env.FRESHNESS_SKIP_SYNC === "1") {
 // ---- 2. compare -----------------------------------------------------------
 const prev = readJson(STATE) ?? {};
 const next = fingerprint();
-const changed =
-  firstRun ||
-  prev.topTag !== next.topTag ||
-  prev.releaseCount !== next.releaseCount ||
-  prev.changelogTop !== next.changelogTop ||
-  prev.changelogCount !== next.changelogCount;
-// data regression (sync failed → empty/shorter) is NOT new content
-const degraded =
-  !firstRun &&
-  (next.releaseCount < prev.releaseCount ||
-    (next.releaseCount === 0 && prev.topTag !== "") ||
-    next.changelogCount < prev.changelogCount);
-if (degraded) {
+
+const verdict = compareState(prev, next, { firstRun });
+if (verdict.degraded) {
   const detail = `data looks degraded (releases ${prev.releaseCount}->${next.releaseCount}, changelog ${prev.changelogCount}->${next.changelogCount}) — skipping rebuild`;
   log(detail);
   appendLog("degraded", detail);
   process.exit(0);
 }
+const changed = verdict.changed;
 
 const priorBuildFailed = existsSync(FAILED_MARK);
 if (!changed && !priorBuildFailed) {
@@ -261,33 +294,33 @@ if (!changed) {
 
 // ---- 3. rebuild + restart (state advances only after success) -------------
 if (!buildWww()) {
-  alertBuildFailed(`pnpm --filter @stratat/www build exit=${lastStatus}（${BUILD_ATTEMPTS} 次尝试均失败）`);
+  alertBuildFailed(`bash scripts/deploy-www.sh exit=${lastStatus}（${BUILD_ATTEMPTS} 次尝试均失败）`);
   process.exit(0);
 }
 appendLog("rebuild-ok", `www build ok (top=${next.topTag})`);
 clearBuildFailedMark();
 writeFileSync(STATE, JSON.stringify(next, null, 2));
 
-// standalone static copy (same as remote-bootstrap)
-const STANDALONE = join(ROOT, "apps/www/.next/standalone/apps/www");
-for (const [src, dst] of [
-  ["apps/www/.next/static", ".next/static"],
-  ["apps/www/public", "public"],
-]) {
-  if (existsSync(join(ROOT, src))) {
-    run("mkdir", ["-p", join(STANDALONE, dst)]);
-    run("rsync", ["-a", "--delete", join(ROOT, src) + "/", join(STANDALONE, dst) + "/"]);
-  }
-}
-
-const pm2Bin = ["/usr/local/bin/pm2", "/usr/bin/pm2"].find((p) => existsSync(p)) ?? "pm2";
-run(pm2Bin, ["restart", "strata-www"]) || log("WARN: pm2 restart failed (dev machine?)");
+// deploy-www.sh already copied `public/` and `.next/static` into the standalone tree and
+// restarted pm2 after the swap. Nothing to restart from here.
 
 // ---- 4. notify IndexNow ---------------------------------------------------
-if (run("node", ["scripts/indexnow-submit.mjs"])) {
-  const detail = "IndexNow pinged.";
+// Record what the submission actually returned, not just that it ran. `"IndexNow pinged."` could
+// not distinguish "200, 412 URLs accepted" from "403, key rejected" — both left the same line in
+// the log, so a failing submission looked identical to a working one. The submitter prints
+// `indexnow <status> — <n> urls` and exits non-zero on a rejected status; capture and log that.
+const indexnow = runCapture("node", ["scripts/indexnow-submit.mjs"]);
+const indexnowLine = indexnow.stdout.split("\n").find((line) => line.startsWith("indexnow")) ?? "";
+if (indexnow.code === 0) {
+  const detail = indexnowLine || "IndexNow submitted (no status line)";
   log(detail);
   appendLog("indexnow", detail);
+} else {
+  // A rejected submission is a real failure, not a warning: the new URLs stay undiscovered until
+  // the next run. Log it with the exit code so the log shows which side broke.
+  const detail = `IndexNow failed (exit=${indexnow.code}): ${indexnowLine || indexnow.stderr.trim().slice(0, 200)}`;
+  log(detail);
+  appendLog("indexnow-fail", detail);
 }
 
 log(`done ${new Date().toISOString()}`);
