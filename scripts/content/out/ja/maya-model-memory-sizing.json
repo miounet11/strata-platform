@@ -1,0 +1,39 @@
+{
+  "id": "ja-concept-maya-model-memory-sizing",
+  "locale": "ja",
+  "kind": "concept",
+  "slug": "maya-model-memory-sizing",
+  "path": "/ja/guides/maya-model-memory-sizing",
+  "market": "ja",
+  "order": 200,
+  "publishAt": "2026-11-08",
+  "status": "live",
+  "article": {
+    "title": "Maya のモデル選定：ローカル LLM に必要な VRAM と RAM の合計",
+    "description": "GLM-5.3-Flash、DeepSeek-V4.1-Flash、MiniMax-M3.1-Flash、Qwen-3.8-Flash-Next に必要なメモリ合計の早見表、推奨値、そして下回っても動く底线。",
+    "body": "モデルが自分の PC で有多大になるかを決めるのは、**VRAM とシステム RAM の合計**ひとつです。Maya はよく使う部分を GPU に、残りを RAM に置き、収まらない部分は回答中に高速な NVMe SSD から読み出します。\n\n二つの数値を分けて考えます。*モデル全体*はモデル全体を VRAM と RAM に常駐させるのに必要な容量、*推奨値*は OS と既定のコンテキスト分を加えた値です。推奨値を下回っても動くのは、足りない分が SSD からストリームされるからです。\n\n## VRAM + RAM の早見表\n\n単位は GB。「モデル全体」は全部をメモリに置くために必要な容量、「推奨値」はシステムと既定コンテキスト込みです。\n\n| モデル | Quant | モデル全体 | 推奨値（VRAM + RAM） | 動作環境 |\n|---|---|---|---|---|\n| GLM-5.3-Flash | Maya-XS | 約 80 | 88 | NVIDIA、AMD、Mac* |\n| GLM-5.3-Flash | Maya-S24 | 約 102 | 128 | NVIDIA、AMD、Mac* |\n| GLM-5.3-Flash | Maya-S（既定） | 約 104 | 128 | NVIDIA、AMD、Mac* |\n| GLM-5.3-Flash | Maya-M | 約 124 | 160 | NVIDIA、AMD、Mac* |\n| GLM-5.3-Flash | Maya-L | 約 164 | 192 | NVIDIA、AMD、Mac* |\n| DeepSeek-V4.1-Flash | Maya-XS | 121 | 128 | NVIDIA、AMD |\n| DeepSeek-V4.1-Flash | Maya-S（既定） | 186 | 224 | NVIDIA、AMD |\n| DeepSeek-V4.1-Flash | UD-IQ1_M | 140 | 160 | NVIDIA、AMD |\n| MiniMax-M3.1-Flash | Maya-XS | 100 | 128 | NVIDIA、AMD |\n| MiniMax-M3.1-Flash | Maya-S | 130 | 160 | NVIDIA、AMD |\n| Qwen-3.8-Flash-Next | UD-IQ2_XS | 47 | 64 | NVIDIA、AMD |\n| Qwen-3.8-Flash-Next | CYBER-FROST Q5_K_M | 84 | 96 | NVIDIA、AMD |\n\n\\* Mac（Apple Silicon）対応は実験的で、GLM-5.3-Flash の GGUF quant のみです。DeepSeek と Qwen に含まれる n-gram テーブルは SSD に残り続けてメモリには数えないため、ダウンロード容量は表の数値より大きくなります。\n\n## 手元のマシンに合わせる\n\n| 手元の PC | 合計 | 完全に収まる | 動くが遅いもの |\n|---|---|---|---|\n| 16 GB GPU + 48 GB RAM | 64 | Qwen UD-IQ2_XS | GLM Maya-XS、GLM Maya-S24 |\n| 24 GB GPU + 64 GB RAM | 88 | GLM Maya-XS、Qwen UD-IQ2_XS | GLM Maya-S24、Qwen CYBER-FROST |\n| 32 GB GPU + 96 GB RAM | 128 | GLM Maya-S、GLM Maya-S24、MiniMax Maya-XS | GLM Maya-M |\n| 48 GB GPU + 128 GB RAM | 176 | GLM Maya-M、MiniMax Maya-S | GLM Maya-L、DeepSeek Maya-S |\n| 64 GB GPU + 128 GB RAM | 192 | GLM Maya-L | DeepSeek Maya-S |\n| 64 GB GPU + 192 GB RAM | 256 以上 | DeepSeek Maya-S、MiniMax EXL3 | DeepSeek UD-IQ3_S |\n| 384 GB RAM のサーバー | 384 以上 | すべてのモデル（DeepSeek UD-Q8_K_XL を含む） | — |\n\nStrix Halo、Gorgon Halo、Mac のような共有メモリのマシンでは合計を一度だけ数え、OS 用に約 16 GB を残します。独立显卡では配分がより重要です。同じ合計でも、VRAM 側の割合が多いほど速くなります。\n\n## 底线\n\n対応 GPU、**32 GB の RAM**、そしてダウンロードに十分な高速 NVMe SSD があれば、推奨値を下回ってもすべてのモデルが動きます。ハードディスクは代用になりません。\n\nVRAM + RAM に入らない部分は回答中に SSD から読み込まれます。動作はしますが、推奨値から離れるほど遅くなります。セットアップがこの PC でどれだけのモデルをメモリに常駐できるかを表示してくれるため、数百 GB のダウンロードを決める前に数字を確認できます。\n\n表の小さい側では、「大きめのモデルを 1 つ動かす」定番構成は RTX 4090 か RX 7900 XTX に 64 GB の RAM を足すものです。RTX 4060 Ti のような小型カードでは、SSD からストリームし続けるのではなく、メモリに収まる Qwen UD-IQ2_XS ビルドを選ぶのが合理的です。",
+    "faq": [
+      {
+        "q": "どのローカルモデルが自分の PC に収まるかはどう判断しますか。",
+        "a": "GPU の VRAM とシステム RAM を足したものが判断基準です。Maya はよく使う部分を GPU に、残りを RAM に置き、収まらない分は高速 NVMe SSD から読み出します。"
+      },
+      {
+        "q": "これらのモデルを動かす最小構成は何ですか。",
+        "a": "対応 GPU、32 GB の RAM、ダウンロードに十分な高速 NVMe SSD です。推奨値を下回っても動きますが、離れるほど遅くなります。"
+      },
+      {
+        "q": "Mac や Strix Halo のような共有メモリは数え方が違いますか。",
+        "a": "共有メモリでは合計を一度だけ数え、OS 用に約 16 GB を残します。独立显卡では配分が重要で、同じ合計でも VRAM の割合が多いほど速くなります。"
+      },
+      {
+        "q": "なぜダウンロード容量が、実行に必要なメモリより大きいのですか。",
+        "a": "DeepSeek と Qwen の n-gram テーブルは SSD に残り続けてメモリには数えないため、ダウンロード容量は表の数値より大きくなります。"
+      }
+    ],
+    "imagePrompt": "An abstract editorial illustration featuring a dark navy background with teal geometric accents. The design is modern and clean, with no text or letters, formatted in a 16:9 aspect ratio."
+  },
+  "generatedAt": "2026-11-08T00:00:00.000Z",
+  "model": "manual-project-maya",
+  "imagePath": "/media/guides/ja/maya-model-memory-sizing.webp",
+  "publishedAt": "2026-11-08"
+}

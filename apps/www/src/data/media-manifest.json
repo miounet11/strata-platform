@@ -1414,6 +1414,18 @@
       "alt": {
         "en": "Dorm-room-limits: local AI constraints"
       }
+    },
+    "guide-maya-model-memory-sizing": {
+      "type": "image",
+      "path": "/media/guides/en/maya-model-memory-sizing.webp",
+      "page": "/guides/maya-model-memory-sizing",
+      "slot": "hero",
+      "locale": "en",
+      "alt": {
+        "en": "Maya model sizing: how much VRAM plus RAM a local LLM needs",
+        "zh": "Maya 模型选型：本地大模型到底需要多少显存加内存",
+        "ja": "Maya のモデル選定：ローカル LLM に必要な VRAM と RAM の合計"
+      }
     }
   },
   "cluster": "192.168.2.100"
