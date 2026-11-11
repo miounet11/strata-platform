@@ -65,5 +65,6 @@ test("index exports all three modules and every contract test is scanned by npm 
     "goal.test.ts",
     "phase.test.ts",
     "plan.test.ts",
+    "static-assets.test.ts",
   ]);
 });

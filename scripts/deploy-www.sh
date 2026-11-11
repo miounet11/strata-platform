@@ -95,11 +95,151 @@ rm -f tsconfig.tsbuildinfo .next-build/tsconfig.tsbuildinfo
 NEXT_PUBLIC_MEDIA_BASE="${NEXT_PUBLIC_MEDIA_BASE-}"
 export NEXT_PUBLIC_MEDIA_BASE
 echo "media base: ${NEXT_PUBLIC_MEDIA_BASE:-<local public/>}"
-NODE_OPTIONS=--max-old-space-size=6144 NEXT_DIST_DIR=.next-build pnpm build
+
+# Worker cap. Next sizes the build worker pool from `nproc - 1` (9 on the 10-core production box)
+# and every worker carries its own V8 heap, so the default concurrency is what took the 8 GB host
+# into OOM 14 times on 2026-10-30. `experimental.cpus` in next.config.ts is the only knob Next 15.5
+# reads for this, so the count is passed through NEXT_BUILD_CPUS rather than an env var Next ignores.
+BUILD_CPUS="${BUILD_CPUS:-2}"
+case "$BUILD_CPUS" in
+  ''|*[!0-9]*)
+    echo "BUILD_CPUS must be a positive integer, got '$BUILD_CPUS' — refusing to build" >&2
+    exit 64
+    ;;
+esac
+if [ "$BUILD_CPUS" -lt 1 ] || [ "$BUILD_CPUS" -gt 32 ]; then
+  echo "BUILD_CPUS=$BUILD_CPUS is outside the sane range 1..32 — refusing to build" >&2
+  exit 64
+fi
+
+# Memory gate. A full build is 48k pages; on the 8 GB box the peak was 57 GB virtual and the kernel
+# killed the build rather than let it finish. Checking headroom first turns a half-finished build
+# (which used to leave the live tree broken) into an immediate, explicit refusal.
+#
+# MemAvailable is Linux-only. On macOS/BSD the gate has no reading, so it announces that instead of
+# passing silently — a skipped guard must never look like a passed one.
+MIN_AVAIL_MB="${MIN_AVAIL_MB:-2500}"
+case "$MIN_AVAIL_MB" in
+  ''|*[!0-9]*)
+    echo "MIN_AVAIL_MB must be a non-negative integer, got '$MIN_AVAIL_MB' — refusing to build" >&2
+    exit 64
+    ;;
+esac
+
+read_avail_mb() {
+  awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo 2>/dev/null
+}
+
+# Reap orphaned build workers left behind when a `next build` dies (OOM, kill, timeout). Those
+# workers are reparented to pid 1 and keep 0.6–1.2 GB RSS each. On 2026-11-04 seven of them from
+# the Oct 31 build held MemAvailable at 229 MB, so the gate below refused every scheduled deploy
+# for four days: not enough memory -> refuse -> nobody reaps -> still not enough memory.
+#
+# Match only THIS repo's pnpm path and the jest-worker child script. Other sites on this box run
+# their own jest-worker processes, and `ppid == 1` alone is not proof a worker is ours.
+reap_orphan_build_workers() {
+  local pids p n=0
+  pids=$(ps -eo pid=,ppid=,args= 2>/dev/null | awk -v root="$ROOT" '
+    $2 == 1 && index($0, root "/node_modules/.pnpm/") > 0 &&
+    index($0, "jest-worker/processChild.js") > 0 { print $1 }
+  ')
+  [ -z "$pids" ] && return 0
+  echo "reaping orphaned build workers: $(echo $pids | tr '\n' ' ')" >&2
+  for p in $pids; do
+    kill -9 "$p" 2>/dev/null && n=$((n + 1))
+  done
+  echo "reaped $n orphaned build worker(s)" >&2
+  sleep 2
+}
+
+# Also reap after THIS run's build, whether it succeeded, failed, or was killed. Otherwise a build
+# that dies part-way leaves fresh orphans that accumulate until some later run finally trips the
+# low-memory branch above. Linux only: BSD ps does not accept -eo, and local dev builds are not
+# reparented to pid 1 the way a cron job killed by the OOM killer is.
+if [ -r /proc/meminfo ]; then
+  trap reap_orphan_build_workers EXIT
+fi
+
+avail_mb=""
+if [ -r /proc/meminfo ]; then
+  avail_mb=$(read_avail_mb)
+  # On Linux the reading is expected to work. Failing to read it is a broken gate, and a broken
+  # headroom check must not be mistaken for a passing one — that is exactly how the OOM loop
+  # survived: the guard looked satisfied while the build was being killed.
+  case "$avail_mb" in
+    ''|*[!0-9]*)
+      echo "memory gate: /proc/meminfo is readable but MemAvailable could not be parsed (awk missing?) — refusing to build" >&2
+      exit 64
+      ;;
+  esac
+fi
+
+if [ -z "$avail_mb" ]; then
+  echo "memory gate: unavailable (no /proc/meminfo on $(uname -s)) — proceeding without the headroom check"
+elif [ "$MIN_AVAIL_MB" -gt 0 ] && [ "$avail_mb" -lt "$MIN_AVAIL_MB" ]; then
+  # Try to recover before refusing. A plain `exit 3` here is what turned one orphaned build into a
+  # permanent freeze: the scheduled retry can never build, so it can never create the headroom.
+  echo "memory gate: ${avail_mb}MB available < ${MIN_AVAIL_MB}MB — trying to reclaim orphaned build workers" >&2
+  reap_orphan_build_workers
+  avail_mb=$(read_avail_mb)
+  case "$avail_mb" in
+    ''|*[!0-9]*)
+      echo "memory gate: could not re-read MemAvailable after reaping — refusing to build" >&2
+      exit 64
+      ;;
+  esac
+  if [ "$avail_mb" -lt "$MIN_AVAIL_MB" ]; then
+    echo "not enough memory to build: ${avail_mb}MB available < ${MIN_AVAIL_MB}MB floor — live site untouched" >&2
+    echo "wait for the running build to finish, or lower MIN_AVAIL_MB, then retry" >&2
+    exit 3
+  fi
+  echo "memory gate: recovered to ${avail_mb}MB available after reaping"
+else
+  echo "memory gate: ${avail_mb}MB available (floor ${MIN_AVAIL_MB}MB)"
+fi
+
+BUILD_HEAP_MB="${BUILD_HEAP_MB:-3072}"
+case "$BUILD_HEAP_MB" in
+  ''|*[!0-9]*)
+    echo "BUILD_HEAP_MB must be a positive integer, got '$BUILD_HEAP_MB' — refusing to build" >&2
+    exit 64
+    ;;
+esac
+if [ "$BUILD_HEAP_MB" -lt 512 ]; then
+  echo "BUILD_HEAP_MB=$BUILD_HEAP_MB is below 512MB, the build cannot finish — refusing" >&2
+  exit 64
+fi
+
+echo "build cpus: ${BUILD_CPUS}, heap: ${BUILD_HEAP_MB}MB"
+NODE_OPTIONS="--max-old-space-size=${BUILD_HEAP_MB}" \
+  NEXT_DIST_DIR=.next-build \
+  NEXT_BUILD_CPUS="$BUILD_CPUS" \
+  pnpm build
 build_status=$?
 
 if [ "$build_status" -ne 0 ] || [ ! -d .next-build/standalone/apps/www ]; then
   echo "build failed (exit=$build_status) — live site untouched, .next still serves" >&2
+  rm -rf .next-build
+  exit 1
+fi
+
+# nginx serves /_next/static/ from the swapped tree's own `static/` (deploy/nginx/strata.conf),
+# not from the standalone copy. A build that emits no chunks there is safe to reject here but
+# fatal after the swap: hashed assets are immutable and CF-cached for a year, so the site keeps
+# rendering from cache and only white-screens once those entries expire. On 2026-11-11 the live
+# .next/static/chunks held 0 files while the cached HTML still referenced 12 of them. If Next
+# reused its cache and skipped re-emitting them, carry the previous live tree's chunks into the
+# new tree — immutable content-hashed files are correct to accumulate, not replace — then gate.
+STATIC_SRC=.next/static
+STATIC_DST=.next-build/static
+if [ -d "$STATIC_SRC/chunks" ]; then
+  mkdir -p "$STATIC_DST"
+  cp -rn "$STATIC_SRC"/. "$STATIC_DST"/ 2>/dev/null || true
+fi
+node scripts/check-static-assets.mjs .next-build
+static_status=$?
+if [ "$static_status" -ne 0 ]; then
+  echo "static asset check failed (exit=$static_status) — live site untouched, .next still serves" >&2
   rm -rf .next-build
   exit 1
 fi
@@ -115,6 +255,8 @@ else
   sitemap_status=$?
   if [ "$sitemap_status" -ne 0 ]; then
     echo "sitemap check failed (exit=$sitemap_status) — live site untouched, .next still serves" >&2
+    # Drop the rejected tree so a cron retry does not stack another ~13 GB next to it.
+    rm -rf .next-build
     exit 1
   fi
 fi
@@ -144,6 +286,8 @@ else
     else
       echo "patrol could not run (exit=$patrol_status) — gate is broken, live site untouched" >&2
     fi
+    # Same reason as the sitemap branch: the rejected build must not survive to the next run.
+    rm -rf .next-build
     exit 1
   fi
 fi
@@ -194,6 +338,31 @@ mv .next-build .next
 pm2 restart strata-www >/dev/null 2>&1
 restart_status=$?
 echo "restart exit=$restart_status"
+
+# Shield the live server from the OOM killer. Builds and the server share this 8 GB box, and on
+# 2026-10-30 the kernel picked the build (and once, `next-server` itself) because both sat at the
+# default score. A lowered oom_score_adj makes the kernel prefer the build process, which is the
+# one that can be retried, over the one whose death is a 502. pm2 assigns a new pid on restart, so
+# this has to run after it; the write is best-effort because pm2 may still be forking.
+if [ "$restart_status" -eq 0 ]; then
+  live_pid=$(pm2 pid strata-www 2>/dev/null | tr -d '[:space:]')
+  case "$live_pid" in
+    ''|*[!0-9]*)
+      echo "WARN: could not read strata-www pid — oom_score_adj not set" >&2
+      ;;
+    *)
+      if [ -w "/proc/$live_pid/oom_score_adj" ]; then
+        if echo "${LIVE_OOM_SCORE_ADJ:--500}" > "/proc/$live_pid/oom_score_adj" 2>/dev/null; then
+          echo "oom_score_adj: strata-www (pid $live_pid) = $(cat "/proc/$live_pid/oom_score_adj")"
+        else
+          echo "WARN: writing oom_score_adj for pid $live_pid failed" >&2
+        fi
+      else
+        echo "oom_score_adj: unavailable on $(uname -s) — skipped"
+      fi
+      ;;
+  esac
+fi
 
 # Lock in whatever this build improved, now that it is the live tree. Only improvements are
 # written, so a clean deploy leaves the file alone; a regression was already blocked above and
