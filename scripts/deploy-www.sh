@@ -236,7 +236,7 @@ if [ -d "$STATIC_SRC/chunks" ]; then
   mkdir -p "$STATIC_DST"
   cp -rn "$STATIC_SRC"/. "$STATIC_DST"/ 2>/dev/null || true
 fi
-node scripts/check-static-assets.mjs .next-build
+node ../../scripts/check-static-assets.mjs .next-build
 static_status=$?
 if [ "$static_status" -ne 0 ]; then
   echo "static asset check failed (exit=$static_status) — live site untouched, .next still serves" >&2
