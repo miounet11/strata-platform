@@ -8,7 +8,7 @@
     "dev:api": "pnpm --filter @stratat/api dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "test": "node --test apps/www/tests/*.test.ts scripts/content/*.test.mjs",
+    "test": "node --test apps/www/tests/*.test.ts scripts/content/*.test.mjs tests/*.test.ts",
     "check:sitemap": "pnpm --filter @stratat/www check:sitemap",
     "sync:releases": "node scripts/sync-releases.mjs",
     "sync:community": "node scripts/sync-github-community.mjs",
@@ -20,12 +20,19 @@
     "intake:loop": "node scripts/run-intake-loop.mjs",
     "freshness:watch": "node scripts/freshness-watch.mjs",
     "content:grow": "node scripts/content-grow.mjs",
+    "content:mine": "node scripts/content/mine-topics.mjs --merge",
+    "content:covers": "node scripts/content/images.mjs --fallback-svg",
+    "content:revalidate": "node scripts/revalidate.mjs --scope all",
     "enrich:assets": "node scripts/enrichment/generate-assets.mjs",
     "enrich:verify": "node scripts/enrichment/validate-images.mjs",
     "enrich:loop": "node scripts/enrichment/run-enrich-loop.mjs",
     "enrich:briefs": "node scripts/enrichment/sync-briefs-from-content.mjs",
     "indexnow": "node scripts/indexnow-submit.mjs",
-    "radar:import": "node scripts/import-radar-briefs.mjs"
+    "radar:import": "node scripts/import-radar-briefs.mjs",
+    "deploy:dry": "bash deploy/sync-and-deploy.sh --dry-run",
+    "deploy:sync": "bash deploy/sync-and-deploy.sh --sync-only",
+    "deploy:revalidate": "bash deploy/sync-and-deploy.sh --revalidate all",
+    "deploy:www": "bash deploy/sync-and-deploy.sh --deploy"
   },
   "engines": {
     "node": ">=20"

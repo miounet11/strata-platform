@@ -6,6 +6,7 @@ dist
 *.log
 .env
 .env.local
+.deploy.env
 apps/api/data/*.db
 apps/api/data/*.db-*
 apps/desktop/src-tauri/target
@@ -27,6 +28,7 @@ apps/www/tsconfig.tsbuildinfo
 # next run, so committing them would add megabytes of churn on every job.
 scripts/content/radar.json
 scripts/content/radar-state.json
+scripts/content/traffic-board.json
 
 # Client fork build output
 apps/client-upstream/host/dist
