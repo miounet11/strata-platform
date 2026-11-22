@@ -34,6 +34,7 @@ import { StringDecoder } from "node:string_decoder";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createGunzip } from "node:zlib";
+import { writeTrafficSnapshot } from "./content/traffic-board.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const LOG_DIR = process.env.STRATA_LOG_DIR || "/var/log/nginx";
@@ -317,12 +318,14 @@ export function botName(userAgent) {
   return "其他爬虫";
 }
 
-/** Articles that went live on `date` (their publishAt is that day and status is live). */
+/** Articles that went live on `date` (checking actual `publishedAt` first, then `publishAt`). */
 export function publishedOn(date) {
   const outDir = join(ROOT, "scripts", "content", "out");
-  if (!existsSync(outDir)) return { total: 0, byLocale: {}, titles: [] };
+  if (!existsSync(outDir)) return { total: 0, byLocale: {}, titles: [], corpusLive: 0, corpusScheduled: 0 };
   const byLocale = {};
   const titles = [];
+  let corpusLive = 0;
+  let corpusScheduled = 0;
   for (const locale of readdirSync(outDir, { withFileTypes: true })) {
     if (!locale.isDirectory()) continue;
     for (const file of readdirSync(join(outDir, locale.name))) {
@@ -333,13 +336,16 @@ export function publishedOn(date) {
       } catch {
         continue;
       }
-      if (item.status !== "live" || item.publishAt !== date) continue;
+      if (item.status === "live") corpusLive++;
+      else corpusScheduled++;
+      const actualDate = item.publishedAt || item.publishAt;
+      if (item.status !== "live" || actualDate !== date) continue;
       byLocale[locale.name] = (byLocale[locale.name] || 0) + 1;
       titles.push({ locale: locale.name, slug: item.slug, title: item.article?.title || item.slug });
     }
   }
   const total = Object.values(byLocale).reduce((a, b) => a + b, 0);
-  return { total, byLocale, titles };
+  return { total, byLocale, titles, corpusLive, corpusScheduled };
 }
 
 function topEntries(map, n) {
@@ -393,6 +399,9 @@ export function formatReport({ date, range, summary, published, logFrom, partial
     if (published.titles.length > 8) lines.push(`  …另有 ${published.titles.length - 8} 篇`);
   } else {
     lines.push("当天发帖 0 篇");
+  }
+  if (typeof published.corpusLive === "number") {
+    lines.push(`指南库存：已上线 ${published.corpusLive} 篇 / 待发 ${published.corpusScheduled ?? 0} 篇`);
   }
 
   lines.push("");
@@ -468,6 +477,18 @@ async function main() {
   }
 
   if (failures.length) process.exitCode = 1;
+
+  // The board reads this file only. Write it before the webhook call so a failed
+  // delivery cannot throw away a snapshot that was already computed. A snapshot
+  // failure must not block the report itself. Always use wall-clock time: an
+  // explicit `--date` backfill must not replace "today" on the board.
+  // Static import, not import() from inside main: this file's top-level await is
+  // the module evaluation, and a dynamic import back into it never settles.
+  try {
+    await writeTrafficSnapshot({ now: Date.now() });
+  } catch (error) {
+    console.error(`[report] traffic snapshot failed: ${error.message}`);
+  }
 
   if (has("--send")) {
     const { notifyFeishu } = await import("./notify.mjs");

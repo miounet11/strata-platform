@@ -3,48 +3,43 @@
 #
 #   /opt/stratat/scripts/content/daily-guides.sh [--no-build]
 #
-# 1. write the articles that are scheduled for today (LLM, per locale)
-# 2. validate them — nothing ships if the gate fails
-# 3. flip due scheduled → live
-# 4. rebuild the site so the new pages are served
-#
-# Images are NOT generated here: the image worker lives on a private-network cluster that this
-# host cannot reach. They are produced on the workstation and committed to the repo.
+# Pipeline:
+#   1. Local preflight (disk, plan, outDir, mediaDir) — never blocked by missing LLM creds
+#   2. Discover new topics: radar.mjs --merge (HF/GH/sitemaps) + mine-topics.mjs --merge (releases/issues/traffic)
+#   3. If LLM creds pass preflight: generate due articles (publishAt <= today), demand-prioritized
+#   4. Ensure every written article has a hero cover (AI WebP if available, deterministic SVG fallback otherwise)
+#   5. Verify quality gate (verify.mjs)
+#   6. Snapshot corpus, then publish due items (paced via PUBLISH_DAILY_CAP)
+#   7. Refresh live site instantaneously via POST /api/revalidate (falling back to deploy-www.sh only if needed)
+#   8. Submit newly published URLs to IndexNow
 set -uo pipefail
 
-ROOT=/opt/stratat
+ROOT="${STRATAT_ROOT:-/opt/stratat}"
 cd "$ROOT" || exit 1
-LOG=/var/log/stratat-guides.log
+LOG="${STRATAT_GUIDES_LOG:-/var/log/stratat-guides.log}"
 exec >>"$LOG" 2>&1
 echo "=== $(date -Is) daily-guides start ==="
 
-# Credentials come from the host env file, never from this script. The previous version carried
-# a literal `sk-...` in the `${VAR:-default}` slot, which shipped a live API key to every clone
-# and kept it in git history. `/opt/stratat/.env` is gitignored and root-owned.
-#
-# This has to load *before* the webhook default below, or an operator who edits .env to point
-# alerts elsewhere would have no effect: the value would already be captured.
+# Prevent overlapping scheduled runs (e.g. if an LLM wave runs long).
+if command -v flock >/dev/null 2>&1; then
+  GUIDES_LOCK="${STRATAT_GUIDES_LOCK:-/run/lock/stratat-daily-guides.lock}"
+  [ -d /run/lock ] && [ -w /run/lock ] || GUIDES_LOCK="${TMPDIR:-/tmp}/stratat-daily-guides.lock"
+  exec 8>"$GUIDES_LOCK" 2>/dev/null || true
+  if ! flock -n 8 2>/dev/null; then
+    echo "another daily-guides.sh run holds $GUIDES_LOCK — skipping overlap cleanly"
+    exit 0
+  fi
+fi
+
 if [ -f "$ROOT/.env" ]; then
   set -a
   . "$ROOT/.env"
   set +a
 fi
 
-# Nobody is watching this job: it runs from cron at 06:45 and a failure only lands in a log
-# file on a host no one has open. Two things therefore have to hold. (1) A step that fails must
-# make the script fail — the original version ran `node ...; echo "exit=$?"`, which recorded the
-# status and then carried on, so a publish failure still ended with exit 0 and an empty log line
-# looked like success. (2) The failure must reach a person, which is what the webhook is for.
-#
-# The webhook URL is the default here on purpose: if `.env` is missing or truncated, a silent
-# "no notification" is the one outcome we cannot detect later. A hook is a write endpoint, not a
-# credential — it can post messages, not read anything.
 FEISHU_WEBHOOK_URL="${FEISHU_WEBHOOK_URL:-https://open.feishu.cn/open-apis/bot/v2/hook/b5626c22-0a4e-467d-885f-585c3852ae77}"
 
-# Set by the failure path; the EXIT trap reads it to explain *why*, not just that something broke.
 FAIL_REASON=""
-# Counted, not acted on immediately: a failed item should not throw away the articles that were
-# written successfully. The count turns into a non-zero exit (and therefore an alert) at the end.
 GENERATE_FAILURES=0
 
 fail() {
@@ -52,19 +47,6 @@ fail() {
   exit "${2:-1}"
 }
 
-# Keep a timestamped copy of the article corpus before anything publishes.
-#
-# There is no other recovery path. `scripts/content/out/` is the only copy of every generated
-# article — it is not in git (the tree is 6.3 MB per snapshot and rewritten daily), and the
-# build reads it in place. An `rsync --delete` from a workstation, a bad generate run, or a
-# mistaken cleanup therefore destroys articles permanently. cleanyourtv hit exactly this case
-# and its runner notes it by name; this host had no equivalent.
-#
-# Retention is 20 copies. At 6.3 MB each that is ~126 MB against 75 GB free, so the cost is
-# noise, while 20 days is long enough to notice a loss and recover it.
-#
-# Snapshots live under /var/lib, not the repo: `deploy-www.sh` and any future `git clean` must
-# never be able to reach them.
 SNAPSHOT_ROOT=/var/lib/stratat-content-snapshots
 SNAPSHOT_KEEP=20
 
@@ -74,33 +56,23 @@ snapshot_content() {
   dir="$SNAPSHOT_ROOT/$(date -u +%Y%m%dT%H%M%SZ)"
   mkdir -p "$dir" || { echo "WARNING: cannot create $dir — no snapshot taken"; return 0; }
   rsync -a "$ROOT/scripts/content/out/" "$dir/" || {
-    # Not fatal: a snapshot failing must not stop today's publication. It is reported so the
-    # loss of the recovery path is visible rather than silently assumed.
     echo "WARNING: content snapshot incomplete at $dir"
     return 0
   }
   count=$(find "$dir" -name '*.json' | wc -l)
   echo "content snapshot: $dir ($count articles)"
-  # `ls -d */` sorts lexically, and the directory name is a UTC timestamp, so the oldest copies
-  # are first. Deleting only beyond the newest SNAPSHOT_KEEP keeps a rolling window.
   ls -1d "$SNAPSHOT_ROOT"/*/ 2>/dev/null | sort | head -n "-$SNAPSHOT_KEEP" | xargs -r rm -rf
 }
 
-# Sending must never be able to mask the original failure. If curl or DNS is down, the alert is
-# lost but the exit code and the log tail are still on disk, so the job reports the same failure
-# with or without the webhook.
 send_alert() {
   local reason="$1" code="$2" when host tail20 text
   when=$(date -Is)
   host=$(hostname)
-  # 20 lines is enough to see the error without turning the card into a wall of text.
   tail20=$(tail -n 20 "$LOG" 2>/dev/null | cut -c1-400)
-  text=$(printf '【Strata 发布失败】\n原因: %s\n主机: %s\n时间: %s\n退出码: %s\n\n最近日志:\n%s' \
+  text=$(printf '【Strata 内容管线告警】\n原因: %s\n主机: %s\n时间: %s\n退出码: %s\n\n最近日志:\n%s' \
     "$reason" "$host" "$when" "$code" "$tail20")
 
-  # Logged as well as sent: when an alert is delivered but says the wrong thing, the log is the
-  # only place to see what was actually pushed.
-  echo "[alert] 发送失败通知: $reason (exit=$code)"
+  echo "[alert] 发送通知: $reason (exit=$code)"
 
   if ALERT_TEXT="$text" ALERT_URL="$FEISHU_WEBHOOK_URL" /usr/bin/node -e '
     const text = process.env.ALERT_TEXT;
@@ -114,7 +86,6 @@ send_alert() {
       .then(async (r) => {
         const body = await r.text();
         console.log(`[alert] feishu HTTP ${r.status} ${body.slice(0, 200)}`);
-        // A 200 with code!=0 is a rejected message, not a delivered one.
         try {
           if (JSON.parse(body).code !== 0) process.exit(3);
         } catch { process.exit(3); }
@@ -138,132 +109,106 @@ on_exit() {
 }
 trap on_exit EXIT
 
-# Run the full precondition check before any generation. This replaces the API-key-only guard
-# that used to live here: a key being present says nothing about whether the endpoint answers or
-# whether the model is still served, and those two failures cost an hour of per-article retries
-# before the publish gate finally reports "nothing written". preflight also covers the local
-# inputs generation reads in place (plan.json, out/, media, disk), whose absence fails the same
-# late way.
-/usr/bin/node scripts/content/preflight.mjs
-preflight_status=$?
-if [ "$preflight_status" -ne 0 ]; then
-  fail "前置检查未通过（preflight.mjs exit=$preflight_status），已拒绝运行" 1
+# 1. Local preconditions (disk, plan.json, out/, media/) — always enforced.
+/usr/bin/node scripts/content/preflight.mjs --local-only
+local_preflight=$?
+if [ "$local_preflight" -ne 0 ]; then
+  fail "本地前置检查未通过（preflight --local-only exit=$local_preflight）" 1
 fi
+
 export CONTENT_CONCURRENCY="${CONTENT_CONCURRENCY:-3}"
-
+# Cadence tuned for 2x/day execution (06:45 & 18:45 UTC):
+#   - up to 10 due articles/locale/run (max 20/locale/day once LLM creds are enabled)
+#   - up to 25 published articles/run (= 50/day steady ramp, avoids crawl-budget bursts)
+PER_LOCALE_LIMIT="${CONTENT_PER_LOCALE_LIMIT:-10}"
+PUBLISH_CAP="${PUBLISH_DAILY_CAP:-25}"
 today=$(date -u +%F)
+run_started_iso=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
-# Today's locales come from the plan, so the schedule lives in one place.
-locales=$(/usr/bin/node --input-type=module -e '
-  import plan from "/opt/stratat/scripts/content/plan.json" with { type: "json" };
+# Roll the base schedule forward whenever all non-radar slots have expired.
+remaining=$(/usr/bin/node --input-type=module -e '
+  import { readFileSync } from "node:fs";
+  const plan = JSON.parse(readFileSync("scripts/content/plan.json", "utf8"));
   const t = new Date().toISOString().slice(0, 10);
-  const set = new Set(plan.items.filter((a) => a.publishAt === t).map((a) => a.locale));
-  console.log([...set].join(" "));
+  console.log(plan.items.filter((a) => a.publishAt >= t).length);
 ')
-
-if [ -z "$locales" ]; then
-  # An empty day is the one failure that looks exactly like success: the script exits 0, nothing
-  # is written, and the site quietly stops growing — which is what happened from 2026-10-29 while
-  # the plan still ended on 2026-10-28.
-  #
-  # Rolling the schedule forward is the fix, not alerting about it. Every article already written
-  # is skipped by generate.mjs on the output file, so re-planning from today only moves items that
-  # have no JSON yet: days that are already behind us carry no work and nothing is re-generated.
-  # Keep the old plan first, because a re-plan rewrites every publishAt and that is the only
-  # record of what was originally intended.
-  remaining=$(/usr/bin/node --input-type=module -e '
-    import plan from "/opt/stratat/scripts/content/plan.json" with { type: "json" };
-    console.log(plan.items.filter((a) => a.publishAt >= new Date().toISOString().slice(0, 10)).length);
-  ')
-
-  if [ "${remaining:-0}" -eq 0 ]; then
-    echo "schedule exhausted — rolling the plan forward from $today"
-    cp scripts/content/plan.json "scripts/content/.plan.${today}.json" 2>/dev/null || true
-    /usr/bin/node scripts/content/plan.mjs
-    plan_status=$?
-    echo "replan exit=$plan_status"
-    if [ "$plan_status" -ne 0 ]; then
-      fail "排程已用尽且自动续期失败（plan.mjs exit=$plan_status），站点不会再有新文章" 1
-    fi
-    # Re-read: the plan just changed underneath the locale query above.
-    locales=$(/usr/bin/node --input-type=module -e '
-      import plan from "/opt/stratat/scripts/content/plan.json" with { type: "json" };
-      const t = new Date().toISOString().slice(0, 10);
-      const set = new Set(plan.items.filter((a) => a.publishAt === t).map((a) => a.locale));
-      console.log([...set].join(" "));
-    ')
-    if [ -z "$locales" ]; then
-      fail "排程续期后仍无 $today 的条目，需人工检查 plan.mjs" 1
-    fi
-  else
-    echo "no locales scheduled for $today — nothing to write ($remaining item(s) still queued for later dates)"
+if [ "${remaining:-0}" -eq 0 ]; then
+  echo "schedule exhausted — rolling the plan forward from $today"
+  cp scripts/content/plan.json "scripts/content/.plan.${today}.json" 2>/dev/null || true
+  /usr/bin/node scripts/content/plan.mjs
+  plan_status=$?
+  echo "replan exit=$plan_status"
+  if [ "$plan_status" -ne 0 ]; then
+    fail "排程已用尽且自动续期失败（plan.mjs exit=$plan_status）" 1
   fi
 fi
 
-# Radar runs before the locale queue is turned into articles. Its whole value is timing: a name is
-# worth a page while it is still rising, so it has to become a plan item today, not sit in
-# radar.json. --merge appends today-dated items; generate.mjs then writes them like any other and
-# publish.mjs releases them the same way. A dead source must not stop the day's scheduled work, so
-# a failure here is reported and carried, never fatal.
+# 2. Topic discovery (zero LLM credentials required — always runs).
 /usr/bin/node scripts/content/radar.mjs --merge
 radar_status=$?
 echo "radar exit=$radar_status"
 if [ "$radar_status" -ne 0 ]; then
-  echo "WARNING: radar reported a problem (exit=$radar_status); scheduled articles still run"
+  echo "WARNING: radar reported a problem (exit=$radar_status); continuing"
 fi
 
-# Re-read the locale list after merging. `locales` above was computed before the radar appended
-# today-dated items, so a locale that only the radar has work for was never generated: the item
-# landed in the plan, waited for nothing, and was picked up days later or not at all. This is the
-# whole point of running the radar *before* generation, so the list has to be recomputed here.
-radar_locales=$(/usr/bin/node --input-type=module -e '
-  import plan from "/opt/stratat/scripts/content/plan.json" with { type: "json" };
-  const t = new Date().toISOString().slice(0, 10);
-  const set = new Set(plan.items.filter((a) => a.publishAt === t && a.status === "scheduled").map((a) => a.locale));
-  console.log([...set].join(" "));
-')
-# Union, never a replacement: the radar can only add locales, and dropping one that was already
-# queued would trade one silent gap for another.
-if [ -n "$radar_locales" ]; then
-  locales=$(printf '%s\n%s\n' ${locales} $radar_locales | tr ' ' '\n' | grep -v '^$' | sort -u | tr '\n' ' ')
+/usr/bin/node scripts/content/mine-topics.mjs --merge
+mine_status=$?
+echo "mine-topics exit=$mine_status"
+if [ "$mine_status" -ne 0 ]; then
+  echo "WARNING: mine-topics reported a problem (exit=$mine_status); continuing"
 fi
 
-if [ -n "$locales" ]; then
-  echo "writing for: $locales"
-  for locale in $locales; do
-    /usr/bin/node scripts/content/generate.mjs --locale "$locale"
-    status=$?
-    echo "generate $locale exit=$status"
-    # generate.mjs exits non-zero when *any* item failed, even if others were written. Failing
-    # the whole run right here would throw away the articles that did succeed, so the count is
-    # carried to the end instead: verify still gates what ships, and the non-zero exit still
-    # reaches the webhook. It is not downgraded to a warning — that was the bug.
-    if [ "$status" -ne 0 ]; then
-      GENERATE_FAILURES=$((GENERATE_FAILURES + 1))
-      echo "ERROR: generate $locale reported failures (exit=$status)"
-    fi
-  done
+# 3. LLM generation (runs only if LLM preflight passes; missing creds do NOT block publishing backlog).
+LLM_READY=0
+if /usr/bin/node scripts/content/preflight.mjs; then
+  LLM_READY=1
+else
+  echo "WARNING: LLM preflight failed — skipping new generation, continuing cover/publish/revalidate for queued articles"
 fi
 
-# Illustrate before gating. `publish.mjs` refuses to publish an article with no hero image, so
-# without this step every newly written article waits forever and the run ends having published
-# nothing — the images were only ever produced by hand from the workstation. The gateway path is
-# used automatically because CLUSTER_HOST is unset on this host.
-/usr/bin/node scripts/content/images.mjs
+if [ "$LLM_READY" -eq 1 ]; then
+  # Demand-ordered locales with any due unwritten item (publishAt <= today, catching up missed days).
+  locales=$(/usr/bin/node --input-type=module -e '
+    import { existsSync, readFileSync } from "node:fs";
+    const plan = JSON.parse(readFileSync("scripts/content/plan.json", "utf8"));
+    const t = new Date().toISOString().slice(0, 10);
+    const priority = ["en", "zh", "ja", "de", "fr", "es", "pt"];
+    const pending = new Set(
+      plan.items
+        .filter((a) => (!a.publishAt || a.publishAt <= t) && !existsSync(`scripts/content/out/${a.locale}/${a.slug}.json`))
+        .map((a) => a.locale),
+    );
+    const ordered = priority.filter((l) => pending.has(l));
+    for (const l of pending) if (!ordered.includes(l)) ordered.push(l);
+    console.log(ordered.join(" "));
+  ')
+  if [ -n "$locales" ]; then
+    echo "writing due articles (limit=${PER_LOCALE_LIMIT}/locale) for: $locales"
+    for locale in $locales; do
+      /usr/bin/node scripts/content/generate.mjs --locale "$locale" --due-only --limit "$PER_LOCALE_LIMIT"
+      status=$?
+      echo "generate $locale exit=$status"
+      if [ "$status" -ne 0 ]; then
+        GENERATE_FAILURES=$((GENERATE_FAILURES + 1))
+        echo "ERROR: generate $locale reported failures (exit=$status)"
+      fi
+    done
+  else
+    echo "all due plan items already have generated JSON on disk"
+  fi
+fi
+
+# 4. Hero covers (AI WebP when backend available, deterministic editorial SVG fallback otherwise — zero starvation).
+/usr/bin/node scripts/content/images.mjs --fallback-svg
 images_status=$?
 echo "images exit=$images_status"
 if [ "$images_status" -ne 0 ]; then
-  # Not fatal: a gateway hiccup on one prompt must not block the articles that do have images.
-  # Any article still missing one is held by publish.mjs, which reports the count below.
-  echo "WARNING: images reported failures (exit=$images_status); unillustrated articles will wait"
+  echo "WARNING: images reported failures (exit=$images_status); continuing"
 fi
 
-# Must match the base deploy-www.sh builds with, or the gate checks the wrong place: verify probes
-# the URL the page will request, so a mismatch here either fails healthy articles (CDN base, files
-# only on disk) or passes broken ones. Both scripts now default to serving media from this host's
-# public/media; export a base to move them behind a CDN.
 export NEXT_PUBLIC_MEDIA_BASE="${NEXT_PUBLIC_MEDIA_BASE-}"
 
+# 5. Quality gate.
 /usr/bin/node scripts/content/verify.mjs
 verify_status=$?
 echo "verify exit=$verify_status (media base: ${NEXT_PUBLIC_MEDIA_BASE:-<local public/>})"
@@ -271,9 +216,10 @@ if [ "$verify_status" -ne 0 ]; then
   fail "内容质量门禁未通过（verify.mjs exit=$verify_status），本次不发布" 1
 fi
 
+# 6. Snapshot & paced publish.
 snapshot_content
 
-publish_out=$(/usr/bin/node scripts/content/publish.mjs 2>&1)
+publish_out=$(/usr/bin/node scripts/content/publish.mjs --limit "$PUBLISH_CAP" 2>&1)
 publish_status=$?
 echo "$publish_out"
 echo "publish exit=$publish_status"
@@ -281,49 +227,55 @@ if [ "$publish_status" -ne 0 ]; then
   fail "发布步骤失败（publish.mjs exit=$publish_status）" 1
 fi
 
-# Exit 0 with nothing published is the failure mode that hides: on 2026-10-22 all 131 due
-# articles were held for a missing hero image and the run still reported success. Alert, but do
-# not abort — a starved day should not stop the deploy of whatever did make it through.
 starved=$(printf '%s\n' "$publish_out" | grep -m1 '^STARVED ' || true)
 if [ -n "$starved" ]; then
-  echo "WARN: 今天有到期内容但没有一篇能发布——${starved#STARVED }"
+  echo "WARN: 有到期内容被缺图拦下——${starved#STARVED }"
   /usr/bin/node "$ROOT/scripts/notify.mjs" \
     --stage "daily-guides/starved" \
-    --reason "有到期文章，但全部因缺图被拦下，今天没有新内容上线" \
+    --reason "有到期文章因缺图被拦下" \
     --raw "$publish_out" || true
 fi
 
+published_paths=$(printf '%s\n' "$publish_out" | grep -m1 '^PUBLISHED_PATHS ' | sed 's/^PUBLISHED_PATHS //' || true)
+
+# 7. Make new guides live: prefer <1s zero-rebuild ISR revalidation; fall back to full deploy only if needed.
 if [ "${1:-}" != "--no-build" ]; then
-  # One deploy entry point: staging build, atomic swap, restart only on success.
-  "$ROOT/scripts/deploy-www.sh"
-  deploy_status=$?
-  echo "deploy exit=$deploy_status"
-  # 75 is deploy-www.sh's "another deploy holds the lock". Nothing was built and nothing is
-  # broken — the content is already published, it just has to wait for the other build. Alerting
-  # here would page someone for a healthy box every time a manual deploy overlaps the timer.
-  if [ "$deploy_status" -eq 75 ]; then
-    echo "WARN: 另一个部署正在进行，本次跳过构建；内容已发布，等待下一次部署上线"
-  elif [ "$deploy_status" -ne 0 ]; then
-    fail "站点构建或部署失败（deploy-www.sh exit=$deploy_status），线上仍是上一版" 1
+  REVALIDATED=0
+  if [ "${DAILY_GUIDES_FULL_BUILD:-0}" != "1" ]; then
+    if [ -n "$published_paths" ]; then
+      /usr/bin/node "$ROOT/scripts/revalidate.mjs" --scope guides --paths "$published_paths"
+    else
+      /usr/bin/node "$ROOT/scripts/revalidate.mjs" --scope guides
+    fi
+    reval_status=$?
+    echo "revalidate exit=$reval_status"
+    if [ "$reval_status" -eq 0 ]; then
+      REVALIDATED=1
+    else
+      echo "WARN: instant revalidation unavailable (exit=$reval_status) — falling back to deploy-www.sh"
+    fi
+  fi
+
+  if [ "$REVALIDATED" -eq 0 ] && [ -n "$published_paths" ]; then
+    "$ROOT/scripts/deploy-www.sh"
+    deploy_status=$?
+    echo "deploy exit=$deploy_status"
+    if [ "$deploy_status" -eq 75 ]; then
+      echo "WARN: 另一个部署正在进行，本次跳过构建；内容已发布，等待下一次部署上线"
+    elif [ "$deploy_status" -ne 0 ]; then
+      fail "站点构建或部署失败（deploy-www.sh exit=$deploy_status），线上仍是上一版" 1
+    fi
   fi
 fi
 
-# Tell the indexers what just shipped, and only now: submitting before the build would hand
-# crawlers a URL that still 404s, which is worse than not submitting. This step did not exist in
-# this job at all — `indexnow-submit.mjs` was only reachable through `content-grow.mjs` and
-# `freshness-watch.mjs`, so every article published here waited for a crawler to find it.
-# For a radar article, whose whole value is being indexed while the name is still rising, that
-# wait can outlast the signal. Not fatal: a failed submit costs discovery time, not the run.
-/usr/bin/node "$ROOT/scripts/indexnow-submit.mjs"
+# 8. Notify IndexNow of newly shipped guides.
+/usr/bin/node "$ROOT/scripts/indexnow-submit.mjs" --since "$run_started_iso"
 indexnow_status=$?
 echo "indexnow exit=$indexnow_status"
 if [ "$indexnow_status" -ne 0 ]; then
   echo "WARNING: IndexNow 提交失败（exit=$indexnow_status）；文章已上线，只是收录变慢"
 fi
 
-# Content that failed to generate is a real failure even when verify passes on what exists:
-# the schedule expects those articles today and they are not there. Checked last so the alert
-# names the cause rather than a downstream symptom, but before the success line is printed.
 if [ "$GENERATE_FAILURES" -ne 0 ]; then
   fail "有 $GENERATE_FAILURES 个语言的条目生成失败（详见上方 ERROR 与 .state.jsonl）" 1
 fi

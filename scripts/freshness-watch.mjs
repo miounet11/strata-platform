@@ -256,6 +256,13 @@ if (process.env.FRESHNESS_SKIP_SYNC === "1") {
       appendLog("sync", warn);
     }
   }
+  if (process.env.FRESHNESS_SKIP_DOWNLOADS !== "1") {
+    if (!run("node", ["scripts/sync-downloads.mjs"])) {
+      const warn = "WARN: sync-downloads failed";
+      log(warn);
+      appendLog("sync", warn);
+    }
+  }
 }
 
 // ---- 2. compare -----------------------------------------------------------
@@ -292,24 +299,38 @@ if (!changed) {
   appendLog(firstRun ? "first-run" : "rebuild-start", detail);
 }
 
-// ---- 3. rebuild + restart (state advances only after success) -------------
-if (!buildWww()) {
-  alertBuildFailed(`bash scripts/deploy-www.sh exit=${lastStatus}（${BUILD_ATTEMPTS} 次尝试均失败）`);
-  process.exit(0);
+// ---- 3. refresh live site (prefer instant zero-rebuild ISR revalidation) ---
+const refreshStartedIso = new Date().toISOString();
+let refreshed = false;
+
+if (process.env.FRESHNESS_FORCE_REBUILD !== "1") {
+  const reval = runCapture("node", ["scripts/revalidate.mjs", "--scope", "releases"]);
+  if (reval.code === 0) {
+    const detail = `instant revalidation ok (top=${next.topTag}): ${reval.stdout.trim()}`;
+    log(detail);
+    appendLog("revalidate-ok", detail);
+    refreshed = true;
+  } else {
+    const detail = `instant revalidation unavailable (exit=${reval.code}): ${(reval.stderr || reval.stdout).trim().slice(0, 180)} — falling back to full build`;
+    log(detail);
+    appendLog("revalidate-fallback", detail);
+  }
 }
-appendLog("rebuild-ok", `www build ok (top=${next.topTag})`);
+
+if (!refreshed) {
+  if (!buildWww()) {
+    alertBuildFailed(`bash scripts/deploy-www.sh exit=${lastStatus}（${BUILD_ATTEMPTS} 次尝试均失败）`);
+    process.exit(0);
+  }
+  appendLog("rebuild-ok", `www build ok (top=${next.topTag})`);
+}
+
 clearBuildFailedMark();
 writeFileSync(STATE, JSON.stringify(next, null, 2));
 
-// deploy-www.sh already copied `public/` and `.next/static` into the standalone tree and
-// restarted pm2 after the swap. Nothing to restart from here.
-
 // ---- 4. notify IndexNow ---------------------------------------------------
-// Record what the submission actually returned, not just that it ran. `"IndexNow pinged."` could
-// not distinguish "200, 412 URLs accepted" from "403, key rejected" — both left the same line in
-// the log, so a failing submission looked identical to a working one. The submitter prints
-// `indexnow <status> — <n> urls` and exits non-zero on a rejected status; capture and log that.
-const indexnow = runCapture("node", ["scripts/indexnow-submit.mjs"]);
+const sinceArgs = changed && prev.topTag ? ["--since", new Date(Date.now() - 24 * 3600_000).toISOString()] : [];
+const indexnow = runCapture("node", ["scripts/indexnow-submit.mjs", ...sinceArgs]);
 const indexnowLine = indexnow.stdout.split("\n").find((line) => line.startsWith("indexnow")) ?? "";
 if (indexnow.code === 0) {
   const detail = indexnowLine || "IndexNow submitted (no status line)";

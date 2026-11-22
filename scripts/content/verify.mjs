@@ -90,8 +90,8 @@ for (const a of articles) {
   // An article that has not been illustrated yet is a task, not a defect: images are produced
   // on the workstation, so a freshly written article legitimately has none. The hard error is a
   // manifest entry that points at a file which is not there.
-  const id = `guide-${a.slug}`;
-  const asset = manifest.assets[id];
+  const asset =
+    manifest.assets[`guide-${a.locale}-${a.slug}`] ?? manifest.assets[`guide-${a.slug}`];
   if (!asset?.path) awaitingImage.push(`${a.locale}/${a.slug}`);
   else imageChecks.push({ a, path: asset.path });
 }

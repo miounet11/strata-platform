@@ -1,11 +1,12 @@
 // Flip scheduled articles to live on their publish day.
 //
-//   node scripts/content/publish.mjs            # apply today's batch
-//   node scripts/content/publish.mjs --dry-run  # show what would change
-//   node scripts/content/publish.mjs --all      # ignore publishAt (first launch / local preview)
+//   node scripts/content/publish.mjs                        # apply due items
+//   node scripts/content/publish.mjs --locale en --limit 25 # paced publishing
+//   node scripts/content/publish.mjs --dry-run              # preview only
+//   node scripts/content/publish.mjs --all                  # ignore publishAt
 //
-// Articles are written by generate.mjs as `scheduled`. Only `live` articles are rendered, so
-// this is the single gate that keeps ~1000 pages from all appearing on the same day.
+// Priority when `--limit` is active: high-demand locales (en → zh → ja → de → fr → es → pt)
+// and freshest kinds (radar / release / troubleshoot / task / compare / hardware / concept / local).
 import { readdirSync, readFileSync, renameSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
@@ -13,9 +14,23 @@ const ROOT = new URL("../..", import.meta.url).pathname;
 const OUT = join(ROOT, "scripts/content/out");
 const MANIFEST = join(ROOT, "apps/www/src/data/media-manifest.json");
 const args = process.argv.slice(2);
+const arg = (name) => {
+  const i = args.indexOf(`--${name}`);
+  return i >= 0 ? args[i + 1] : null;
+};
 const dryRun = args.includes("--dry-run");
 const all = args.includes("--all");
+const onlyLocale = arg("locale");
+const limit = arg("limit") ? Math.max(1, Number(arg("limit"))) : Infinity;
 const today = new Date().toISOString().slice(0, 10);
+
+const LOCALE_PRIORITY = ["en", "zh", "ja", "de", "fr", "es", "pt"];
+const KIND_PRIORITY = ["radar", "release", "troubleshoot", "task", "compare", "hardware", "concept", "local"];
+
+function rankOf(list, value) {
+  const idx = list.indexOf(value);
+  return idx === -1 ? list.length : idx;
+}
 
 function writeAtomic(path, data) {
   const tmp = `${path}.${process.pid}.tmp`;
@@ -28,53 +43,87 @@ if (!existsSync(OUT)) {
   process.exit(1);
 }
 
-// An article without its hero image renders a placeholder, which is worse than publishing a day
-// later. Images are produced on the workstation (the image worker is on a private network this
-// host cannot reach) and arrive with the next deploy, so hold those articles back instead.
 const manifest = existsSync(MANIFEST)
   ? JSON.parse(readFileSync(MANIFEST, "utf8")).assets ?? {}
   : {};
 
-let live = 0, pending = 0, already = 0, noImage = 0;
-/** Due today (or overdue) but held back for a missing hero image. */
+function hasCover(item) {
+  return Boolean(
+    manifest[`guide-${item.locale}-${item.slug}`]?.path ??
+      manifest[`guide-${item.slug}`]?.path,
+  );
+}
+
+let live = 0;
+let pending = 0;
+let already = 0;
+let noImage = 0;
+let deferredByCap = 0;
 const blockedByImage = [];
+const candidates = [];
 const byLocale = {};
+const publishedPaths = [];
 
 for (const entry of readdirSync(OUT, { withFileTypes: true })) {
   if (!entry.isDirectory()) continue;
+  if (onlyLocale && entry.name !== onlyLocale) continue;
   const dir = join(OUT, entry.name);
   for (const file of readdirSync(dir)) {
     if (!file.endsWith(".json")) continue;
     const path = join(dir, file);
     const item = JSON.parse(readFileSync(path, "utf8"));
-    if (item.status === "live") { already++; continue; }
+    if (item.status === "live") {
+      already++;
+      continue;
+    }
 
     const due = all || !item.publishAt || item.publishAt <= today;
-    if (!due) { pending++; continue; }
+    if (!due) {
+      pending++;
+      continue;
+    }
 
-    if (!manifest[`guide-${item.slug}`]?.path) {
+    if (!hasCover(item)) {
       noImage++;
       blockedByImage.push({ slug: item.slug, locale: item.locale, publishAt: item.publishAt });
       continue;
     }
 
-    item.status = "live";
-    item.publishedAt = today;
-    if (!dryRun) writeAtomic(path, `${JSON.stringify(item, null, 2)}\n`);
-    live++;
-    byLocale[item.locale] = (byLocale[item.locale] ?? 0) + 1;
+    candidates.push({ path, item });
   }
 }
 
+candidates.sort(
+  (a, b) =>
+    rankOf(LOCALE_PRIORITY, a.item.locale) - rankOf(LOCALE_PRIORITY, b.item.locale) ||
+    rankOf(KIND_PRIORITY, a.item.kind) - rankOf(KIND_PRIORITY, b.item.kind) ||
+    (a.item.order ?? 0) - (b.item.order ?? 0),
+);
+
+for (const { path, item } of candidates) {
+  if (live >= limit) {
+    deferredByCap++;
+    continue;
+  }
+  item.status = "live";
+  item.publishedAt = today;
+  if (!dryRun) writeAtomic(path, `${JSON.stringify(item, null, 2)}\n`);
+  live++;
+  byLocale[item.locale] = (byLocale[item.locale] ?? 0) + 1;
+  publishedPaths.push(`/${item.locale}/guides/${item.slug}`);
+}
+
 const mode = dryRun ? "would publish" : "published";
-console.log(`${mode} ${live} · already live ${already} · still scheduled ${pending} · waiting for image ${noImage}`);
+console.log(
+  `${mode} ${live} · already live ${already} · still scheduled ${pending + deferredByCap} · waiting for image ${noImage}` +
+    (deferredByCap ? ` (paced cap deferred ${deferredByCap})` : ""),
+);
 for (const [locale, n] of Object.entries(byLocale).sort()) console.log(`  ${locale}: ${n}`);
+if (publishedPaths.length > 0 && !dryRun) {
+  console.log(`PUBLISHED_PATHS ${publishedPaths.join(",")}`);
+}
 if (dryRun) console.log("(dry run — nothing written)");
 
-// A day where articles were due and every one of them was held back is not a quiet day — it is
-// the pipeline starving. On 2026-10-22 this printed `published 0 · waiting for image 131` and
-// exited 0, so the run looked healthy while nothing shipped. Say it in a form the caller can act
-// on, and name a sample so the reason is visible without opening the article files.
 if (!dryRun && live === 0 && blockedByImage.length > 0) {
   console.log(`STARVED blocked_by_image=${blockedByImage.length}`);
   for (const b of blockedByImage.slice(0, 5)) {

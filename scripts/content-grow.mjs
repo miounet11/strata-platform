@@ -48,6 +48,16 @@ if (canEnrich || process.env.ENRICH_FORCE === "1") {
 console.log(`[content-grow] start ${new Date().toISOString()}`);
 for (const [cmd, args] of steps) run(cmd, args);
 
+// Push synced JSON corpora straight into Next ISR caches without a full site rebuild.
+const revalStatus = spawnSync("node", ["scripts/revalidate.mjs", "--scope", "all"], {
+  cwd: ROOT,
+  stdio: "inherit",
+  env: process.env,
+}).status;
+if (revalStatus !== 0) {
+  console.warn(`[content-grow] instant revalidation skipped/failed (exit=${revalStatus})`);
+}
+
 run("node", ["scripts/indexnow-submit.mjs"]);
 
 const stats = {};

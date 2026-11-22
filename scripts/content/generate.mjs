@@ -33,6 +33,7 @@ const arg = (name) => {
 };
 const onlyLocale = arg("locale");
 const onlyKind = arg("kind");
+const dueOnly = args.includes("--due-only");
 const limit = arg("limit") ? Number(arg("limit")) : Infinity;
 
 
@@ -56,6 +57,8 @@ const KIND_BRIEF = {
   concept: "an explainer for one concept in local LLM deployment",
   radar:
     "a page about a newly released model that people have just started searching for. Explain what it is for, what hardware it needs to run locally, and how the reader can measure it on their own machine. Never invent a benchmark, a download count or a release date",
+  release:
+    "a practical release guide covering what changed in this Strata engine version, who should upgrade, and how to verify performance after updating. Use only the release tag, date, asset count and highlights supplied in the facts block — never invent features or speedups",
 };
 
 function factsBlock(item) {
@@ -99,11 +102,11 @@ function buildPrompt(item) {
     `  title: string, 50-62 characters, contains the subject, no clickbait, no site name. Over 100 characters is rejected`,
     `  description: string, 120-155 characters, a real summary for a search result. Over 200 characters is rejected — count before answering`,
     `  body: string, markdown, at least 900 characters, using these sections:`,
-    `        1. a 2-3 sentence answer-first opening (the conclusion, before any preamble)`,
-    `        2. "## " heading sections that explain the why and the how`,
+    `        1. a 2-3 sentence answer-first opening paragraph. It must start the body with no heading above it, state the conclusion in the first sentence, and be quotable on its own`,
+    `        2. "## " heading sections, each beginning with one bold sentence (**like this**) that gives that section's answer, then the explanation`,
     `        3. one markdown table with at least 3 rows built from the measured facts`,
     `        4. one sentence that defines the core term, phrased so it can be quoted on its own`,
-    `  faq: array of 3-5 objects { q, a } where q is a question people actually type into a search box, and a is 1-3 sentences`,
+    `  faq: array of 3-5 objects { q, a } where q is a question people actually type into a search box, and a is 1-3 sentences that answers it in the first sentence (a bare "it depends" opening is rejected)`,
     `  imagePrompt: string, an English prompt for an abstract editorial illustration: dark navy background, teal accent, geometric, absolutely no text or letters, 16:9`,
     "",
     "Rules: describe how the reader measures or checks things on their own machine; base every claim on the facts above; do not promise speed you cannot derive from them; no markdown headings above level 3; do not link to any URL.",
@@ -177,6 +180,27 @@ function repairControlChars(text) {
   return out;
 }
 
+/**
+ * Openings that spend the first sentence saying nothing.
+ *
+ * Kept narrow on purpose: "It depends" is legitimate in sentence two, and a zh answer that opens
+ * with 视情况而定 is the same non-answer as "it depends". A wider pattern would reject real
+ * answers that happen to mention a caveat.
+ */
+const HEDGE_OPENING =
+  /^(?:it\s+depends|that\s+depends|depends\s+on|generally\s+speaking|in\s+most\s+cases|there\s+is\s+no\s+single|视情况而定|看情况|一般来说|这取决于|要看具体情况|一概而论|場合によります|一概には言えません|状況によります)/i;
+
+/**
+ * The first sentence of `text`, respecting the full-width terminators zh/ja use.
+ *
+ * Splitting on "." alone returns the entire zh answer as one "sentence" (nothing in it has a
+ * period), which would make the length and hedge checks meaningless in those locales.
+ */
+function firstSentence(text) {
+  const match = /[^。！？.!?\n]+[。！？.!?]?/.exec(text.trim());
+  return (match?.[0] ?? "").trim();
+}
+
 function parseArticle(raw, slug) {
   const text = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
   const start = text.indexOf("{");
@@ -187,6 +211,24 @@ function parseArticle(raw, slug) {
     if (!obj[key]) throw new Error(`missing ${key}`);
   }
   if (!Array.isArray(obj.faq) || obj.faq.length < 3) throw new Error("need at least 3 FAQ entries");
+
+  // FAQ answers are rendered as `FAQPage` and are the most-quoted part of a page: an answer
+  // engine lifts the `acceptedAnswer` text whole. An answer that opens "It depends on your
+  // setup, but…" is not quotable as an answer, and one that opens with a restatement of the
+  // question spends its first sentence saying nothing. Both were produced regularly. The gate
+  // only checks the opening, because a good answer often qualifies itself in sentence two.
+  for (const [index, entry] of obj.faq.entries()) {
+    const answer = String(entry?.a ?? "").trim();
+    if (!answer) throw new Error(`faq[${index}] has no answer`);
+    const opening = firstSentence(answer);
+    const openingHan = (opening.match(/[\u3400-\u9fff]/g) ?? []).length;
+    if (opening.length + openingHan < 20) {
+      throw new Error(`faq[${index}] first sentence is too short to answer: ${opening}`);
+    }
+    if (HEDGE_OPENING.test(opening)) {
+      throw new Error(`faq[${index}] opens with a hedge instead of an answer: ${opening}`);
+    }
+  }
 
   // 900 characters is a length floor for Latin prose. A Han character carries roughly a word,
   // not a letter, so a zh article at 811 characters is longer-form than an en one at 900 —
@@ -218,12 +260,63 @@ function parseArticle(raw, slug) {
     const variants = [s, s.replace(/-/g, " ")].map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
     const label = new RegExp(`^\\s*(?:${variants.join("|")})\\s*[:：|—–]`, "i");
     if (label.test(title)) throw new Error(`title uses the slug as a label: ${title}`);
+
+    // The label rule above only catches the slug at the start of the title with a colon after it.
+    // 17 of 130 shipped articles put it mid-sentence instead ("Fixing context-truncated error in
+    // Strata local AI", "Understanding KV-Cache for Local LLMs"), and in every one of those the
+    // slug is a run of plain words.
+    //
+    // The rule is therefore limited to slugs without digits. A hardware slug ("rtx5090-iq2-xs")
+    // is a model designation the writer legitimately puts in the sentence — the existing test
+    // asserts exactly that for "RTX 5090 运行 rtx5090-iq2-xs 的性能与功耗实测分析", and rejecting it
+    // would reject the correct title. A word-only slug ("kv-cache", "first-token-slow") has no
+    // such reading: a person writes "KV cache", not a hyphenated lowercase identifier.
+    if (!/\d/.test(s)) {
+      // The slug is interpolated into a pattern, so it is escaped first. Every slug in `plan.json`
+      // is `[a-z0-9_-]` today, but that is a convention of the planner, not a guarantee of this
+      // function — a slug with a `.` would otherwise match any character and quietly widen the rule.
+      const escaped = s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const identifier = new RegExp(`(?:^|[^\\p{L}\\p{N}-])${escaped}(?=$|[^\\p{L}\\p{N}-])`, "u");
+      if (identifier.test(title.toLowerCase())) {
+        throw new Error(`title contains the slug as an identifier: ${title}`);
+      }
+    }
+  }
+
+  // The product is "Strata". "Stratat" is the domain leaking into prose, and it appeared in 43
+  // titles and descriptions because nothing checked the spelling of the brand. The site is the
+  // authority on its own name, and a wrong name is the first thing a reader sees.
+  //
+  // `stratat.com` is *correct* and must survive: the bare-word test alone matches it, because the
+  // dot after "stratat" is a word boundary. So the domain is stripped before the test, and only
+  // the leftover bare "Stratat" is a misspelling.
+  const brandMisspellings = /\bstratat\b/i;
+  for (const [field, value] of [["title", obj.title], ["description", obj.description]]) {
+    const stripped = String(value).replace(/\bstratat\.(?:com|top|dev|io|net)\b/gi, "");
+    if (brandMisspellings.test(stripped)) {
+      throw new Error(`${field} misspells the product as Stratat: ${value}`);
+    }
   }
 
   // Structure is what makes the page extractable by answer engines: headings split it into
   // quotable sections and a table carries the facts. Both are required, not nice to have.
   const headings = (String(obj.body).match(/^#{2,3} /gm) ?? []).length;
   if (headings < 2) throw new Error(`body needs at least 2 headings, got ${headings}`);
+
+  // Answer-first is a hard gate, not a prompt suggestion. A body that opens with a heading makes
+  // an extractor take the first heading as the answer, and a body that opens with preamble ("In
+  // recent years…") gives it a sentence with no claim in it. Both were common before the rule was
+  // enforced: the prompt already asked for an answer-first opening, and the writer still opened
+  // with "## Why this matters" because a heading is the easiest way to start.
+  const opening = bodyText.trimStart();
+  if (opening.startsWith("#")) {
+    throw new Error("body opens with a heading; the answer-first paragraph must come first");
+  }
+  const firstBlock = opening.split(/\n\s*\n/)[0] ?? "";
+  const firstHan = (firstBlock.match(/[\u3400-\u9fff]/g) ?? []).length;
+  if (firstBlock.length + firstHan < 120) {
+    throw new Error(`opening answer too short (${firstBlock.length}, weighted ${firstBlock.length + firstHan})`);
+  }
 
   // Count rows only inside a real table. Counting every line that starts with `|` accepted
   // bodies that never render as a table — five articles (es x2, fr, pt x2) shipped rows like
@@ -327,9 +420,20 @@ async function main() {
     process.exit(2);
   }
   const plan = JSON.parse(readFileSync(PLAN, "utf8"));
-  let queue = plan.items;
+  const today = new Date().toISOString().slice(0, 10);
+  const KIND_PRIORITY = ["radar", "release", "troubleshoot", "task", "compare", "hardware", "concept", "local"];
+  const rankKind = (k) => {
+    const idx = KIND_PRIORITY.indexOf(k);
+    return idx === -1 ? KIND_PRIORITY.length : idx;
+  };
+  let queue = [...plan.items];
   if (onlyLocale) queue = queue.filter((i) => i.locale === onlyLocale);
   if (onlyKind) queue = queue.filter((i) => i.kind === onlyKind);
+  if (dueOnly) queue = queue.filter((i) => !i.publishAt || i.publishAt <= today);
+  // Skip already-written files BEFORE slicing `--limit` so a capped run actually generates new
+  // articles instead of burning its limit on previously generated items.
+  queue = queue.filter((i) => !existsSync(join(OUT, i.locale, `${i.slug}.json`)));
+  queue.sort((a, b) => rankKind(a.kind) - rankKind(b.kind) || (a.order ?? 0) - (b.order ?? 0));
   queue = queue.slice(0, Number.isFinite(limit) ? limit : queue.length);
 
   console.log(`→ ${queue.length} item(s), concurrency ${CONCURRENCY}, model ${MODEL}`);

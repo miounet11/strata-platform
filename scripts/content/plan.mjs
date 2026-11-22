@@ -62,6 +62,12 @@ const TASKS = [
   { slug: "remote-access", en: "Reach your model from another device", zh: "从另一台设备访问本机模型" },
   { slug: "backup-models", en: "Move models between machines", zh: "把模型搬到另一台机器" },
   { slug: "first-week", en: "What the first week actually looks like", zh: "第一周的真实体验" },
+  { slug: "connect-claude-code-local", en: "Connect Claude Code to a local Strata model", zh: "把 Claude Code 接入本地 Strata 模型" },
+  { slug: "connect-cursor-local-llm", en: "Use Cursor IDE with a local OpenAI-compatible model", zh: "Cursor 接入本地 OpenAI 兼容大模型教程" },
+  { slug: "connect-cline-roo-code", en: "Run Cline and Roo Code on local GPUs with zero API bills", zh: "Cline / Roo Code 零 API 账单本地接入指南" },
+  { slug: "strata-vs-ollama", en: "Strata vs Ollama for 100B-class local models", zh: "Strata 对比 Ollama：百亿到千亿参数本地推理选型" },
+  { slug: "strata-vs-vllm", en: "Strata vs vLLM: single-user desktop vs multi-user serving", zh: "Strata 对比 vLLM：桌面单机与多并发服务的取舍" },
+  { slug: "vram-buying-tiers", en: "12 GB vs 16 GB vs 24 GB vs 32 GB VRAM for local LLMs", zh: "12G / 16G / 24G / 32G 显存跑本地大模型怎么选" },
 ];
 
 // D — troubleshooting, grouped from the issues people actually file.
@@ -212,6 +218,8 @@ for (const locale of LOCALES) {
     ["rx7900xtx", "rx9070xt_16gb"], ["rx7900xtx", "rx6900xt_16gb"], ["rtx4090", "rx7900xtx"],
     ["rtx5090", "rx9070xt_16gb"], ["rtx5070", "rx7900xtx"], ["rtxpro6000", "rtx4090"],
     ["macstudio_m5ultra_96", "rtx4090"], ["rtx3090", "dual_rtx3090_24gb"], ["rtxpro6000", "rtx5090"],
+    ["rtx5080", "rx9070xt_16gb"], ["rtx5070", "rtx4070ti_super"], ["ryzen_ai_max_395_128", "macstudio_m5max_128"],
+    ["dgx", "ryzen_ai_max_395_128"], ["dual5060", "rtx4090"],
   ];
   for (const [a, b] of compare) {
     const left = rigBySlug.get(a);
@@ -270,9 +278,10 @@ if (existsSync(existingPlanPath)) {
     .slice(0, 10);
 
   for (const item of previous?.items ?? []) {
-    if (item?.kind !== "radar" || !item.slug || !item.locale) continue;
-    if (item.publishAt && item.publishAt < radarCutoff) continue;
-    const key = `${item.locale}/radar/${item.slug}`;
+    const isDynamic = item?.kind === "radar" || item?.kind === "release" || Boolean(item?.minedFrom);
+    if (!isDynamic || !item.slug || !item.locale) continue;
+    if (item.kind === "radar" && item.publishAt && item.publishAt < radarCutoff) continue;
+    const key = `${item.locale}/${item.kind}/${item.slug}`;
     if (seen.has(key)) continue;
     seen.add(key);
     items.push(item);
@@ -284,12 +293,10 @@ for (const item of items) byLocale[item.locale] = (byLocale[item.locale] ?? 0) +
 const byKind = {};
 for (const item of items) byKind[item.kind] = (byKind[item.kind] ?? 0) + 1;
 
-// Stable ordering, then spread across the week so publishing is paced. Radar items keep the date
-// they were found on: a name is worth a page while it is rising, and re-slotting it into the
-// pacing schedule would hold it for weeks after the signal decayed.
 items.forEach((item, index) => {
   item.order = index;
-  if (item.kind !== "radar") item.publishAt = publishSlot(index, items.length);
+  const keepDate = item.kind === "radar" || item.kind === "release" || Boolean(item.minedFrom);
+  if (!keepDate) item.publishAt = publishSlot(index, items.length);
   item.status = "scheduled";
 });
 

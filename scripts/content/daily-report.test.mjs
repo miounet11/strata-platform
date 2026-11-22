@@ -20,6 +20,7 @@ import {
   collect,
   readLogLines,
 } from "../daily-report.mjs";
+import { siteOf, snapshotFromLines, writeTrafficSnapshot } from "./traffic-board.mjs";
 
 const TZ = "Asia/Shanghai";
 
@@ -425,6 +426,115 @@ test("大日志(5 万行)流式读完且计数正确", async () => {
     assert.equal(out.summary.bots.requests, N / 5);
     assert.equal(out.summary.humans.requests, N - N / 5);
     assert.equal(out.summary.pages.get("/zh"), N / 2);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+const HUMAN = "Mozilla/5.0 Chrome/131";
+// 2026-10-22 18:00 in Asia/Shanghai, still that local day.
+const SNAP_NOW = Date.parse("2026-10-22T10:00:00.000Z");
+
+test("路径首段归入语言站点，其余归其他", () => {
+  assert.equal(siteOf("/zh"), "zh");
+  assert.equal(siteOf("/zh/gpus/rtx-4090"), "zh");
+  assert.equal(siteOf("/en"), "en");
+  assert.equal(siteOf("/ja/a"), "ja");
+  assert.equal(siteOf("/de"), "de");
+  assert.equal(siteOf("/fr/x"), "fr");
+  assert.equal(siteOf("/es"), "es");
+  assert.equal(siteOf("/pt/y"), "pt");
+  assert.equal(siteOf("/"), "other");
+  assert.equal(siteOf("/downloads/app"), "other");
+});
+
+test("流量快照按站点分开人机，排除静态与 RSC，跨两天分桶", () => {
+  const snap = snapshotFromLines([
+    { t: "2026-10-21T02:00:00.000Z", ip: "203.0.113.10", uri: "/zh", ua: HUMAN, status: 200 },
+    { t: "2026-10-21T03:00:00.000Z", ip: "203.0.113.10", uri: "/zh/gpus", ua: HUMAN, status: 200 },
+    { t: "2026-10-22T02:00:00.000Z", ip: "203.0.113.10", uri: "/zh", ua: HUMAN, status: 200 },
+    { t: "2026-10-22T03:00:00.000Z", ip: "203.0.113.11", uri: "/en", ua: "Googlebot/2.1", status: 200 },
+    { t: "2026-10-22T04:00:00.000Z", ip: "203.0.113.12", uri: "/_next/static/x.js", ua: HUMAN, status: 200 },
+    { t: "2026-10-22T04:01:00.000Z", ip: "203.0.113.12", uri: "/_next/data/build/en.json", ua: HUMAN, status: 200 },
+    { t: "not-json", ip: "203.0.113.99", uri: "/zh", ua: HUMAN },
+  ], { now: SNAP_NOW, dayCount: 2 });
+
+  const zh = snap.sites.find((site) => site.site === "zh");
+  const en = snap.sites.find((site) => site.site === "en");
+  assert.equal(zh.today.humanPv, 1);
+  assert.equal(zh.today.humanIps, 1);
+  assert.equal(zh.days7.humanPv, 3);
+  assert.equal(zh.days7.humanIps, 1, "同一 IP 跨天只算一个独立 IP");
+  assert.equal(en.today.botPv, 1);
+  assert.equal(en.today.humanPv, 0);
+  assert.equal(snap.sites.reduce((sum, site) => sum + site.days7.humanPv + site.days7.botPv, 0), 4);
+  assert.deepEqual(snap.trend.map((day) => day.date), ["2026-10-21", "2026-10-22"]);
+  assert.equal(snap.trend[0].humanPv, 2);
+  assert.equal(snap.trend[1].botPv, 1);
+  assert.equal(JSON.stringify(snap).includes("203.0.113"), false);
+});
+
+test("独立 IP 到上限后停止增长，但浏览量继续计", () => {
+  const snap = snapshotFromLines([
+    { t: "2026-10-22T02:00:00.000Z", ip: "203.0.113.1", uri: "/ja", ua: HUMAN, status: 200 },
+    { t: "2026-10-22T02:01:00.000Z", ip: "203.0.113.2", uri: "/ja", ua: HUMAN, status: 200 },
+    { t: "2026-10-22T02:02:00.000Z", ip: "203.0.113.1", uri: "/ja", ua: HUMAN, status: 200 },
+  ], { now: SNAP_NOW, dayCount: 1, ipCap: 1 });
+  const ja = snap.sites.find((site) => site.site === "ja");
+  assert.equal(ja.today.humanPv, 3);
+  assert.equal(ja.today.humanIps, 1);
+  assert.equal(ja.today.humanIpsCapped, true);
+});
+
+test("热门页最多 8 条，溢出后浏览量仍然精确，爬虫最多 4 个", () => {
+  const lines = [];
+  for (let i = 0; i < 10; i++) {
+    for (let n = 0; n < 10 - i; n++) {
+      lines.push({ t: "2026-10-22T02:00:00.000Z", ip: "203.0.113.7", uri: `/de/p${i}`, ua: HUMAN, status: 200 });
+    }
+  }
+  for (let n = 0; n < 5; n++) lines.push({ t: "2026-10-22T03:00:00.000Z", ip: "198.51.100.1", uri: "/de", ua: "Googlebot/2.1", status: 200 });
+  for (let n = 0; n < 4; n++) lines.push({ t: "2026-10-22T03:00:01.000Z", ip: "198.51.100.2", uri: "/de", ua: "Mozilla/5.0 (compatible; Baiduspider/2.0)", status: 200 });
+  for (let n = 0; n < 3; n++) lines.push({ t: "2026-10-22T03:00:02.000Z", ip: "198.51.100.3", uri: "/de", ua: "Mozilla/5.0 (compatible; bingbot/2.0)", status: 200 });
+  for (let n = 0; n < 2; n++) lines.push({ t: "2026-10-22T03:00:03.000Z", ip: "198.51.100.4", uri: "/de", ua: "Bytespider", status: 200 });
+  lines.push({ t: "2026-10-22T03:00:04.000Z", ip: "198.51.100.5", uri: "/de", ua: "curl/8.5.0", status: 200 });
+  const snap = snapshotFromLines(lines, { now: SNAP_NOW, dayCount: 1, pageCap: 3 });
+  const de = snap.sites.find((site) => site.site === "de");
+  assert.equal(de.pages.length, 3, "pageCap 只有 3，热门列表不能超过它，也不能超过 8");
+  assert.deepEqual(de.pages.map(([uri]) => uri), ["/de/p0", "/de/p1", "/de/p2"]);
+  assert.equal(de.pageOverflow, 28);
+  assert.equal(de.today.humanPv, 55);
+  assert.equal(de.bots.length, 4);
+  assert.deepEqual(de.bots.map(([name]) => name), ["Googlebot", "Baidu", "Bing", "ByteDance"]);
+  assert.equal(JSON.stringify(snap).includes("198.51.100"), false);
+  assert.equal(JSON.stringify(snap).includes("203.0.113"), false);
+
+  const many = [];
+  for (let i = 0; i < 10; i++) {
+    many.push({ t: "2026-10-22T02:00:00.000Z", ip: "203.0.113.8", uri: `/pt/p${i}`, ua: HUMAN, status: 200 });
+  }
+  const top = snapshotFromLines(many, { now: SNAP_NOW, dayCount: 1 });
+  assert.equal(top.sites.find((site) => site.site === "pt").pages.length, 8);
+});
+
+test("快照文件是完整 JSON，且不含访客 IP", async () => {
+  const dir = mkdtemp("stratat-traffic-");
+  const file = join(dir, "traffic-board.json");
+  try {
+    fs.writeFileSync(join(dir, "strata-access.log"), [
+      line({ t: "2026-10-22T02:00:00.000Z", ip: "203.0.113.50", uri: "/fr", ua: HUMAN, status: 200 }),
+      line({ t: "2026-10-22T02:05:00.000Z", ip: "203.0.113.51", uri: "/_next/static/app.js", ua: HUMAN, status: 200 }),
+    ].join("\n") + "\n");
+    const snap = await writeTrafficSnapshot({
+      dir,
+      file,
+      now: SNAP_NOW,
+      dayCount: 1,
+    });
+    const text = fs.readFileSync(file, "utf8");
+    assert.equal(text.includes("203.0.113"), false);
+    assert.equal(JSON.parse(text).sites.find((site) => site.site === "fr").today.humanPv, snap.sites.find((site) => site.site === "fr").today.humanPv);
+    assert.equal(snap.sites.find((site) => site.site === "fr").today.humanPv, 1);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

@@ -22,6 +22,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const noNetwork = process.argv.includes("--no-network");
+const localOnly = process.argv.includes("--local-only");
 
 const problems = [];
 const note = (msg) => problems.push(msg);
@@ -33,12 +34,13 @@ function env(name) {
 
 // --- required configuration -------------------------------------------------
 //
-// All three are read by generate.mjs. BASE_URL and MODEL have working defaults in that file,
-// and this check deliberately does not repeat them: a default that works is not a precondition,
-// and duplicating the default here would drift from generate.mjs silently.
-
-for (const name of ["CONTENT_LLM_API_KEY", "CONTENT_LLM_BASE_URL", "CONTENT_LLM_MODEL"]) {
-  if (!env(name)) note(`${name} 未设置（应写在 /opt/stratat/.env）`);
+// `--local-only` checks disk/plan/out/media without requiring LLM credentials, so daily-guides.sh
+// can still run radar, topic mining, procedural covers, and publishing even when LLM keys are
+// absent or rotated.
+if (!localOnly) {
+  for (const name of ["CONTENT_LLM_API_KEY", "CONTENT_LLM_BASE_URL", "CONTENT_LLM_MODEL"]) {
+    if (!env(name)) note(`${name} 未设置（应写在 /opt/stratat/.env）`);
+  }
 }
 
 // --- local inputs the run reads in place ------------------------------------
@@ -98,7 +100,7 @@ try {
 // the Authorization header, and that the configured model name is one this endpoint serves.
 // Retries are off by design — preflight must answer "is it up now", not wait for it to recover.
 
-if (!noNetwork && env("CONTENT_LLM_API_KEY") && env("CONTENT_LLM_BASE_URL") && env("CONTENT_LLM_MODEL")) {
+if (!localOnly && !noNetwork && env("CONTENT_LLM_API_KEY") && env("CONTENT_LLM_BASE_URL") && env("CONTENT_LLM_MODEL")) {
   const base = env("CONTENT_LLM_BASE_URL").replace(/\/$/, "");
   try {
     const res = await fetch(`${base}/chat/completions`, {
