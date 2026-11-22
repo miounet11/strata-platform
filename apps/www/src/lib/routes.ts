@@ -26,10 +26,10 @@ export type NavGroup = {
  */
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/download", key: "download" },
-  { href: "/install", key: "install" },
-  { href: "/models", key: "models" },
+  { href: "/can-i-run", key: "canIRun" },
   { href: "/gpus", key: "gpus" },
   { href: "/benchmarks", key: "benchmarks" },
+  { href: "/best", key: "best" },
   { href: "/guides", key: "guides" },
 ];
 
@@ -41,10 +41,16 @@ export const SECONDARY_NAV: NavGroup[] = [
   {
     key: "learn",
     items: [
+      { href: "/install", key: "install" },
+      { href: "/models", key: "models" },
+      { href: "/can-i-run", key: "canIRun" },
       { href: "/topics", key: "topics" },
       { href: "/gpus", key: "gpus" },
       { href: "/gpus/vendor", key: "gpuBrands" },
       { href: "/benchmarks", key: "benchmarks" },
+      { href: "/method", key: "method" },
+      { href: "/best", key: "best" },
+      { href: "/search", key: "search" },
     ],
   },
   {
@@ -66,10 +72,10 @@ export const SECONDARY_NAV: NavGroup[] = [
   },
   {
     key: "site",
-    // Account pages (`/login`, `/dashboard`, `/register`) are deliberately absent: they are
-    // `noindex`, so linking them from every page would only spend crawl budget on pages that
-    // can never rank.
-    items: [{ href: "/links", key: "links" }],
+    items: [
+      { href: "/vps", key: "vps" },
+      { href: "/links", key: "links" },
+    ],
   },
 ];
 
@@ -79,9 +85,13 @@ export const STATIC_PATHS = [
   "/download",
   "/install",
   "/models",
+  "/can-i-run",
+  "/search",
   "/gpus",
   "/gpus/vendor",
   "/benchmarks",
+  "/method",
+  "/best",
   "/guides",
   "/topics",
   "/releases",
@@ -92,15 +102,24 @@ export const STATIC_PATHS = [
   "/community/labels",
   "/pulse",
   "/creator",
+  "/vps",
   "/links",
 ] as const;
 
 /**
  * Guide categories, in the order the index lists them. `key` matches `guides.kinds.*`; the
- * order runs from "what does this mean" to "why is it broken", which is also roughly the order
- * a reader needs them.
+ * order runs from "what does this mean" to "why is it broken" plus rising radar & release picks.
  */
-export const GUIDE_KINDS = ["concept", "compare", "hardware", "local", "task", "troubleshoot"] as const;
+export const GUIDE_KINDS = [
+  "concept",
+  "compare",
+  "hardware",
+  "local",
+  "task",
+  "troubleshoot",
+  "radar",
+  "release",
+] as const;
 export type GuideKind = (typeof GUIDE_KINDS)[number];
 
 export function guideKindOrder(kind: string): number {
@@ -110,8 +129,12 @@ export function guideKindOrder(kind: string): number {
 
 /** Paths whose first segment is a hub worth naming in the trail. */
 const HUB_LABELS: Record<string, string> = {
+  "can-i-run": "canIRun",
+  search: "search",
   gpus: "gpus",
   benchmarks: "benchmarks",
+  best: "best",
+  method: "method",
   guides: "guides",
   topics: "topics",
   releases: "releases",
@@ -121,6 +144,7 @@ const HUB_LABELS: Record<string, string> = {
   pulls: "pulls",
   pulse: "pulse",
   creator: "creator",
+  vps: "vps",
   links: "links",
 };
 
@@ -131,9 +155,13 @@ export function hubKeyFor(pathname: string): string | undefined {
 
 /**
  * Path builders for detail pages.
- *
- * Defined in `lib/internal-links`, which also emits these URLs, so the index, a detail page and
- * an in-prose link cannot disagree about a segment. Re-exported here because pages import their
- * route model from one module.
  */
-export { guidePath, gpuPath, gpuSeriesPath, gpuVendorPath, rigPath, releasePath } from "./internal-links";
+export {
+  guidePath,
+  guideCategoryPath,
+  gpuPath,
+  gpuSeriesPath,
+  gpuVendorPath,
+  rigPath,
+  releasePath,
+} from "./internal-links";

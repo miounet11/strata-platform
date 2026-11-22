@@ -1,15 +1,16 @@
-"use client";
-
-import { useState } from "react";
-import { mediaById, mediaForPage, mediaUrl } from "@/lib/media";
+import { mediaById, mediaForGuide, mediaForPage, mediaUrl } from "@/lib/media";
+import { FallbackImage } from "./FallbackImage";
 
 /**
- * Client-side so a broken or missing file degrades to a labelled placeholder instead of a
- * broken-image glyph. Width/height come from the manifest (all art is 16:9) so the browser
- * reserves space and the page does not jump while the image loads.
+ * Server Component wrapper around `<FallbackImage>`.
+ *
+ * Resolving the manifest on the server keeps the 60 KB `media-manifest.json` out of the client
+ * bundle and lets runtime-generated guide images appear via hot-reloaded `readDataJson` without
+ * rebuilding the site.
  */
 export function EnrichedImage({
   id,
+  guideSlug,
   page,
   slot,
   locale,
@@ -19,6 +20,7 @@ export function EnrichedImage({
   priority = false,
 }: {
   id?: string;
+  guideSlug?: string;
   page?: string;
   slot?: string;
   locale: string;
@@ -27,32 +29,23 @@ export function EnrichedImage({
   height?: number;
   priority?: boolean;
 }) {
-  const [failed, setFailed] = useState(false);
-  const asset = id ? mediaById(id) : mediaForPage(page ?? "", slot ?? "").find((a) => a.type === "image");
-  if (!asset?.path) return null;
+  const asset = guideSlug
+    ? mediaForGuide(guideSlug, locale)
+    : id
+      ? mediaById(id)
+      : mediaForPage(page ?? "", slot ?? "").find((a) => a.type === "image");
+  const src = mediaUrl(asset?.path);
+  if (!asset || !src) return null;
 
   const alt = asset.alt?.[locale] ?? asset.alt?.en ?? "";
-
-  if (failed) {
-    return (
-      <div className={`page-visual page-visual-missing ${className ?? ""}`.trim()} role="img" aria-label={alt}>
-        <span>{alt}</span>
-      </div>
-    );
-  }
-
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={mediaUrl(asset.path)}
+    <FallbackImage
+      src={src}
       alt={alt}
+      className={className}
       width={width}
       height={height}
-      className={`page-visual ${className ?? ""}`.trim()}
-      loading={priority ? "eager" : "lazy"}
-      decoding="async"
-      fetchPriority={priority ? "high" : "auto"}
-      onError={() => setFailed(true)}
+      priority={priority}
     />
   );
 }

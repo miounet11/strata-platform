@@ -84,6 +84,26 @@
     "guides": {
       "title": "Guides for running a local LLM",
       "description": "Step-by-step guides on VRAM, quantization, GPU choice and troubleshooting for running a large model on your own PC."
+    },
+    "method": {
+      "title": "How we measure local LLM benchmarks",
+      "description": "Source, formula, assumptions and limits behind every number on the Strata benchmark table."
+    },
+    "best": {
+      "title": "Best GPUs and machines for local LLMs by use case",
+      "description": "Ranked short lists for local LLM hardware: cheapest cost per million tokens, best under $2000, lowest power draw, and Apple unified memory options."
+    },
+    "vps": {
+      "title": "2026 budget VPS deals: China-optimized routes and ~$20/year bandwidth",
+      "description": "A daily-verified shortlist of affordable VPS plans for mainland China access (CMIN2 / CUII / 9929 / optimized direct), focused on about $20/year and at least 100 Mbps. Built for local AI relays and nodes, with test IPs, honest route notes, renewal terms and checkout links."
+    },
+    "canIRun": {
+      "title": "Can My PC Run a Local LLM? VRAM, RAM & Speed Calculator",
+      "description": "Check which Qwen3.8-Flash-Next quantization fits your GPU VRAM, system RAM, and context length (8K–128K), with tok/s and cost estimates."
+    },
+    "search": {
+      "title": "Search Strata — Guides, GPUs, Benchmarks & Releases",
+      "description": "Search 3,200+ GPUs, 29 measured benchmarks, hardware shortlists, setup guides, and Strata releases."
     }
   },
   "nav": {
@@ -108,7 +128,12 @@
     "gpus": "GPUs",
     "guides": "Guides",
     "gpuBrands": "GPU brands",
-    "skipToContent": "Skip to main content"
+    "skipToContent": "Skip to main content",
+    "method": "Method",
+    "best": "Best",
+    "vps": "VPS deals",
+    "canIRun": "Can I Run It?",
+    "search": "Search"
   },
   "topics": {
     "title": "Guides",
@@ -366,7 +391,17 @@
     "reset": "Reset",
     "daysShort": "days",
     "back": "All hardware",
-    "rigSpecNote": "Specifications and compatibility"
+    "rigSpecNote": "Specifications and compatibility",
+    "rigDecisionTitle": "Quick decision verdict",
+    "rigVerdictMeasured": "{name} outputs {write} tok/s at ${cost}/M tokens (rank #{costRank} of {total} measured rigs on unit cost), breaking even in {days} days at full load.",
+    "rigVerdictPending": "{name} ({memory} GB) reaches {write} tok/s write and {read} tok/s read. Street rig pricing is still pending, so unit cost is not ranked yet.",
+    "rigStandingLine": "Generation speed rank #{speedRank} of {totalRigs} · System power rank #{powerRank} ({watts} W).",
+    "rigSkipCheaper": "For a lower upfront build cost, compare against",
+    "rigSkipFaster": "If you need faster interactive token speed, compare against",
+    "rigFaqSpeedQ": "How fast does {name} run local LLMs?",
+    "rigFaqSpeedA": "{name} ({memory} GB) measures {write} tokens/s generation and {read} tokens/s prompt reading on Qwen3.8-Flash-Next (snapshot {date}).",
+    "rigFaqWorthQ": "Is {name} worth buying over cloud LLM APIs?",
+    "rigFaqWorthA": "At ${cost}/M tokens local cost, {name} breaks even in {days24} days at 24h/day utilization, or {days4} days at 4h/day — making daily utilization the main deciding factor."
   },
   "gpus": {
     "title": "GPU compatibility",
@@ -441,7 +476,12 @@
     "specChip": "GPU chip",
     "specProcess": "Process",
     "specMemoryType": "Memory type",
-    "specBus": "Bus interface"
+    "specBus": "Bus interface",
+    "specTransistors": "Transistors",
+    "specTransistorsValue": "{count} million",
+    "specDieSize": "Die size",
+    "specPixelRate": "Pixel rate",
+    "specTextureRate": "Texture rate"
   },
   "guides": {
     "title": "Guides",
@@ -457,15 +497,278 @@
       "local": "Local setup",
       "troubleshoot": "Troubleshooting",
       "task": "Workflows",
-      "hardware": "Hardware"
+      "hardware": "Hardware",
+      "radar": "New & rising models",
+      "release": "Release guides"
     },
     "all": "All guides",
     "homeIntro": "Start with the question you have. Each guide ends by pointing at the next step.",
-    "editorial": "Editorial pages"
+    "editorial": "Editorial pages",
+    "categoryIntro": "{count} practical guides in {kind}, grounded in measured local hardware data.",
+    "viewAllCategory": "See all in this category",
+    "otherCategories": "Other guide categories"
   },
   "notFound": {
     "title": "This page does not exist",
     "body": "The link may be outdated. Everything else is one click away.",
     "home": "Back to the start"
+  },
+  "method": {
+    "title": "How the benchmark numbers are measured",
+    "description": "The data source, the formula behind each figure, the assumptions it uses, and what the measurements do not cover.",
+    "intro": "Every number on the benchmarks page comes from one source and one formula. This page states both, plus the limits, so a figure can be checked or corrected rather than taken on trust.",
+    "sourceTitle": "Where the data comes from",
+    "sourceBody": "Tokens per second and prices are taken from {name}. Licence terms: {license}",
+    "sourceMethod": "source methodology",
+    "methodTitle": "How each figure is calculated",
+    "method1": "Daily output = reading speed × hours you run the machine.",
+    "method2": "Power cost = watts × hours × electricity price.",
+    "method3": "Cost per day = power cost + hardware price spread over its useful life.",
+    "method4": "Payback days = rig price ÷ money saved per day versus an API.",
+    "assumptionsTitle": "Assumptions behind the table",
+    "assumptionsIntro": "The table uses these defaults. Change any of them on the benchmarks page and every derived figure updates.",
+    "assumptionReadingShare": "Share of output that is reading",
+    "assumptionActiveHours": "Hours per day",
+    "assumptionElectricity": "Electricity price",
+    "assumptionHardwareLife": "Hardware life",
+    "assumptionHost": "Host allowance",
+    "assumptionApi": "API reference price (read / write)",
+    "perMM": "$ per million tokens",
+    "limitsTitle": "What these numbers do not cover",
+    "limit1": "Consumer GPUs only. Server parts and multi-GPU configurations are excluded.",
+    "limit2": "One workload: a sequential single-stream mix. Batched, concurrent serving runs faster in aggregate and slower per stream.",
+    "limit3": "Prices are dated street prices and move independently of the measurements.",
+    "limit4": "A payback figure is an estimate, not a quote: it assumes the machine is busy at the stated hours.",
+    "freshnessTitle": "How current this is",
+    "freshnessBody": "The table was last synchronised on {date}. Measures are re-published in place, so a figure quoted from an older copy can be checked against its date.",
+    "citeTitle": "Citing these figures",
+    "citeBody": "The dataset is free to cite with attribution to Strata and the underlying source. Link to this page when citing a method, and to the benchmarks page when citing a number.",
+    "backToBenchmarks": "Back to the benchmark table"
+  },
+  "best": {
+    "title": "Best hardware for local LLMs by use case",
+    "intro": "Every list below is ranked from the same measured benchmark table, with the ranking rule stated. Nothing is hand-picked: the order changes when the data changes.",
+    "count": "{count} machines qualify",
+    "limitsTitle": "What these lists do not cover",
+    "limitShared": "All figures are single-stream measurements on one workload. Multi-user serving, fine-tuning and server parts behave differently.",
+    "methodNote": "Ranking rules and assumptions:",
+    "methodLink": "how we measure",
+    "allBenchmarks": "full benchmark table",
+    "guidesLink": "setup guides",
+    "synced": "measured {date}",
+    "faqWhyCount": "Why these {count} machines and not the cheapest card?",
+    "faqWhyCountAnswer": "Because the ranking uses measured cost per million tokens, which folds in power draw and hardware life. A cheaper card that is slower or thirstier costs more per token over five years. The list is generated from the benchmark table and reorders itself when the data changes.",
+    "faqWhereData": "Where do these numbers come from?",
+    "faqWhereDataAnswer": "From {source}, measured {date}. Every list on this page is derived from that same dated table, and the assumptions behind the cost figures are stated on the benchmarks page.",
+    "faqTopPickQ": "Which machine ranks #1 for {title}?",
+    "faqTopPickA": "{name} currently ranks #1 with {memory} GB memory, {write} tok/s generation, {cost}/M tokens local cost, and {days} break-even under default workload assumptions."
+  },
+  "scenarios": {
+    "items": {
+      "value": {
+        "title": "Cheapest hardware to run a local LLM",
+        "seoTitle": "Cheapest hardware to run a local LLM (measured cost per million tokens)",
+        "seoDescription": "The six machines with the lowest measured cost per million tokens running a 125B-class model locally, including power and hardware lifetime.",
+        "summary": "Ranked by measured cost per million tokens, which already includes electricity and hardware spread over five years. The cheapest to run is not always the cheapest to buy.",
+        "rule": "Ranked by cost per million tokens (power + hardware life)",
+        "about": "cost per million tokens for local LLM inference",
+        "limit": "Cheapest per token assumes the machine runs near full time. At a few hours a day, a cheaper rig with worse throughput can win on total spend."
+      },
+      "under2000": {
+        "title": "Best local LLM hardware under $2000",
+        "seoTitle": "Best local LLM hardware under $2000 (measured, full rig price)",
+        "seoDescription": "Every measured machine whose full rig price is $2000 or less, ranked cheapest first, with tokens per second and payback in days.",
+        "summary": "The whole rig under $2000, not just the card. These are the machines that fit a student budget and still run a 125B-class model.",
+        "rule": "Full rig price of $2000 or less, cheapest first",
+        "about": "budget local LLM hardware under 2000 dollars",
+        "limit": "Rig prices are dated street prices. Used cards and prebuilt sales move faster than this table, so check the price before buying."
+      },
+      "lowPower": {
+        "title": "Lowest-power local LLM machines",
+        "seoTitle": "Lowest-power hardware for running local LLMs (watts measured)",
+        "seoDescription": "The six machines that draw the least power while running a 125B-class local model, for bedrooms, dorms and shared flats.",
+        "summary": "Ranked by wall power. This is the list to read if the machine has to live in a bedroom, a dorm room, or on a shared circuit.",
+        "rule": "Ranked by wall power draw, lowest first",
+        "about": "low power consumption local LLM hardware",
+        "limit": "Wall power is the figure measured under load on this workload; idle draw and fan noise are separate and not in this table."
+      },
+      "apple": {
+        "title": "Apple Silicon for local LLMs",
+        "seoTitle": "Apple Silicon for local LLMs: Mac Studio and MacBook compared",
+        "seoDescription": "Every measured Apple machine, ranked by cost per million tokens, with unified memory size, power draw and payback in days.",
+        "summary": "Apple machines are ranked separately because unified memory changes the question: there is no VRAM ceiling to fit under, only a price and a bandwidth limit.",
+        "rule": "Apple Silicon only, ranked by cost per million tokens",
+        "about": "Apple Silicon unified memory for local LLM inference",
+        "limit": "Unified memory is shared with the OS and every open app, so the usable ceiling is lower than the listed size. Bandwidth, not capacity, is usually the limit."
+      },
+      "fastest": {
+        "title": "Fastest GPUs for local LLM generation speed",
+        "seoTitle": "Fastest GPUs for local LLM tokens per second (measured)",
+        "seoDescription": "The eight fastest measured machines for local LLM generation speed (tok/s) running Qwen3.8-Flash-Next.",
+        "summary": "Ranked strictly by measured generation speed (writing tokens/s). High generation speed is what makes interactive coding and chat feel instant.",
+        "rule": "Ranked by measured writing speed (tokens/s)",
+        "about": "fastest generation speed for local LLM inference",
+        "limit": "The fastest cards carry steep upfront prices ($8,500–$18,317 rigs). If budget matters more than peak tok/s, check the value or payback shortlists."
+      },
+      "fastPayback": {
+        "title": "Fastest break-even GPUs vs cloud LLM APIs",
+        "seoTitle": "Fastest break-even GPUs for local LLMs vs API pricing",
+        "seoDescription": "The eight local LLM machines that pay back their hardware cost fastest compared to cloud API token pricing.",
+        "summary": "Ranked by shortest break-even period in days against blended cloud API pricing ($0.154/M tok at 90/10 read/write). Lower upfront rig cost often beats peak speed.",
+        "rule": "Ranked by shortest break-even days vs cloud API",
+        "about": "local LLM hardware break-even time",
+        "limit": "Break-even assumes steady daily utilization. Dropping from 24h/day to 4h/day multiplies payback days by roughly 6×."
+      },
+      "multiGpu": {
+        "title": "Best dual-GPU setups for local LLMs",
+        "seoTitle": "Best dual-GPU setups for local LLMs (measured layer-split benchmarks)",
+        "seoDescription": "Measured dual-GPU configurations (2× RTX 3090, 2× RTX 5060 Ti, 2× TITAN RTX, 2× RX 6900 XT, 2× RTX 3060) ranked by cost per million tokens.",
+        "summary": "Dual-card layer-split builds deliver 24–48 GB of combined VRAM at a fraction of workstation card pricing, ranked here by measured $/M tokens.",
+        "rule": "Dual-GPU rigs ranked by cost per million tokens",
+        "about": "dual-GPU local LLM configurations",
+        "limit": "Dual-card builds need motherboard PCIe spacing, adequate PSU headroom (750–1000W+), and active case airflow."
+      },
+      "amd": {
+        "title": "Best AMD GPUs & APUs for local LLMs (ROCm / HIP)",
+        "seoTitle": "Best AMD GPUs and Ryzen AI Max+ for local LLMs",
+        "seoDescription": "Measured AMD Radeon RX 7900 XTX, RX 9070 XT, RX 6900 XT, and Ryzen AI Max+ 395 128 GB ranked by local LLM cost and speed.",
+        "summary": "Measured AMD discrete GPUs and unified-memory Strix Halo systems running Strata via HIP/ROCm, ranked by local cost per million tokens.",
+        "rule": "AMD rigs ranked by cost per million tokens",
+        "about": "AMD ROCm and HIP local LLM hardware",
+        "limit": "Check ROCm/HIP driver support for your exact OS before buying; Windows HIP and Linux ROCm builds evolve independently."
+      },
+      "highVram": {
+        "title": "Best high-VRAM & unified-memory machines (48 GB–512 GB)",
+        "seoTitle": "Best 48 GB to 512 GB VRAM machines for large local LLMs",
+        "seoDescription": "Machines with 48 GB to 512 GB of VRAM or unified memory for 4-bit weights and 128K context windows, ranked by memory capacity.",
+        "summary": "Machines with 48 GB or more memory let you run higher-bit quantizations and long 128K context windows with minimal or zero disk offloading.",
+        "rule": "Rigs with ≥48 GB memory, ranked by capacity then $/M tok",
+        "about": "high-memory local LLM workstations",
+        "limit": "Unified-memory machines trade lower generation tok/s for massive memory capacity; discrete RTX PRO 6000 is much faster but costs $18,317."
+      }
+    }
+  },
+  "vps": {
+    "title": "2026 budget VPS deals: China-optimized routes and ~$20/year bandwidth",
+    "intro": "A daily-verified shortlist of affordable VPS plans for visitors in mainland China and for local AI relays or nodes. We look for about $20/year (up to about $30 when the route is clearly better), at least 100 Mbps, and honest notes on CN2 GIA, CMIN2, 9929, CUII, or optimized direct routes — regular international transit is never labelled as a premium China path.",
+    "verifiedAt": "Last verified (Asia/Shanghai): {time}",
+    "dailyNote": "This page is refreshed from a data file, so a full site rebuild is not required every day. A Cloudflare 403 or other temporary block keeps the last good record and is never treated as a delisting; a vendor 404 is what marks a plan out of stock.",
+    "criteriaTitle": "Selection criteria",
+    "criteriaBudget": "Around $20/year, with a hard look at plans up to $25; clearly better premium routes may go up to about $30.",
+    "criteriaBandwidth": "High-bandwidth picks start at 100 Mbps. A 5 Mbps special stays in the footnotes even if the route is good.",
+    "criteriaRoute": "Prefer mainland-China-optimized routes (CN2 GIA / CMIN2 / 9929 / CUII / optimized direct) and say plainly whether China Telecom CN2 is present.",
+    "criteriaUse": "Intended for nodes that Chinese users will hit, local AI relays, or light services. Regular international plans are listed only as control-plane or non-China backups.",
+    "dealsTitle": "China-optimized high-bandwidth plans that are still orderable",
+    "backupTitle": "Regular international backups (control plane / non-China traffic)",
+    "backupIntro": "These often have more bandwidth and disk, and same-price renewals are more common, but they are not China-optimized routes.",
+    "footnotesTitle": "Not a high-bandwidth recommendation",
+    "faqTitle": "FAQ",
+    "disclosureTitle": "Affiliate and update notes",
+    "disclosure": "Some checkout buttons already use approved affiliate or referral links (those links are marked rel=sponsored). Listings without an approved code still go to the official vendor page. We list plans by verified stock, price and route quality, and we will not hide a 5 Mbps cap or a non-optimized route for a commission. The price that matters is the one on the vendor checkout page; confirm renewal terms and datacenter stock before you pay. Outbound click records, when collected, only measure visits through our hop and are not orders or sign-ups.",
+    "cta": "Go to checkout (affiliate link)",
+    "testIp": "Test IP",
+    "route": "Route",
+    "renewal": "Renewal",
+    "stockIn": "In stock",
+    "stockOut": "Out of stock",
+    "stockUnknown": "Unverified",
+    "pricePerYear": "{price}/year",
+    "specs": "Specs",
+    "bandwidth": "Bandwidth and traffic",
+    "location": "Location",
+    "noDeals": "No verified high-bandwidth plans are currently in stock.",
+    "faqs": [
+      {
+        "question": "Which VPS plans around $20 work well from mainland China?",
+        "answer": "As of the 2026-11-13 check, there is almost no in-stock premium China-optimized plan at $20/year with 100 Mbps or more. The closest fits are DediOne’s Los Angeles/Kansas mainland-optimized 2C2G ($25.99/year, 200 Mbps unmetered, optimized direct) and DediOne Los Angeles CMIN2+CUII ($29.99/year, 200 Mbps, 500 GB/month). CloudCone and RackNerd plans at $14–22 have more bandwidth but use regular international transit. The $19.99 5 Mbps CMIN2 special is only for very light use."
+      },
+      {
+        "question": "What is the difference between CMIN2 and a regular 163 route?",
+        "answer": "CMIN2 is China Mobile’s premium return path and is usually more stable than ordinary CMI/163 at peak hours; DediOne’s CMIN2 plans also add China Unicom CUII. A “163” or “optimized direct” line is often CN2 GT or plain direct peering, which typically lags CN2 GIA / CMIN2 / 9929 at night. Ignore marketing words and test the published IP from China Telecom, Mobile and Unicom yourself. This page always states whether China Telecom CN2 is present."
+      },
+      {
+        "question": "How do I test latency and the route back to mainland China?",
+        "answer": "Ping or run mtr to the test IP from Telecom, Mobile and Unicom networks, then read traceroute for CN2 (59.43), CMIN2, 9929, or ordinary 163/CMI hops. After purchase, test your own IP the same way. Latency varies by province and time of day, so one sample is not a full-day guarantee."
+      },
+      {
+        "question": "Why is the 5 Mbps CMIN2 special not recommended?",
+        "answer": "The DediOne Los Angeles CMIN2 special is about $19.99/year with a decent CMIN2+CUII path, but the cap is only 5 Mbps, which saturates quickly for relays or multi-user access. This page’s high-bandwidth bar starts at 100 Mbps, so that plan is listed only as a footnote."
+      },
+      {
+        "question": "Should I buy now or wait for Black Friday?",
+        "answer": "If you do not need the servers immediately, the week around Black Friday 2026 (27 November) is when RackNerd, CloudCone, DMIT, HostDare and VMISS more often release same-price-renewal deals. In-stock premium lines at $20/year and ≥100 Mbps are scarce right now, so it is reasonable to watch this page and buy if a clearly better Black Friday offer appears."
+      },
+      {
+        "question": "Are these affiliate links, and are the prices guaranteed?",
+        "answer": "Where an approved affiliate or referral code exists, the button goes to the vendor page with that code and stays disclosed here (rel=sponsored). Other buttons still go to official pages. Prices, stock and renewal terms are always those on the vendor checkout page. This list is checked daily, but it does not replace a last look before you pay."
+      }
+    ],
+    "ctaOfficial": "View official plan",
+    "ctaAffiliate": "Go to checkout (affiliate link)"
+  },
+  "canIRun": {
+    "title": "Can My PC Run a Local LLM? VRAM & RAM Calculator",
+    "intro": "Pick your GPU or enter your VRAM, system RAM, and target context length (8K–128K). Get an instant quantization verdict, KV-cache memory estimate, expected tok/s, and local cost vs API break-even.",
+    "presetLabel": "Choose a GPU / machine preset",
+    "customOption": "Custom hardware (enter VRAM & RAM below)",
+    "vramLabel": "GPU VRAM / Unified Memory",
+    "ramLabel": "System RAM",
+    "unifiedLabel": "Unified memory (Apple Silicon / Strix Halo / DGX Spark)",
+    "contextLabel": "Context window",
+    "hoursLabel": "Daily active usage",
+    "electricityLabel": "Electricity ($/kWh)",
+    "verdictCanRun": "Yes — your hardware can run Qwen3.8-Flash-Next locally.",
+    "verdictCannotRun": "Not enough memory for the minimum 125B build yet.",
+    "bestQuantLabel": "Recommended quant",
+    "kvOverheadLabel": "KV cache allowance",
+    "speedLabel": "Expected write speed",
+    "costLabel": "Local unit cost",
+    "paybackLabel": "Est. break-even",
+    "daysUnit": "days",
+    "evidenceMeasured": "measured",
+    "evidenceEstimated": "bandwidth est.",
+    "bottleneckVram": "Dedicated GPU VRAM is below the 12 GB minimum floor. Upgrade to a 12 GB+ GPU (e.g., RTX 3060 12GB, RTX 5070, or RX 7900 XTX) or use a 64 GB+ unified-memory machine.",
+    "bottleneckRam": "Your GPU VRAM meets the 12 GB floor, but system RAM is below the 32 GB minimum (or too tight for this context length). Try 8K context or upgrade to 64 GB RAM.",
+    "bottleneckUnified": "Unified memory needs ~20% headroom for the OS. Aim for at least 48–64 GB unified memory (Mac mini M5 Pro 64 GB or Ryzen AI Max+ 128 GB).",
+    "colQuant": "Quantization",
+    "colStatus": "Verdict",
+    "colVramNeed": "VRAM",
+    "colRamNeed": "System RAM",
+    "colDownload": "Download",
+    "colSpeed": "Est. write",
+    "statusRecommended": "Recommended",
+    "statusFits": "Fits",
+    "statusTight": "Fits (tight)",
+    "statusNeedsRam": "Needs more RAM",
+    "statusNeedsVram": "Needs 12 GB+ VRAM",
+    "seeRig": "Measured benchmark",
+    "seeGpu": "GPU spec sheet",
+    "installCta": "Install guide",
+    "downloadCta": "Download Strata",
+    "tierTableTitle": "Quick reference: what each VRAM & RAM tier can run (at 32K context)",
+    "tierTableIntro": "Every row is computed directly from the same quantization floors and KV-cache rules as the interactive calculator above.",
+    "tierColHardware": "Hardware tier",
+    "tierFootnote": "* Unified memory shares one pool with the OS (~82% usable for model + KV cache).",
+    "faq1Q": "What is the minimum GPU VRAM and RAM to run Strata locally?",
+    "faq1A": "You need at least 12 GB GPU VRAM and 32 GB system RAM for the Coder build, or 12 GB VRAM + 64 GB RAM for the recommended IQ2_XS default build.",
+    "faq2Q": "Can an 8 GB GPU like an RTX 4060 run Qwen3.8-Flash-Next?",
+    "faq2A": "No — 8 GB discrete VRAM sits below the 12 GB minimum floor for Qwen3.8-Flash-Next builds. Moving to a 12 GB or 16 GB card (such as RTX 4070, RTX 5070, or RX 9070 XT) unlocks local runs.",
+    "faq3Q": "How much extra memory does 128K context require?",
+    "faq3A": "Long 128K context adds roughly 14 GB of KV-cache memory overhead compared to ~1.5 GB at 8K context, so 64 GB–96 GB system RAM (or 128 GB unified memory) is recommended for heavy 128K workloads.",
+    "faq4Q": "Is Apple Silicon unified memory faster or slower than an RTX 4090?",
+    "faq4A": "Apple Silicon holds much larger models in one quiet unified pool (64–512 GB), while discrete NVIDIA cards like the RTX 4090 (109.3 tok/s) and RTX 5090 (168.4 tok/s) generate tokens 2–5× faster."
+  },
+  "search": {
+    "title": "Search Strata",
+    "intro": "Search across 3,200+ GPUs, 29 measured benchmarks, setup guides, troubleshooting, and releases.",
+    "placeholder": "Search GPU model, error message, quantization, or topic…",
+    "button": "Search",
+    "allTypes": "All types",
+    "emptyPrompt": "Type a GPU (e.g. RTX 4090), an error (CUDA out of memory), or a workflow (128k context).",
+    "noResults": "No matching pages found. Try a shorter keyword or pick a popular topic above.",
+    "loading": "Searching…",
+    "popularHeading": "Popular searches",
+    "resultCount": "{count} matching result(s)",
+    "browseHeading": "Browse by section"
   }
 }

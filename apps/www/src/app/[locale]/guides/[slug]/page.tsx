@@ -3,14 +3,19 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { RegisterLocales } from "@/components/LocaleAvailability";
 import { Markdown } from "@/components/Markdown";
 import { RelatedContent, relatedArticles } from "@/components/RelatedContent";
-import { articleLocales, getArticle, getLiveArticles, localesForSlug } from "@/lib/articles";
+import { getArticle, getLiveArticles, localesForSlug } from "@/lib/articles";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
 import { allGpus } from "@/lib/gpus";
 import { jsonLdGraph, nodeId } from "@/lib/jsonld";
-import { linkifyMentions } from "@/lib/internal-links";
+import { findMentions, linkifyMentions } from "@/lib/internal-links";
+import { GUIDE_KINDS, guideCategoryPath } from "@/lib/routes";
 import { seoMetadata } from "@/lib/seo-messages";
+import { ORG_ID, PERSON_ID, WEBSITE_ID, siteEntityNodes } from "@/lib/site-entities";
+
+export const revalidate = 1800;
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
 
@@ -54,20 +59,25 @@ export default async function GuidePage({
   if (!article) notFound();
 
   const { title, description, body, faq } = article.article;
-  // A guide that names cards ("the 4090 does this at 30 tok/s") is the best inbound link those
-  // catalogue pages will ever get, so the first mention of each card becomes one. Capped at
-  // three: past that the prose reads as a link farm and the extra edges carry no new signal.
-  const linkedBody = linkifyMentions(
-    body,
-    allGpus().map((gpu) => ({ name: gpu.name, slug: gpu.slug })),
-    { limit: 3 },
+  const siblings = localesForSlug(slug).filter((code): code is (typeof routing.locales)[number] =>
+    routing.locales.includes(code as (typeof routing.locales)[number]),
   );
+  const gpus = allGpus().map((gpu) => ({ name: gpu.name, slug: gpu.slug }));
+  const linkedBody = linkifyMentions(body, gpus, { limit: 3 });
+  const mentionedGpus = findMentions(body, gpus, { limit: 8 }).map((mention) => ({
+    name: mention.title,
+    slug: mention.href.replace(/^\/gpus\//, ""),
+  }));
   const url = `${SITE}/${locale}/guides/${slug}`;
   const tn = await getTranslations({ locale, namespace: "nav" });
+  const tg = await getTranslations({ locale, namespace: "guides" });
+  const kindsMap = tg.raw("kinds") as Record<string, string>;
+  const hasCategory = (GUIDE_KINDS as readonly string[]).includes(article.kind);
+  const kindLabel = kindsMap[article.kind] ?? article.kind;
+  const updatedIso = article.generatedAt ?? article.publishedAt ?? article.publishAt;
 
   const pageId = nodeId(url, "webpage");
   const articleLd = {
-    "@context": "https://schema.org",
     "@type": "Article",
     "@id": nodeId(url, "article"),
     headline: title,
@@ -75,16 +85,17 @@ export default async function GuidePage({
     inLanguage: locale,
     url,
     mainEntityOfPage: { "@id": pageId },
-    datePublished: article.publishAt,
-    dateModified: article.generatedAt ?? article.publishAt,
-    author: { "@type": "Organization", name: "Stratat" },
-    publisher: { "@type": "Organization", name: "Stratat", url: SITE },
+    datePublished: article.publishedAt ?? article.publishAt,
+    dateModified: updatedIso,
+    author: { "@id": PERSON_ID },
+    publisher: { "@id": ORG_ID },
+    isPartOf: { "@id": WEBSITE_ID },
   };
 
-  // Labels come from `nav.*` so the structured trail matches the visible one in every language.
   const crumbLd = breadcrumbJsonLd(SITE, locale, [
     { path: "", name: tn("home") },
     { path: "/guides", name: tn("guides") },
+    ...(hasCategory ? [{ path: guideCategoryPath(article.kind), name: kindLabel }] : []),
     { name: title, id: pageId },
   ]);
 
@@ -95,14 +106,23 @@ export default async function GuidePage({
     name: title,
     description,
     inLanguage: locale,
-    isPartOf: { "@type": "WebSite", name: "Strata", url: SITE },
+    isPartOf: { "@id": WEBSITE_ID },
+    about: { "@type": "Thing", name: kindLabel },
+    mentions: mentionedGpus.map((gpu) => ({
+      "@type": "Product",
+      name: gpu.name,
+      url: `${SITE}/${locale}/gpus/${gpu.slug}`,
+    })),
   };
 
   const faqLd =
     faq.length > 0
       ? {
-          "@context": "https://schema.org",
           "@type": "FAQPage",
+          "@id": nodeId(url, "faq"),
+          name: `FAQ: ${title}`,
+          inLanguage: locale,
+          isPartOf: { "@id": pageId },
           mainEntity: faq.map((item) => ({
             "@type": "Question",
             name: item.q,
@@ -111,24 +131,30 @@ export default async function GuidePage({
         }
       : null;
 
-  const others = articleLocales()
-    .filter((code) => code !== locale)
-    .map((code) => ({ code, hit: getArticle(code, slug) }))
-    .filter((entry) => entry.hit);
-
   return (
-    <div className="container page">
+    <div className="container page" data-page="guide">
+      <RegisterLocales locales={siblings.length > 0 ? siblings : [locale]} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLdGraph([webPageLd, articleLd, crumbLd, faqLd])),
+          __html: JSON.stringify(
+            jsonLdGraph([...siteEntityNodes(), webPageLd, articleLd, crumbLd, faqLd]),
+          ),
         }}
       />
 
-      <Breadcrumbs label={title} />
+      <Breadcrumbs
+        label={title}
+        parents={hasCategory ? [{ href: guideCategoryPath(article.kind), text: kindLabel }] : undefined}
+      />
       <h1>{title}</h1>
       <p className="page-intro">{description}</p>
-      <EnrichedImage id={`guide-${slug}`} locale={locale} className="page-visual" />
+      {updatedIso ? (
+        <p className="meta">
+          {kindLabel} · <time dateTime={updatedIso}>{updatedIso.slice(0, 10)}</time>
+        </p>
+      ) : null}
+      <EnrichedImage guideSlug={slug} locale={locale} className="page-visual" />
 
       <article className="article-body">
         <Markdown source={linkedBody} />

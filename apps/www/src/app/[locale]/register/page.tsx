@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AuthForm } from "@/components/AuthForm";
+import { ClientMessages } from "@/components/ClientMessages";
 import { seoMetadata } from "@/lib/seo-messages";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
 import { SITE } from "@/lib/seo";
@@ -33,7 +34,9 @@ export default async function RegisterPage({
 
       <h1>{t("registerTitle")}</h1>
       <p className="page-intro">{t("apiHint")}</p>
-      <AuthForm mode="register" />
+      <ClientMessages namespaces={["auth"]}>
+        <AuthForm mode="register" />
+      </ClientMessages>
     </div>
   );
 }

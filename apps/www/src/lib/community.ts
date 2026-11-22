@@ -25,6 +25,20 @@ export function getLabel(slug: string): CommunityLabel | undefined {
   return load().labels.find((l) => l.slug === slug);
 }
 
+/**
+ * Only substantive GitHub issues earn a prerendered, indexed page across all locales.
+ * Empty/bot/one-line issues stay reachable on-demand (HTTP 200 with `noindex`) instead of
+ * multiplying thin near-duplicate pages across 7 languages.
+ */
+export function isSubstantiveIssue(issue: { body?: string; comments?: number }): boolean {
+  const bodyLen = (issue.body ?? "").replace(/\s+/g, " ").trim().length;
+  return bodyLen >= 160 || (issue.comments ?? 0) >= 2;
+}
+
+export function getIndexableIssues(): CommunityIssue[] {
+  return load().issues.filter(isSubstantiveIssue);
+}
+
 export function excerpt(text: string, max = 160): string {
   const flat = text.replace(/\s+/g, " ").trim();
   if (flat.length <= max) return flat;

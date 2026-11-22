@@ -1,0 +1,25 @@
+{
+  "columns": [
+    {
+      "slug": "ecosystem",
+      "title": {
+        "en": "The Strata ecosystem & community forks",
+        "zh": "Strata 生态与社区分支",
+        "ja": "Strata のエコシステムとコミュニティフォーク",
+        "de": "Das Strata-Ökosystem & Community-Forks",
+        "fr": "L'écosystème Strata et les forks communautaires",
+        "es": "El ecosistema de Strata y los forks de la comunidad",
+        "pt": "O ecossistema Strata e os forks da comunidade"
+      },
+      "intro": {
+        "en": "The upstream engine and the community forks built on it: what they change, how they measure their gains, and which licence they ship under. Fork numbers are their own reports, not this site's benchmark table.",
+        "zh": "上游引擎，以及基于它延伸出的社区分支：它们改了什么、如何衡量收益、各自用什么许可。分支给出的数字是其自测结果，不是本站基准表。",
+        "ja": "上流エンジンと、それを元にしたコミュニティ製フォーク — 変更点、効果の測り方、ライセンスの違い。フォークの数値は独自の報告であり、本サイトのベンチマーク表ではありません。",
+        "de": "Die Upstream-Engine und die Community-Forks darauf: was sie ändern, wie sie ihre Zuwächse messen und unter welcher Lizenz sie stehen. Die Zahlen der Forks sind eigene Messungen, nicht die Benchmark-Tabelle dieser Site.",
+        "fr": "Le moteur amont et les forks de la communauté : ce qu'ils changent, comment ils mesurent leurs gains et sous quelle licence. Les chiffres des forks sont leurs propres mesures, pas le tableau de benchmarks de ce site.",
+        "es": "El motor upstream y los forks comunitarios: qué cambian, cómo miden sus mejoras y con qué licencia. Las cifras de los forks son sus propias mediciones, no la tabla de benchmarks de este sitio.",
+        "pt": "O motor upstream e os forks da comunidade: o que mudam, como medem os ganhos e sob que licença. Os números dos forks são medições próprias, não a tabela de benchmarks deste site."
+      }
+    }
+  ]
+}

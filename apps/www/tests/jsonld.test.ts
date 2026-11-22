@@ -99,3 +99,26 @@ test("skip link: every locale has the nav string it renders", () => {
     assert.ok(label.trim().length > 0, `${locale} skipToContent is blank`);
   }
 });
+
+test("i18n parity: all 7 locales define canIRun, search, vps, new guide kinds, and all 9 scenarios", () => {
+  const scenarios = ["value", "under2000", "lowPower", "apple", "fastest", "fastPayback", "multiGpu", "amd", "highVram"];
+  for (const locale of ["en", "zh", "ja", "de", "fr", "es", "pt"]) {
+    const m = JSON.parse(readFileSync(new URL(`../messages/${locale}.json`, import.meta.url), "utf8"));
+    assert.ok(m.nav?.canIRun, `${locale} missing nav.canIRun`);
+    assert.ok(m.nav?.search, `${locale} missing nav.search`);
+    assert.ok(m.nav?.vps, `${locale} missing nav.vps`);
+    assert.ok(m.canIRun?.title, `${locale} missing canIRun.title`);
+    assert.ok(m.search?.title, `${locale} missing search.title`);
+    assert.ok(m.guides?.kinds?.radar, `${locale} missing guides.kinds.radar`);
+    assert.ok(m.guides?.kinds?.release, `${locale} missing guides.kinds.release`);
+    for (const key of scenarios) {
+      assert.ok(m.scenarios?.items?.[key]?.title, `${locale} missing scenarios.items.${key}.title`);
+    }
+  }
+});
+
+test("site entities: WebSite declares SearchAction pointing at /en/search", () => {
+  const source = readFileSync(new URL("../src/lib/site-entities.ts", import.meta.url), "utf8");
+  assert.match(source, /"@type":\s*"SearchAction"/);
+  assert.match(source, /\/en\/search\?q=\{search_term_string\}/);
+});

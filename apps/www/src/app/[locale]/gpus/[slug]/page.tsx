@@ -20,6 +20,7 @@ import { guidePath, gpuPath, gpuSeriesPath, gpuVendorPath, rigPath } from "@/lib
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
 import { jsonLdGraph, nodeId } from "@/lib/jsonld";
+import { ORG_ID, siteEntityNodes } from "@/lib/site-entities";
 import { RelatedContent } from "@/components/RelatedContent";
 import { siteMetadata } from "@/lib/seo";
 
@@ -101,12 +102,14 @@ export default async function GpuPage({
   // would otherwise have to read off the table. `Product` with a brand and category lets the
   // page be understood as a specific piece of hardware rather than a generic article.
   const productLd = {
-    "@context": "https://schema.org",
     "@type": "Product",
     "@id": nodeId(`${SITE}/${locale}${gpuPath(gpu.slug)}`, "product"),
     name: gpu.name,
     brand: { "@type": "Brand", name: vendorLabel[gpu.vendor] },
     category: "Graphics processing unit",
+    // The card is not sold here: this page measures whether the model fits on it. Stating that
+    // keeps the Product node from reading as a shop listing with a price left out.
+    isRelatedTo: { "@id": `${SITE}/${locale}/benchmarks#dataset` },
     url: `${SITE}/${locale}${gpuPath(gpu.slug)}`,
     ...(gpu.year ? { releaseDate: String(gpu.year) } : {}),
     ...(gpu.vramGb > 0
@@ -126,7 +129,7 @@ export default async function GpuPage({
     <div className="container page">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([productLd, crumbLd])) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([...siteEntityNodes(), productLd, crumbLd])) }}
       />
       <Breadcrumbs
         label={gpu.name}
@@ -177,6 +180,34 @@ export default async function GpuPage({
             <tr>
               <th>{t("specProcess")}</th>
               <td>{gpu.process}</td>
+            </tr>
+          ) : null}
+          {/* The silicon's physical facts. Radeon 680M shipped on "Rembrandt" and "Rembrandt+",
+              HD Graphics 3000 on "Sandy Bridge GT2" (624M / 149 mm²) and "GT2+" (1,160M / 216
+              mm²). Those are different dies, and the spec sheet has always carried the numbers —
+              rendering them is what stops the two URLs from being the same page. */}
+          {gpu.transistorsM != null ? (
+            <tr>
+              <th>{t("specTransistors")}</th>
+              <td>{t("specTransistorsValue", { count: gpu.transistorsM })}</td>
+            </tr>
+          ) : null}
+          {gpu.dieSizeMm2 != null ? (
+            <tr>
+              <th>{t("specDieSize")}</th>
+              <td>{gpu.dieSizeMm2} mm²</td>
+            </tr>
+          ) : null}
+          {gpu.pixelRateGps != null ? (
+            <tr>
+              <th>{t("specPixelRate")}</th>
+              <td>{gpu.pixelRateGps} GPixel/s</td>
+            </tr>
+          ) : null}
+          {gpu.textureRateGts != null ? (
+            <tr>
+              <th>{t("specTextureRate")}</th>
+              <td>{gpu.textureRateGts} GTexel/s</td>
             </tr>
           ) : null}
           <tr>

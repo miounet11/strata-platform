@@ -24,6 +24,11 @@ export function guidePath(slug: string): string {
   return `/guides/${encodeURIComponent(slug)}`;
 }
 
+/** Category pillar page for a guide kind, e.g. `/guides/category/troubleshoot`. */
+export function guideCategoryPath(kind: string): string {
+  return `/guides/category/${encodeURIComponent(kind)}`;
+}
+
 export function gpuPath(slug: string): string {
   return `/gpus/${encodeURIComponent(slug)}`;
 }
@@ -93,7 +98,7 @@ export function parentPathOf(pathname: string): string | undefined {
 }
 
 /** Detail paths are `/locale/<hub>/<slug>`; hubs are the first segment after the locale. */
-const HREF = /^\/(?:[a-z]{2}(?:-[A-Za-z]{2,4})?\/)?[a-z0-9]+(?:[/?][^\s#]*)?$/;
+const HREF = /^\/(?:[a-z]{2}(?:-[A-Za-z]{2,4})?\/)?[a-z0-9][a-z0-9-]*(?:[/?][^\s#]*)?$/;
 
 /** The private-prefix test lives with the route model; this is just the readable alias. */
 const isPrivatePath = (pathname: string) => !isPublicPath(pathname);

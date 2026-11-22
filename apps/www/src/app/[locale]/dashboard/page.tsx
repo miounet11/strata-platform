@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ClientMessages } from "@/components/ClientMessages";
 import { DashboardPanel } from "@/components/DashboardPanel";
 import { seoMetadata } from "@/lib/seo-messages";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
@@ -33,7 +34,9 @@ export default async function DashboardPage({
 
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
-      <DashboardPanel />
+      <ClientMessages namespaces={["dashboard"]}>
+        <DashboardPanel />
+      </ClientMessages>
     </div>
   );
 }

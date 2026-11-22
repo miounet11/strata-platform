@@ -1,20 +1,11 @@
-import manifest from "@/data/media-manifest.json";
+import fallbackManifest from "@/data/media-manifest.json";
+import { readDataJson } from "@/lib/data-file";
 
 /**
- * Public base for media files. In production this is the R2 bucket behind `file.stratat.com`,
- * so images and audio are served by Cloudflare's edge instead of the VPS that also renders the
- * pages. Unset in development, where `/media/...` resolves against `public/`.
+ * Public base for media files. Unset when served from this host's `public/media/`.
  */
 const MEDIA_BASE = (process.env.NEXT_PUBLIC_MEDIA_BASE ?? "").replace(/\/+$/, "");
 
-/**
- * Absolute (or root-relative) URL for a manifest path.
- *
- * The manifest stores root-relative paths because the files also live in `public/` for local
- * work and for the image worker that writes them. The base is applied at read time so moving to
- * a CDN is one environment variable, not 139 edits — and turning it off restores the old
- * behaviour without touching data.
- */
 export function mediaUrl(path: string | undefined): string | undefined {
   if (!path) return undefined;
   if (!MEDIA_BASE || !path.startsWith("/media/")) return path;
@@ -28,23 +19,36 @@ export type MediaAsset = {
   slot: string;
   alt?: Record<string, string>;
   locale?: string;
+  source?: string;
   text?: string;
   language?: string;
   title?: Record<string, string>;
   body?: string;
 };
 
-export function getMediaManifest() {
-  return manifest;
+type ManifestFile = {
+  assets: Record<string, MediaAsset>;
+};
+
+export function getMediaManifest(): ManifestFile {
+  return readDataJson("media-manifest.json", fallbackManifest as unknown as ManifestFile);
 }
 
 export function mediaForPage(page: string, slot: string) {
-  return Object.entries(manifest.assets as Record<string, MediaAsset>)
+  return Object.entries(getMediaManifest().assets)
     .filter(([, a]) => a.page === page && a.slot === slot)
     .map(([id, a]) => ({ id, ...a }));
 }
 
 export function mediaById(id: string): (MediaAsset & { id: string }) | null {
-  const a = (manifest.assets as Record<string, MediaAsset>)[id];
+  const a = getMediaManifest().assets[id];
   return a ? { id, ...a } : null;
+}
+
+/**
+ * Resolve a guide's hero image with locale-specific priority (`guide-<locale>-<slug>`),
+ * falling back to the legacy shared key (`guide-<slug>`).
+ */
+export function mediaForGuide(slug: string, locale: string): (MediaAsset & { id: string }) | null {
+  return mediaById(`guide-${locale}-${slug}`) ?? mediaById(`guide-${slug}`);
 }

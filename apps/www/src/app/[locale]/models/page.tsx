@@ -1,10 +1,13 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { ClientMessages } from "@/components/ClientMessages";
 import { EnrichedCode, EnrichedImage } from "@/components/EnrichedBlock";
 import { ModelActions } from "@/components/ModelActions";
 import modelsData from "@/data/models.json";
 import { seoMetadata } from "@/lib/seo-messages";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
 import { SITE } from "@/lib/seo";
+
+export const revalidate = 1800;
 
 export async function generateMetadata({
   params,
@@ -39,41 +42,43 @@ export default async function ModelsPage({
           {modelsData.baseModel}
         </a>
       </p>
-      <div className="table-scroll" style={{ marginTop: "1.5rem" }}>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>{t("title")}</th>
-              <th>{t("ram")}</th>
-              <th>{t("vram")}</th>
-              <th>{t("size")}</th>
-              <th className="num">{t("tokPerSec")}</th>
-              <th>{t("actions")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {modelsData.variants.map((v) => (
-              <tr key={v.id}>
-                <td>
-                  <strong>{v.name}</strong>
-                  <div className="meta">{v.description}</div>
-                </td>
-                <td>{v.ramGbMin} GB+</td>
-                <td>{v.vramGbMin} GB+</td>
-                <td>~{v.downloadGb} GB</td>
-                <td className="num">{v.outputTps5070}</td>
-                <td>
-                  <ModelActions
-                    modelId={v.id}
-                    modelName={v.name}
-                    hfUrl={modelsData.huggingface}
-                  />
-                </td>
+      <ClientMessages namespaces={["models"]}>
+        <div className="table-scroll" style={{ marginTop: "1.5rem" }}>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>{t("title")}</th>
+                <th>{t("ram")}</th>
+                <th>{t("vram")}</th>
+                <th>{t("size")}</th>
+                <th className="num">{t("tokPerSec")}</th>
+                <th>{t("actions")}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {modelsData.variants.map((v) => (
+                <tr key={v.id}>
+                  <td>
+                    <strong>{v.name}</strong>
+                    <div className="meta">{v.description}</div>
+                  </td>
+                  <td>{v.ramGbMin} GB+</td>
+                  <td>{v.vramGbMin} GB+</td>
+                  <td>~{v.downloadGb} GB</td>
+                  <td className="num">{v.outputTps5070}</td>
+                  <td>
+                    <ModelActions
+                      modelId={v.id}
+                      modelName={v.name}
+                      hfUrl={modelsData.huggingface}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </ClientMessages>
       <p className="meta" style={{ marginTop: "1.5rem" }}>
         <a href="https://github.com/Niko1221/Strata/blob/main/docs/MODELS.md">docs/MODELS.md</a>
       </p>

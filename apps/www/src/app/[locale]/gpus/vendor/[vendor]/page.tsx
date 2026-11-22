@@ -97,7 +97,7 @@ export default async function GpuVendorPage({
       </ul>
 
       {newest.map((entry) => {
-        const cards = list.filter((gpu) => gpu.series === entry.series).slice(0, 24);
+        const cards = list.filter((gpu) => gpu.series === entry.series).slice(0, 12);
         return (
           <section key={`latest-${entry.slug}`}>
             <h2>{entry.series}</h2>

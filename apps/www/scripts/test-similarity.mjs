@@ -238,6 +238,34 @@ test("a template block shared by several pages is filtered out", () => {
   return null;
 });
 
+// ── 5b. growth in one section must not change another section's verdict ────
+// This is the stratat regression: 412 `/issues` pages became 572 in a build where no GPU page
+// changed a byte, the per-locale cutoff moved from 62 to 68 pages, and the reported pair count
+// jumped 1,376 → 1,517. The filter was counting a template against pages that do not carry it.
+test("unrelated pages growing in the same locale do not resurrect a template block", () => {
+  const shared = words("series", 160);
+  const files = {};
+  for (const suffix of ["a", "b", "c"]) {
+    files[`en/gpus/tpl-${suffix}`] = page(`TPL ${suffix}`, `${shared} ${words(`u${suffix}`, 10)}`);
+  }
+  files["en/gpus/dup-1"] = page("D1", words("real", 120));
+  files["en/gpus/dup-2"] = page("D2", words("real", 120));
+
+  // 400 distinct `/issues` pages push the per-locale cutoff past the template's df of 3, which is
+  // exactly what made the filter stop working. They carry no template of their own.
+  const filler = {};
+  for (let i = 0; i < 400; i++) filler[`en/issues/${i}`] = page(`I${i}`, words(`i${i}`, 60));
+
+  const pairs = pairsOf(run({ ...files, ...filler }).stdout);
+  if (pairs.some((pair) => pair.includes("tpl-"))) {
+    return `the /issues pages must not weaken the /gpus filter: ${pairs.filter((p) => p.includes("tpl-")).join(", ")}`;
+  }
+  if (!pairs.some((pair) => pair.includes("/en/gpus/dup-1 ~ /en/gpus/dup-2"))) {
+    return `the real duplicate must still be reported, got: ${pairs.join(", ")}`;
+  }
+  return null;
+});
+
 // ── 6. locales are never compared to each other ───────────────────────────
 test("identical pages in different locales are not compared", () => {
   const body = words("same", 120);

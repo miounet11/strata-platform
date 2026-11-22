@@ -25,7 +25,12 @@
     "gpus": "显卡",
     "guides": "指南",
     "gpuBrands": "显卡品牌",
-    "skipToContent": "跳到主要内容"
+    "skipToContent": "跳到主要内容",
+    "method": "方法",
+    "best": "场景",
+    "vps": "VPS 特价",
+    "canIRun": "显存计算器",
+    "search": "搜索"
   },
   "topics": {
     "title": "场景",
@@ -283,7 +288,17 @@
     "reset": "恢复默认",
     "daysShort": "天",
     "back": "全部硬件",
-    "rigSpecNote": "规格与兼容性"
+    "rigSpecNote": "规格与兼容性",
+    "rigDecisionTitle": "选购决策结论",
+    "rigVerdictMeasured": "{name} 实测生成速率 {write} tok/s，本地单位成本 ${cost}/百万 token（在 {total} 台实测配置中成本排第 #{costRank}），满载回本周期 {days} 天。",
+    "rigVerdictPending": "{name}（{memory} GB）实测生成 {write} tok/s、读取 {read} tok/s；当前暂缺整机市场价，暂未计入单位成本排名。",
+    "rigStandingLine": "生成速度排第 #{speedRank}/{totalRigs} · 整机功耗排第 #{powerRank}（{watts} W）。",
+    "rigSkipCheaper": "若想降低前期购机预算，可对比",
+    "rigSkipFaster": "若需要更快的交互生成速度，可对比",
+    "rigFaqSpeedQ": "{name} 跑本地大模型有多快？",
+    "rigFaqSpeedA": "{name}（{memory} GB）在 Qwen3.8-Flash-Next 上实测生成速率为 {write} tok/s，提示词读取速率为 {read} tok/s（数据快照 {date}）。",
+    "rigFaqWorthQ": "买 {name} 本地部署比调云端 API 划算吗？",
+    "rigFaqWorthA": "按本地成本 ${cost}/百万 token 计算，{name} 在 24 小时满载下需 {days24} 天回本，若每天使用 4 小时则需 {days4} 天——利用率是核心决定因素。"
   },
   "seo": {
     "suffix": "Strata",
@@ -366,6 +381,26 @@
     "guides": {
       "title": "本地大模型运行指南",
       "description": "显存、量化、显卡选择与排障的分步指南，帮你在这台电脑上把大模型跑起来。"
+    },
+    "method": {
+      "title": "本地大模型跑分是怎么测的",
+      "description": "Strata 跑分表每个数字的来源、公式、假设与局限。"
+    },
+    "best": {
+      "title": "按场景推荐本地大模型显卡与整机",
+      "description": "本地大模型硬件的分场景短名单：每百万 token 成本最低、2000 美元以内、功耗最低，以及 Apple 统一内存方案。"
+    },
+    "vps": {
+      "title": "2026 高性价比 VPS 推荐：中国优化线路与 20 美元/年大带宽",
+      "description": "每日核实的 2026 高性价比 VPS 推荐，聚焦中国大陆访问（CMIN2 / CUII / 9929 / 直连优化），收录约 20 美元/年、带宽不低于 100Mbps 的实惠方案，适合本地 AI 中转与节点部署。含测试 IP、线路实情、续费规则与下单链接。"
+    },
+    "canIRun": {
+      "title": "我的电脑能跑本地大模型吗？显存/内存与速度计算器",
+      "description": "输入显卡显存、系统内存和上下文长度（8K–128K），立即测算可运行的 Qwen3.8-Flash-Next 量化档位、KV 缓存占用、预计 tok/s 与回本天数。"
+    },
+    "search": {
+      "title": "站内搜索 — 显卡、指南、基准测试与版本",
+      "description": "快速检索 3,200+ 显卡兼容数据、29 台实测基准、选型榜单、排障指南与最新版本。"
     }
   },
   "gpus": {
@@ -441,7 +476,12 @@
     "specChip": "芯片代号",
     "specProcess": "制程",
     "specMemoryType": "显存类型",
-    "specBus": "总线接口"
+    "specBus": "总线接口",
+    "specTransistors": "晶体管数",
+    "specTransistorsValue": "{count} 百万",
+    "specDieSize": "芯片面积",
+    "specPixelRate": "像素填充率",
+    "specTextureRate": "纹理填充率"
   },
   "guides": {
     "title": "指南",
@@ -457,15 +497,278 @@
       "local": "本地部署",
       "troubleshoot": "排障",
       "task": "工作流",
-      "hardware": "硬件"
+      "hardware": "硬件",
+      "radar": "新词与新模型",
+      "release": "版本更新指南"
     },
     "all": "全部指南",
     "homeIntro": "从你手上的问题开始。每篇指南结尾都会指向下一步。",
-    "editorial": "专题页"
+    "editorial": "专题页",
+    "categoryIntro": "共 {count} 篇「{kind}」实战指南，所有数字均基于实测硬件数据，不编造跑分。",
+    "viewAllCategory": "查看该分类全部指南",
+    "otherCategories": "其他指南分类"
   },
   "notFound": {
     "title": "这个页面不存在",
     "body": "链接可能已经过期。其余内容都在下面。",
     "home": "回到首页"
+  },
+  "method": {
+    "title": "跑分数据是怎么算出来的",
+    "description": "数据来源、每个数字背后的公式、所用假设，以及这些测量不覆盖的范围。",
+    "intro": "跑分页上的每个数字都来自同一个数据源和同一套公式。本页把两者都写清楚，也写明局限，这样数字可以被核对和修正，而不必直接采信。",
+    "sourceTitle": "数据来源",
+    "sourceBody": "每秒 token 与价格取自 {name}。许可条款：{license}",
+    "sourceMethod": "原站方法说明",
+    "methodTitle": "每个数字怎么算",
+    "method1": "每日产出 = 读取速度 × 每天运行小时数。",
+    "method2": "电费 = 功率 × 小时数 × 电价。",
+    "method3": "每日成本 = 电费 + 硬件价格按其寿命摊到每天。",
+    "method4": "回本天数 = 整机价格 ÷ 相对 API 每天省下的钱。",
+    "assumptionsTitle": "表格背后的假设",
+    "assumptionsIntro": "表格使用以下默认值。在跑分页改动任意一项，所有派生数字都会随之更新。",
+    "assumptionReadingShare": "产出中读取（输入）的占比",
+    "assumptionActiveHours": "每天运行小时",
+    "assumptionElectricity": "电价",
+    "assumptionHardwareLife": "硬件使用年限",
+    "assumptionHost": "整机其他配件预算",
+    "assumptionApi": "API 参考价（读 / 写）",
+    "perMM": "美元 / 百万 token",
+    "limitsTitle": "这些数字不覆盖的范围",
+    "limit1": "仅限消费级显卡，不含服务器型号与多卡配置。",
+    "limit2": "单一负载：顺序单流混合。批处理与并发服务整体吞吐更高，但单流更慢。",
+    "limit3": "价格为当期市价，会独立于测量结果变动。",
+    "limit4": "回本天数是估算而非报价，前提是机器按标注小时数持续满载。",
+    "freshnessTitle": "数据新鲜度",
+    "freshnessBody": "表格最近一次同步于 {date}。指标原地重新发布，因此从旧副本引用的数字可以对照日期核对。",
+    "citeTitle": "引用这些数字",
+    "citeBody": "数据集可自由引用，请注明 Strata 与原始数据源。引用方法时链到本页，引用具体数字时链到跑分页。",
+    "backToBenchmarks": "返回跑分表"
+  },
+  "best": {
+    "title": "按场景选择本地大模型硬件",
+    "intro": "下面的每个榜单都来自同一张实测跑分表，并写明排序规则。没有人工挑选：数据变，顺序就变。",
+    "count": "共 {count} 台符合条件",
+    "limitsTitle": "这些榜单没有覆盖什么",
+    "limitShared": "所有数字都是单一负载下的单流实测。多人并发服务、微调和服务器型号的表现不同。",
+    "methodNote": "排序规则与假设：",
+    "methodLink": "我们的测量方法",
+    "allBenchmarks": "完整跑分表",
+    "guidesLink": "部署指南",
+    "synced": "实测于 {date}",
+    "faqWhyCount": "为什么是这 {count} 台，而不是最便宜的显卡？",
+    "faqWhyCountAnswer": "因为排名用的是实测的每百万 token 成本，已经把功耗和硬件寿命折算进去。更便宜的显卡如果更慢或更费电，五年下来每 token 反而更贵。榜单由基准表直接生成，数据变了顺序就会跟着变。",
+    "faqWhereData": "这些数字从哪来？",
+    "faqWhereDataAnswer": "来自 {source}，实测于 {date}。本页所有榜单都出自同一张带日期的表，成本数字背后的假设写在基准数据页上。",
+    "faqTopPickQ": "在「{title}」中排名第 1 的配置是哪台？",
+    "faqTopPickA": "当前排名第 1 的是 {name}（{memory} GB 显存/内存），实测生成速率 {write} tok/s，本地单位成本 {cost}/百万 token，默认满载回本周期 {days}。"
+  },
+  "scenarios": {
+    "items": {
+      "value": {
+        "title": "跑本地大模型最省钱的硬件",
+        "seoTitle": "跑本地大模型最省钱的硬件（实测每百万 token 成本）",
+        "seoDescription": "运行 125B 级本地模型时每百万 token 成本最低的六台机器，成本已包含电费与五年硬件折旧。",
+        "summary": "按实测每百万 token 成本排序，该成本已包含电费与五年硬件分摊。跑起来最省的，不一定是买起来最便宜的。",
+        "rule": "按每百万 token 成本排序（电费 + 硬件寿命）",
+        "about": "本地大模型推理的每百万 token 成本",
+        "limit": "“每 token 最省”假设机器接近全天运行。若每天只跑几个小时，吞吐更差但更便宜的机器在总花费上可能更划算。"
+      },
+      "under2000": {
+        "title": "2000 美元以内的本地大模型硬件",
+        "seoTitle": "2000 美元以内的本地大模型硬件（实测整机价）",
+        "seoDescription": "整机价不超过 2000 美元的实测机器，按价格从低到高排序，附每秒 token 与回本天数。",
+        "summary": "看的是整机价而不是单卡价。这些机器适合学生预算，同时仍然跑得动 125B 级模型。",
+        "rule": "整机价不超过 2000 美元，由低到高",
+        "about": "2000 美元以内的本地大模型硬件",
+        "limit": "整机价是当时的市场成交价。二手卡和整机促销变化比这张表快，下单前请再核对价格。"
+      },
+      "lowPower": {
+        "title": "功耗最低的本地大模型机器",
+        "seoTitle": "跑本地大模型功耗最低的硬件（实测瓦数）",
+        "seoDescription": "运行 125B 级本地模型时整机功耗最低的六台机器，适合卧室、宿舍与合租环境。",
+        "summary": "按整机功耗排序。如果机器只能放在卧室、宿舍或共用电路上，这份榜单就是为你准备的。",
+        "rule": "按整机功耗由低到高排序",
+        "about": "低功耗本地大模型硬件",
+        "limit": "整机功耗是该负载下的满载实测值；待机功耗与风扇噪音是另外两项指标，不在这张表里。"
+      },
+      "apple": {
+        "title": "Apple Silicon 跑本地大模型",
+        "seoTitle": "Apple Silicon 跑本地大模型：Mac Studio 与 MacBook 对比",
+        "seoDescription": "全部实测 Apple 机器，按每百万 token 成本排序，附统一内存容量、功耗与回本天数。",
+        "summary": "Apple 机器单独排序，因为统一内存改变了问题本身：没有显存上限要卡，只有价格和带宽两个约束。",
+        "rule": "仅 Apple Silicon，按每百万 token 成本排序",
+        "about": "Apple Silicon 统一内存本地推理",
+        "limit": "统一内存与系统和所有前台应用共享，可用上限低于标称容量。真正的瓶颈通常是带宽而非容量。"
+      },
+      "fastest": {
+        "title": "生成速度最快的本地大模型显卡",
+        "seoTitle": "本地大模型生成速度（tok/s）最快的显卡实测榜单",
+        "seoDescription": "按实测生成速率（writing tok/s）排序的 8 台最快本地大模型硬件配置。",
+        "summary": "严格按实测生成速率（token/s）排序。生成速度直接决定对话和代码补全的跟手程度。",
+        "rule": "按实测生成速率（tok/s）从高到低排序",
+        "about": "本地大模型最快生成速度显卡",
+        "limit": "速度最快的卡整机预算高（$8,500–$18,317），若看重性价比请看单位成本或回本榜单。"
+      },
+      "fastPayback": {
+        "title": "对比云端 API 回本最快的本地显卡",
+        "seoTitle": "本地大模型回本最快的显卡配置（对比 API 账单）",
+        "seoDescription": "按相对云端 API 混合单价（$0.154/M tok）的最短回本天数排序的 8 台实测配置。",
+        "summary": "按对比云端 API 账单的最短回本天数排序。整机采购价更低的卡往往比顶级旗舰回本更快。",
+        "rule": "按相对 API 的最短回本天数排序",
+        "about": "本地大模型硬件回本周期",
+        "limit": "回本高度依赖日活跃时长：从 24 小时/天降到 4 小时/天，回本天数会拉长约 6 倍。"
+      },
+      "multiGpu": {
+        "title": "双卡本地大模型配置推荐",
+        "seoTitle": "双卡分层部署本地大模型实测榜单（2×3090 / 2×5060 Ti 等）",
+        "seoDescription": "实测双卡配置（双 3090、双 5060 Ti、双 TITAN RTX、双 6900 XT、双 3060）的显存、速率与成本排名。",
+        "summary": "双卡分层切分可在远低于专业卡的价格下获得 24–48 GB 显存，按实测每百万 token 成本排序。",
+        "rule": "双卡实测配置，按每百万 token 成本排序",
+        "about": "双卡本地大模型推理配置",
+        "limit": "双卡需确认主板 PCIe 槽距、电源余量（建议 750–1000W+）以及机箱风道散热。"
+      },
+      "amd": {
+        "title": "AMD 显卡与锐龙 AI 统一内存本地大模型榜单",
+        "seoTitle": "AMD 显卡（RX 7900 XTX / 9070 XT / 锐龙 AI Max+ 395）本地大模型实测",
+        "seoDescription": "基于 HIP / ROCm 的 AMD 独立显卡与 128 GB 统一内存机型实测速率与成本排行。",
+        "summary": "汇总所有经实测的 AMD 独显与 Strix Halo 统一内存机型，按每百万 token 本地成本排序。",
+        "rule": "AMD 平台实测配置，按单位成本排序",
+        "about": "AMD ROCm 与 HIP 本地大模型硬件",
+        "limit": "购买前请核对对应系统的 HIP/ROCm 驱动支持，Windows 与 Linux 端构建节奏各自独立。"
+      },
+      "highVram": {
+        "title": "大显存与大容量统一内存机型（48 GB–512 GB）",
+        "seoTitle": "48 GB 至 512 GB 大显存本地大模型工作站实测榜单",
+        "seoDescription": "汇总 48 GB 到 512 GB 显存或统一内存机型，适合 4-bit 量化与 128K 长上下文。",
+        "summary": "48 GB 及以上内存可承载更高精度量化与 128K 长上下文，大幅减少甚至消除磁盘换页。",
+        "rule": "内存 ≥48 GB 实测机型，按容量与单位成本排序",
+        "about": "大显存本地大模型工作站",
+        "limit": "统一内存胜在容量大、噪音低，但生成速率不及独显；RTX PRO 6000 极快但整机高达 $18,317。"
+      }
+    }
+  },
+  "vps": {
+    "title": "2026 高性价比 VPS 推荐：中国优化线路与 20 美元/年大带宽",
+    "intro": "面向中国大陆访问与本地 AI 中转/节点部署，每日核实一次仍可下单的实惠 VPS。重点看约 20 美元/年（精品线路可到约 30 美元）、带宽不低于 100Mbps，以及 CN2 GIA、CMIN2、9929、CUII 或三网直连优化等回国线路实情——不把普通国际线路写成精品线。",
+    "verifiedAt": "最后核实时间（Asia/Shanghai）：{time}",
+    "dailyNote": "本页由数据文件热更新，不必每天全站重建。遇到 Cloudflare 403 或其他临时拦截时，会保留上次有效记录，不会把暂时打不开误判为下架；若官方页返回 404，才会标记缺货。",
+    "criteriaTitle": "筛选标准",
+    "criteriaBudget": "年付约 20 美元，重点看不超过 25 美元的大带宽方案；线路明显更好的精品线可放到约 30 美元。",
+    "criteriaBandwidth": "大带宽推荐门槛为 ≥100Mbps；5Mbps 特价即使线路好，也只放在附注里。",
+    "criteriaRoute": "优先中国大陆优化线路（CN2 GIA / CMIN2 / 9929 / CUII / 三网直连优化），并如实写明有没有电信 CN2。",
+    "criteriaUse": "适合给国内用户访问的节点、本地 AI 中转或轻量业务；普通国际线路只作为中控或非回国业务备选。",
+    "dealsTitle": "当前可下单的中国优化大带宽方案",
+    "backupTitle": "普通国际线路备选（中控 / 非回国）",
+    "backupIntro": "带宽和硬盘往往更宽裕，续费也更常见同价，但不是中国优化线路，国内访问可能一般。",
+    "footnotesTitle": "未纳入大带宽推荐",
+    "faqTitle": "常见问题",
+    "disclosureTitle": "推广与更新说明",
+    "disclosure": "本页部分按钮已使用已审核的联盟或分享链接（这些链接带 rel=sponsored）。没有推广链接的项目仍指向官方页面。我们按核实到的库存、价格和线路实情收录，不会因为佣金隐瞒 5Mbps 或非优化线路等短板。展示价格以商家结账页为准，下单前请再确认续费规则与机房库存。出站点击记录只用于核对该链接的访问次数，不等于已下单或已注册。",
+    "cta": "前往下单（含推广链接）",
+    "testIp": "测试 IP",
+    "route": "线路",
+    "renewal": "续费",
+    "stockIn": "现货",
+    "stockOut": "缺货",
+    "stockUnknown": "待核验",
+    "pricePerYear": "{price}/年",
+    "specs": "配置",
+    "bandwidth": "带宽与流量",
+    "location": "机房",
+    "noDeals": "暂无已核实、且仍在售的大带宽方案。",
+    "faqs": [
+      {
+        "question": "20 美元左右有哪些适合中国用户的优化 VPS？",
+        "answer": "以 2026-11-13 的核实结果看，真正适合国内访问、而且带宽达到 100Mbps 的 20 美元档精品线几乎没有现货。更接近预算的是 DediOne 洛杉矶/堪萨斯大陆优化 2C2G（25.99 美元/年，200Mbps 不限流量，三网直连优化）和 DediOne 洛杉矶 CMIN2+CUII（29.99 美元/年，200Mbps，月流量 500GB）。CloudCone、RackNerd 的 14–22 美元方案带宽更大，但是普通国际线路。5Mbps 的 19.99 美元 CMIN2 特价只适合极轻量用途。"
+      },
+      {
+        "question": "CMIN2 和普通 163 线路有什么区别？",
+        "answer": "CMIN2 是中国移动的精品回国线路，通常比普通 CMI/163 国际出口更稳、高峰期丢包更少；DediOne 的 CMIN2 方案还会叠加联通 CUII。普通 163 或“三网直连优化”往往是 CN2 GT 或普通直连，延迟和晚高峰表现通常不如 CN2 GIA / CMIN2 / 9929。无论商家怎么写“优化”，都应以测试 IP 在电信、移动、联通三网的实际延迟和路由为准，本页会标明“有没有电信 CN2”。"
+      },
+      {
+        "question": "如何测试 VPS 到中国大陆的延迟和线路？",
+        "answer": "先 ping 或 mtr 本页给出的测试 IP，分别从电信、移动、联通网络测试。再看 traceroute 是否经过 CN2（59.43）、CMIN2、9929（218.105 等）或普通 163/CMI。下单后应用同样的方法测你的实际 IP。延迟会随省份和时段变化，一次测速不能代表全天质量。"
+      },
+      {
+        "question": "为什么不推荐 5Mbps 的特价 CMIN2？",
+        "answer": "那款 DediOne 洛杉矶 CMIN2 特价大约 19.99 美元/年，线路是 CMIN2+CUII，对国内访问并不差，但带宽只有 5Mbps，上传下载都容易顶满，不适合给较多用户访问或做中转。本页的大带宽推荐门槛是 100Mbps 起，所以它只出现在附注里。"
+      },
+      {
+        "question": "现在买还是等黑五？",
+        "answer": "如果不是马上要用，2026 年黑五（11 月 27 日）前后一周，RackNerd、CloudCone、DMIT、HostDare、VMISS 等商家更常放出续费同价的大流量或优化线。当前 20 美元档且 ≥100Mbps 的精品线现货很少，可以先用这页盯库存，有明显更好的黑五现货再下手。"
+      },
+      {
+        "question": "这些链接是推广链接吗？价格一定准吗？",
+        "answer": "已配置推广链接的方案，按钮会带着联盟或分享参数跳转到商家页面，并在本页保留推广披露（rel=sponsored）；尚未配置的仍指向官方页面。价格、库存和续费规则以商家结账页为准。本页每日核验一次，但不能替代下单前的最后确认。"
+      }
+    ],
+    "ctaOfficial": "查看官方方案",
+    "ctaAffiliate": "前往下单（含推广链接）"
+  },
+  "canIRun": {
+    "title": "我的电脑能跑本地大模型吗？显存与内存计算器",
+    "intro": "选择显卡预设或输入显存、系统内存与目标上下文长度（8K–128K），立即算出可运行的量化档位、KV 缓存占用、预计生成速率与对比云端 API 的回本天数。",
+    "presetLabel": "选择显卡 / 机型预设",
+    "customOption": "自定义配置（在下方手动输入显存与内存）",
+    "vramLabel": "显存 / 统一内存",
+    "ramLabel": "系统内存",
+    "unifiedLabel": "统一内存架构（Apple Silicon / 锐龙 AI Max+ / DGX Spark）",
+    "contextLabel": "上下文长度",
+    "hoursLabel": "每日活跃时长",
+    "electricityLabel": "电价（美元/度）",
+    "verdictCanRun": "可以运行 — 你的配置能在本地运行 Qwen3.8-Flash-Next。",
+    "verdictCannotRun": "当前显存或内存低于 125B 模型的最低运行门槛。",
+    "bestQuantLabel": "推荐量化档位",
+    "kvOverheadLabel": "KV 缓存预留",
+    "speedLabel": "预计生成速度",
+    "costLabel": "本地单位成本",
+    "paybackLabel": "预计回本周期",
+    "daysUnit": "天",
+    "evidenceMeasured": "实测基准",
+    "evidenceEstimated": "带宽推算",
+    "bottleneckVram": "独立显存低于 12 GB 最低门槛。建议升级至 12 GB 以上显卡（如 RTX 3060 12GB、RTX 5070、RX 7900 XTX）或选用 64 GB+ 统一内存设备。",
+    "bottleneckRam": "显存已达 12 GB 门槛，但系统内存低于 32 GB 或不足以承载所选上下文长度。可尝试切换到 8K 上下文或升级至 64 GB 内存。",
+    "bottleneckUnified": "统一内存需为系统保留约 20% 余量，建议至少 48–64 GB 统一内存（如 Mac mini M5 Pro 64 GB 或锐龙 AI Max+ 128 GB）。",
+    "colQuant": "量化档位",
+    "colStatus": "适配结论",
+    "colVramNeed": "需显存",
+    "colRamNeed": "需内存",
+    "colDownload": "下载体积",
+    "colSpeed": "预计生成",
+    "statusRecommended": "最推荐",
+    "statusFits": "流畅运行",
+    "statusTight": "可跑（较紧）",
+    "statusNeedsRam": "内存不足",
+    "statusNeedsVram": "需 12 GB+ 显存",
+    "seeRig": "查看实测基准",
+    "seeGpu": "查看显卡规格",
+    "installCta": "安装教程",
+    "downloadCta": "下载 Strata",
+    "tierTableTitle": "各档位显存与内存适配速查表（按 32K 上下文）",
+    "tierTableIntro": "下表与上方交互计算器共用同一套量化门槛与 KV 缓存公式，便于直接对照与引用。",
+    "tierColHardware": "常见硬件档位",
+    "tierFootnote": "* 统一内存与操作系统共用内存池，按约 82% 可用于模型权重与 KV 缓存计算。",
+    "faq1Q": "本地运行 Strata 最低需要多大显存和内存？",
+    "faq1A": "最低需要 12 GB 独立显存 + 32 GB 系统内存（可跑 Coder 档位）；推荐 12 GB 显存 + 64 GB 内存以流畅运行默认的 IQ2_XS 档位。",
+    "faq2Q": "8 GB 显存显卡（如 RTX 4060）能跑 Qwen3.8-Flash-Next 吗？",
+    "faq2A": "不能。8 GB 独立显存低于 Qwen3.8-Flash-Next 全部发布版本的 12 GB 显存底线，需 12 GB 或 16 GB 及以上显卡（如 RTX 4070 / 5070 / RX 9070 XT）。",
+    "faq3Q": "开 128K 长上下文会多占多少内存？",
+    "faq3A": "128K 上下文大约需要 14 GB 的 KV 缓存空间（8K 仅约 1.5 GB），重度长文档场景建议配备 64–96 GB 系统内存或 128 GB 统一内存。",
+    "faq4Q": "Apple Silicon 统一内存和 RTX 4090 怎么选？",
+    "faq4A": "Apple Silicon（64–512 GB）胜在单机即可装下超大参数与超长上下文且噪音低；RTX 4090（109.3 tok/s）和 RTX 5090（168.4 tok/s）的生成速度则快 2–5 倍。"
+  },
+  "search": {
+    "title": "站内搜索",
+    "intro": "一站搜索 3,200+ 显卡兼容表、29 台实测基准、部署指南、报错排查与版本更新。",
+    "placeholder": "输入显卡型号、报错信息、量化名称或主题…",
+    "button": "搜索",
+    "allTypes": "全部分类",
+    "emptyPrompt": "试试搜索 RTX 4090、CUDA 显存不足、128k 上下文或 Apple Silicon。",
+    "noResults": "未找到匹配页面，请尝试更简短的关键词或点击上方热门词。",
+    "loading": "正在搜索…",
+    "popularHeading": "热门搜索",
+    "resultCount": "找到 {count} 条相关结果",
+    "browseHeading": "按栏目浏览"
   }
 }

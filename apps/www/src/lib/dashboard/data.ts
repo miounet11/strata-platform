@@ -67,6 +67,37 @@ export type BoardData = {
   media: { assets: number; guideAssets: number; covers: number };
   logs: { file: string; lines: string[] }[];
   problems: string[];
+  traffic: { snapshot: TrafficSnapshot | null; error: string | null };
+};
+
+export type TrafficCounts = {
+  humanPv: number;
+  humanIps: number;
+  humanIpsCapped: boolean;
+  botPv: number;
+  botIps: number;
+  botIpsCapped: boolean;
+};
+
+export type TrafficSite = {
+  site: string;
+  today: TrafficCounts;
+  days7: TrafficCounts;
+  bots: [string, number][];
+  pages: [string, number][];
+  pageOverflow: number;
+};
+
+export type TrafficSnapshot = {
+  generatedAt: string;
+  timeZone: string;
+  today: string;
+  from: string;
+  to: string;
+  partial?: boolean;
+  sites: TrafficSite[];
+  trend: (TrafficCounts & { date: string })[];
+  failures: { file?: string; message?: string }[];
 };
 
 type PlanItem = {
@@ -268,7 +299,67 @@ export function collectBoard(): BoardData {
     media: { assets: Object.keys(assets).length, guideAssets, covers },
     logs: readLogs(),
     problems,
+    traffic: readTraffic(problems),
   };
+}
+
+const TRAFFIC_CANDIDATES = [
+  process.env.STRATAT_TRAFFIC_FILE,
+  "/opt/stratat/scripts/content/traffic-board.json",
+  join(process.cwd(), "../../scripts/content/traffic-board.json"),
+  join(process.cwd(), "../../../scripts/content/traffic-board.json"),
+].filter((file): file is string => Boolean(file));
+
+let trafficCache: { file: string; mtimeMs: number; snapshot: TrafficSnapshot | null; error: string | null } | null = null;
+
+function isCounts(value: unknown): value is TrafficCounts {
+  if (!value || typeof value !== "object") return false;
+  const row = value as TrafficCounts;
+  return [row.humanPv, row.humanIps, row.botPv, row.botIps].every((n) => typeof n === "number" && Number.isFinite(n));
+}
+
+function asSnapshot(value: unknown): TrafficSnapshot | null {
+  if (!value || typeof value !== "object") return null;
+  const row = value as TrafficSnapshot;
+  if (typeof row.generatedAt !== "string" || typeof row.today !== "string") return null;
+  if (!Array.isArray(row.sites) || !Array.isArray(row.trend)) return null;
+  for (const site of row.sites) {
+    if (!site || typeof site.site !== "string" || !isCounts(site.today) || !isCounts(site.days7)) return null;
+    if (!Array.isArray(site.bots) || !Array.isArray(site.pages)) return null;
+  }
+  for (const day of row.trend) {
+    if (!day || typeof day.date !== "string" || !isCounts(day)) return null;
+  }
+  return row;
+}
+
+/**
+ * The snapshot is written by the daily report. Opening the board only stats this
+ * file, so a multi-hundred-megabyte access log is never parsed in the request.
+ */
+function readTraffic(problems: string[]): { snapshot: TrafficSnapshot | null; error: string | null } {
+  const file = TRAFFIC_CANDIDATES.find((candidate) => existsSync(candidate));
+  if (!file) {
+    const error = "流量快照还没有生成。日报任务会写 scripts/content/traffic-board.json";
+    problems.push(error);
+    return { snapshot: null, error };
+  }
+  try {
+    const mtimeMs = statSync(file).mtimeMs;
+    if (trafficCache && trafficCache.file === file && trafficCache.mtimeMs === mtimeMs) {
+      if (trafficCache.error) problems.push(trafficCache.error);
+      return { snapshot: trafficCache.snapshot, error: trafficCache.error };
+    }
+    const snapshot = asSnapshot(JSON.parse(readFileSync(file, "utf8")));
+    const error = snapshot ? null : `流量快照无法识别：${file}`;
+    trafficCache = { file, mtimeMs, snapshot, error };
+    if (error) problems.push(error);
+    return { snapshot, error };
+  } catch {
+    const error = `流量快照无法读取：${file}`;
+    problems.push(error);
+    return { snapshot: null, error };
+  }
 }
 
 /**

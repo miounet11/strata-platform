@@ -1,4 +1,5 @@
-import topicData from "@/data/topics.json";
+import fallbackTopicData from "@/data/topics.json";
+import { readDataJson } from "@/lib/data-file";
 import { getRigs, type BenchmarkRig } from "@/lib/benchmarks";
 
 export type TopicFilter = {
@@ -26,23 +27,28 @@ export type Topic = {
   behind?: string[];
   evidence?: string;
   importedAt?: string;
+  /** Column (专题栏目) this topic belongs to; undefined means ungrouped. */
+  column?: string;
 };
 
-const topics = topicData.topics as Topic[];
+function loadTopics(): Topic[] {
+  const data = readDataJson("topics.json", fallbackTopicData as unknown as { topics: Topic[] });
+  return Array.isArray(data.topics) ? data.topics : [];
+}
 
 export function getTopics(): Topic[] {
-  return topics;
+  return loadTopics();
 }
 
 export function getLiveTopics(locale?: string): Topic[] {
-  return topics.filter(
+  return loadTopics().filter(
     (topic) =>
       topic.status === "live" && (!locale || !topic.locales || topic.locales.includes(locale)),
   );
 }
 
 export function getTopic(slug: string): Topic | undefined {
-  return topics.find((topic) => topic.slug === slug);
+  return loadTopics().find((topic) => topic.slug === slug);
 }
 
 /** A topic only exists for the locales it was written for. */

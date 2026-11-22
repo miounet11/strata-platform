@@ -33,6 +33,10 @@ const LIMITS = {
   ogImageCoverage: 1.0,
 };
 
+// Full failure lists are wanted during triage, but printing all of them by default buries the
+// summary. Set AUDIT_DETAIL_LIMIT to see more without copying this script into the work tree.
+const detailLimit = Number(process.env.AUDIT_DETAIL_LIMIT) || 5;
+
 if (!existsSync(appDir)) {
   console.error(`audit: no build output at ${relative(wwwDir, appDir)} — run a build first`);
   process.exit(1);
@@ -87,7 +91,8 @@ const pages = files.map((file) => {
     hasLandmarks: /<(main|nav|header|footer)[\s>]/.test(html),
     hasHtmlLang: /<html lang="/.test(html),
     isArticle: /data-page="(guide|article)"/.test(html),
-    hasTime: /<time datetime=/.test(html),
+    // React 19 serializes `dateTime` in camelCase (same as `hrefLang` above), so match case-insensitively.
+    hasTime: /<time datetime=/i.test(html),
   };
   return facts;
 });
@@ -95,7 +100,7 @@ const indexable = pages.filter((page) => !page.noindex);
 
 /** Collect failures as {id, detail, count} so the summary can be per-check, not per-page. */
 function check(id, failures, empty) {
-  return { id, pass: failures.length === 0, count: failures.length, detail: failures.length ? failures.slice(0, 5).join("; ") : empty };
+  return { id, pass: failures.length === 0, count: failures.length, detail: failures.length ? failures.slice(0, detailLimit).join("; ") : empty };
 }
 
 const checks = [];

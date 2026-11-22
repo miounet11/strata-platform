@@ -40,7 +40,7 @@ gh api 'repos/morluto/rea/git/trees/main?recursive=1' --jq '.tree[].path' | grep
 
 已改名：
 
-- `productName` / `identifier`：`Stratat` / `ai.stratat.desktop`
+- `productName` / `identifier`：`Stratat` / `com.ksxw.stratat`（对齐 Apple Developer 注册的 App ID，见 commit `c175dc3`；不要改回 `ai.stratat.desktop`，会破坏签名链）
 - 包名：`stratat`、`stratat-desktop`（`package.json`、`Cargo.toml`）
 - 进程名与日志前缀：`stratat-desktop`、`[stratat]`、`stratat-logs-*`
 - 数据目录：`~/.stratat`、`~/.local/share/stratat`、Windows `%LOCALAPPDATA%\Stratat`

@@ -3,13 +3,19 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { CommunityBody } from "@/components/CommunityBody";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { excerpt, getCommunity, getPull, relatedLinks } from "@/lib/community";
+import { excerpt, getPull, relatedLinks } from "@/lib/community";
 import { jsonLdGraph } from "@/lib/jsonld";
 import { SITE, siteMetadata } from "@/lib/seo";
 
+export const revalidate = 3600;
+
+/**
+ * Pull requests are rendered on demand rather than prerendered × 7 locales (~21,000 pages) and
+ * marked `noindex`: raw English PR descriptions caused 1,200+ near-duplicate pairs and consumed
+ * ~40% of every build while contributing negligible search traffic. Direct links still return 200.
+ */
 export function generateStaticParams() {
-  const { pulls } = getCommunity();
-  return pulls.map((p) => ({ number: String(p.number) }));
+  return [];
 }
 
 export async function generateMetadata({
@@ -20,7 +26,7 @@ export async function generateMetadata({
   const { locale, number } = await params;
   const pr = getPull(Number(number));
   if (!pr) return {};
-  return siteMetadata(locale, `PR #${pr.number}`, excerpt(pr.body || pr.title), `/pulls/${pr.number}`);
+  return siteMetadata(locale, `PR #${pr.number}`, excerpt(pr.body || pr.title), `/pulls/${pr.number}`, false);
 }
 
 export default async function PullDetailPage({

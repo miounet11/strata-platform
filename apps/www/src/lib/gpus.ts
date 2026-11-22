@@ -43,6 +43,15 @@ export type Gpu = {
   process: string | null;
   /** The silicon, which is often a different name from the board ("AD102" vs "RTX 4090"). */
   gpuName: string | null;
+  /**
+   * The chip's physical facts, null when the spec sheet doesn't report them. Two boards can share
+   * a name and still be different silicon: "Sandy Bridge GT2" is 624M transistors on 149 mm²,
+   * "GT2+" is 1,160M on 216 mm². Without these the pages are indistinguishable.
+   */
+  transistorsM: number | null;
+  dieSizeMm2: number | null;
+  pixelRateGps: number | null;
+  textureRateGts: number | null;
   quant: string | null;
   runnable: boolean;
   variant: string;

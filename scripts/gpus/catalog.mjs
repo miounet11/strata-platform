@@ -243,6 +243,10 @@ function makeRows(vendor, rows, bwKeyOf) {
       bus: null,
       process: null,
       gpuName: null,
+      transistorsM: null,
+      dieSizeMm2: null,
+      pixelRateGps: null,
+      textureRateGts: null,
       brand: vendor === "nvidia" ? "NVIDIA" : vendor === "amd" ? "AMD" : vendor === "intel" ? "Intel" : "Apple",
     };
   });
@@ -351,6 +355,34 @@ function watts(text) {
   return m ? Number(m[1]) : null;
 }
 
+/**
+ * "13,100 million" → 13100, "624 million" → 624. Kept in millions so the number stays readable.
+ *
+ * These four fields exist because a board name does not identify a chip. Radeon 680M was sold on
+ * both "Rembrandt" and "Rembrandt+", and HD Graphics 3000 on both "Sandy Bridge GT2" and "GT2+"
+ * — 624M transistors on a 149 mm² die versus 1,160M on 216 mm². The spec sheet has always known
+ * that; the page did not, so the two URLs rendered the same body.
+ */
+function millions(text) {
+  const m = /([\d,.]+)\s*(million|billion)/i.exec(text);
+  if (!m) return null;
+  const value = Number(m[1].replace(/,/g, ""));
+  if (!Number.isFinite(value)) return null;
+  return m[2].toLowerCase() === "billion" ? value * 1000 : value;
+}
+
+/** "208 mm²" → 208. */
+function millimetres(text) {
+  const m = /([\d.]+)\s*mm/i.exec(text);
+  return m ? Number(m[1]) : null;
+}
+
+/** "30.40 GPixel/s" → 30.4, "2.200 GPixel/s" → 2.2. */
+function gigas(text) {
+  const m = /([\d.]+)\s*G/i.exec(text);
+  return m ? Number(m[1]) : null;
+}
+
 function releaseYear(text) {
   const m = /(19|20)\d{2}/.exec(text);
   return m ? Number(m[0]) : null;
@@ -449,6 +481,10 @@ for (const row of csv.slice(1)) {
     bus: cell(row, "Graphics Card__Bus Interface") || null,
     process: cell(row, "Graphics Processor__Process Size") || null,
     gpuName: cell(row, "Graphics Processor__GPU Name") || null,
+    transistorsM: millions(cell(row, "Graphics Processor__Transistors")),
+    dieSizeMm2: millimetres(cell(row, "Graphics Processor__Die Size")),
+    pixelRateGps: gigas(cell(row, "Theoretical Performance__Pixel Rate")),
+    textureRateGts: gigas(cell(row, "Theoretical Performance__Texture Rate")),
     brand,
   });
 }
@@ -467,9 +503,39 @@ for (const row of bulk) {
   merged.push(row);
 }
 
+// Collapse the one alias TechPowerUp ships for the same APU die: `Rembrandt` / `Rembrandt+`.
+// Those two rows are byte-identical apart from `gpuName`, so publishing both creates duplicate
+// pages (Radeon 660M and 680M across en/ja/zh) and a floor the patrol gate cannot pass.
+//
+// Do NOT generalise this to "gpuName differs": `Phoenix` vs `Hawk Point`, `Opal` vs `Mars`,
+// `GK208B` vs `GK208`, `RS300` vs `RS350` are different silicon and the site must keep both.
+// `gpu-catalog.test.ts` asserts the same. Only a trailing `+` is a spelling of the same die.
+const identityKey = (row) =>
+  Object.keys(row)
+    .sort()
+    .filter((key) => key !== "id" && key !== "slug")
+    .map((key) => {
+      const value = key === "gpuName" ? String(row[key] ?? "").replace(/\+$/, "") : row[key] ?? null;
+      return `${key}=${JSON.stringify(value)}`;
+    })
+    .join("|");
+const seenIdentity = new Map();
+const deduped = [];
+for (const row of merged) {
+  const key = identityKey(row);
+  if (seenIdentity.has(key)) {
+    // Same hardware already published under a chip-revision alias. Do not create a second URL.
+    continue;
+  }
+  seenIdentity.set(key, row);
+  deduped.push(row);
+}
+merged.length = 0;
+merged.push(...deduped);
+
 const usedSlugs = new Set();
 const usedIds = new Set();
-for (const row of merged) {
+for (const row of deduped) {
   // Slugs must be stable and unique; a collision gets a numeric suffix, never a dropped page.
   let slug = row.slug;
   let n = 2;

@@ -52,6 +52,9 @@ export function pageLd(
     name,
     ...(options.description ? { description: options.description } : {}),
     inLanguage: locale,
-    isPartOf: { "@type": "WebSite", name: "Strata", url: site },
+    // Reference the site node by id rather than restating it: every page then points at the one
+    // WebSite entity in `site-entities.ts` instead of inventing a lookalike.
+    isPartOf: { "@id": `${site}/#website` },
+    publisher: { "@id": `${site}/#organization` },
   };
 }

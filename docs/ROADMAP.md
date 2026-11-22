@@ -7,7 +7,7 @@
 - [x] Release sync from GitHub (30 tags)
 - [x] User register/login (JWT + SQLite)
 - [ ] Deploy to VPS + TLS
-- [ ] GitHub `strata-platform/strata-desktop` CI for Win/Mac artifacts
+- [x] GitHub Actions CI for Win/Mac/Linux artifacts (`.github/workflows/desktop-build.yml`)
 
 ## Phase 2 — Product depth
 

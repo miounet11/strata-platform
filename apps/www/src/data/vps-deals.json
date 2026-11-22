@@ -1,0 +1,503 @@
+{
+  "updatedAt": "2026-11-21T01:30:10.464Z",
+  "source": "daily-watch",
+  "criteria": {
+    "budgetUsdPerYear": 25,
+    "budgetNote": "About USD 20/year, with a hard look at plans up to about USD 30 when they add a clearly better China-bound route.",
+    "minBandwidthMbps": 100,
+    "audience": "china-mainland",
+    "focus": [
+      "CN2 GIA",
+      "CMIN2",
+      "9929",
+      "CUII",
+      "optimized direct"
+    ]
+  },
+  "deals": [
+    {
+      "id": "dedione-lax-cu-2c2g",
+      "vendor": "DediOne",
+      "tier": "primary",
+      "name": {
+        "zh": "DediOne 洛杉矶大陆优化 2C2G",
+        "en": "DediOne Los Angeles mainland-optimized 2C2G",
+        "ja": "DediOne ロサンゼルス大陸向け最適化 2C2G",
+        "de": "DediOne Los Angeles festlandoptimiert 2C2G",
+        "fr": "DediOne Los Angeles optimisé Chine continentale 2C2G",
+        "es": "DediOne Los Ángeles optimizado para China continental 2C2G",
+        "pt": "DediOne Los Angeles otimizado para a China continental 2C2G"
+      },
+      "url": "https://dedione.com/store/special-vps-plans",
+      "affiliateUrl": "https://dedione.com/aff.php?aff=661&pid=238",
+      "priceUsdPerYear": 25.99,
+      "cpu": 2,
+      "ram": "2 GB",
+      "disk": "40 GB SSD",
+      "bandwidth": "200 Mbps",
+      "bandwidthMbps": 200,
+      "traffic": {
+        "zh": "不限流量",
+        "en": "Unmetered traffic",
+        "ja": "転送量無制限",
+        "de": "Unbegrenzter Traffic",
+        "fr": "Trafic illimité",
+        "es": "Tráfico ilimitado",
+        "pt": "Tráfego ilimitado"
+      },
+      "location": {
+        "zh": "美国洛杉矶",
+        "en": "Los Angeles, USA",
+        "ja": "米国ロサンゼルス",
+        "de": "Los Angeles, USA",
+        "fr": "Los Angeles, États-Unis",
+        "es": "Los Ángeles, EE. UU.",
+        "pt": "Los Angeles, EUA"
+      },
+      "route": {
+        "zh": "普通三网直连优化（163 / 4837 / CMI），不是电信 CN2 GIA",
+        "en": "Optimized three-network direct (163 / 4837 / CMI). This is not China Telecom CN2 GIA.",
+        "ja": "三大通信向け直結最適化（163 / 4837 / CMI）。中国電信 CN2 GIA ではない。",
+        "de": "Optimierte Direktroute zu den drei chinesischen Netzen (163 / 4837 / CMI). Kein China-Telecom-CN2-GIA.",
+        "fr": "Route directe optimisée vers les trois opérateurs (163 / 4837 / CMI). Ce n’est pas du CN2 GIA China Telecom.",
+        "es": "Ruta directa optimizada a las tres redes (163 / 4837 / CMI). No es China Telecom CN2 GIA.",
+        "pt": "Rota direta otimizada para as três redes (163 / 4837 / CMI). Não é China Telecom CN2 GIA."
+      },
+      "routeClass": "direct-optimized",
+      "testIp": "195.242.178.1",
+      "renewal": {
+        "zh": "下单页未标明续费同价，下单前请再确认",
+        "en": "Same-price renewal is not clearly stated on the order page — confirm at checkout.",
+        "ja": "更新同額の記載は注文ページで確認できない。決済前に再確認を。",
+        "de": "Gleichbleibender Verlängerungspreis ist auf der Bestellseite nicht klar ausgewiesen — vor dem Checkout prüfen.",
+        "fr": "Le renouvellement au même prix n’est pas clairement indiqué — à vérifier au paiement.",
+        "es": "La renovación al mismo precio no está claramente indicada; confírmalo al pagar.",
+        "pt": "A renovação pelo mesmo preço não está claramente indicada; confirme no checkout."
+      },
+      "stock": "in-stock",
+      "stockNote": {
+        "zh": "2026-11-13 核实官网特价页有现货（约 113 台）",
+        "en": "Confirmed in stock on the official specials page on 2026-11-13 (about 113 units).",
+        "ja": "2026-11-13 公式特価ページで在庫を確認（約 113 台）。",
+        "de": "Am 2026-11-13 auf der offiziellen Aktionsseite auf Lager (ca. 113 Stück).",
+        "fr": "En stock sur la page officielle le 2026-11-13 (environ 113 unités).",
+        "es": "En stock en la página oficial el 2026-11-13 (unas 113 unidades).",
+        "pt": "Em estoque na página oficial em 2026-11-13 (cerca de 113 unidades)."
+      },
+      "lastCheck": {
+        "at": "2026-11-21T01:30:03.285Z",
+        "httpStatus": 200,
+        "result": "ok"
+      }
+    },
+    {
+      "id": "dedione-kansas-cu-2c2g",
+      "vendor": "DediOne",
+      "tier": "primary",
+      "name": {
+        "zh": "DediOne 堪萨斯大陆优化 2C2G",
+        "en": "DediOne Kansas mainland-optimized 2C2G",
+        "ja": "DediOne カンザス大陸向け最適化 2C2G",
+        "de": "DediOne Kansas festlandoptimiert 2C2G",
+        "fr": "DediOne Kansas optimisé Chine continentale 2C2G",
+        "es": "DediOne Kansas optimizado para China continental 2C2G",
+        "pt": "DediOne Kansas otimizado para a China continental 2C2G"
+      },
+      "url": "https://dedione.com/store/special-vps-plans",
+      "affiliateUrl": "https://dedione.com/aff.php?aff=661&pid=250",
+      "priceUsdPerYear": 25.99,
+      "cpu": 2,
+      "ram": "2 GB",
+      "disk": "50 GB NVMe",
+      "bandwidth": "200 Mbps",
+      "bandwidthMbps": 200,
+      "traffic": {
+        "zh": "不限流量",
+        "en": "Unmetered traffic",
+        "ja": "転送量無制限",
+        "de": "Unbegrenzter Traffic",
+        "fr": "Trafic illimité",
+        "es": "Tráfico ilimitado",
+        "pt": "Tráfego ilimitado"
+      },
+      "location": {
+        "zh": "美国密苏里（堪萨斯城）",
+        "en": "Missouri (Kansas City), USA",
+        "ja": "米国ミズーリ（カンザスシティ）",
+        "de": "Missouri (Kansas City), USA",
+        "fr": "Missouri (Kansas City), États-Unis",
+        "es": "Misuri (Kansas City), EE. UU.",
+        "pt": "Missouri (Kansas City), EUA"
+      },
+      "route": {
+        "zh": "普通三网直连优化（163 / 4837 / CMI），不是电信 CN2 GIA",
+        "en": "Optimized three-network direct (163 / 4837 / CMI). This is not China Telecom CN2 GIA.",
+        "ja": "三大通信向け直結最適化（163 / 4837 / CMI）。中国電信 CN2 GIA ではない。",
+        "de": "Optimierte Direktroute zu den drei chinesischen Netzen (163 / 4837 / CMI). Kein China-Telecom-CN2-GIA.",
+        "fr": "Route directe optimisée vers les trois opérateurs (163 / 4837 / CMI). Ce n’est pas du CN2 GIA China Telecom.",
+        "es": "Ruta directa optimizada a las tres redes (163 / 4837 / CMI). No es China Telecom CN2 GIA.",
+        "pt": "Rota direta otimizada para as três redes (163 / 4837 / CMI). Não é China Telecom CN2 GIA."
+      },
+      "routeClass": "direct-optimized",
+      "testIp": "144.225.6.1",
+      "renewal": {
+        "zh": "下单页未标明续费同价，下单前请再确认",
+        "en": "Same-price renewal is not clearly stated on the order page — confirm at checkout.",
+        "ja": "更新同額の記載は注文ページで確認できない。決済前に再確認を。",
+        "de": "Gleichbleibender Verlängerungspreis ist auf der Bestellseite nicht klar ausgewiesen — vor dem Checkout prüfen.",
+        "fr": "Le renouvellement au même prix n’est pas clairement indiqué — à vérifier au paiement.",
+        "es": "La renovación al mismo precio no está claramente indicada; confírmalo al pagar.",
+        "pt": "A renovação pelo mesmo preço não está claramente indicada; confirme no checkout."
+      },
+      "stock": "in-stock",
+      "stockNote": {
+        "zh": "2026-11-13 核实官网特价页有现货，可与洛杉矶机房互为备份",
+        "en": "Confirmed in stock on the official specials page on 2026-11-13. Useful as a second site next to Los Angeles.",
+        "ja": "2026-11-13 公式特価ページで在庫を確認。ロサンゼルス機房のバックアップ向き。",
+        "de": "Am 2026-11-13 auf der offiziellen Aktionsseite auf Lager. Geeignet als zweiter Standort neben Los Angeles.",
+        "fr": "En stock sur la page officielle le 2026-11-13. Utile comme second site à côté de Los Angeles.",
+        "es": "En stock en la página oficial el 2026-11-13. Útil como segundo emplazamiento junto a Los Ángeles.",
+        "pt": "Em estoque na página oficial em 2026-11-13. Útil como segundo site junto a Los Angeles."
+      },
+      "lastCheck": {
+        "at": "2026-11-21T01:30:04.416Z",
+        "httpStatus": 200,
+        "result": "ok"
+      }
+    },
+    {
+      "id": "dedione-lax-cmin2-cuii",
+      "vendor": "DediOne",
+      "tier": "primary",
+      "name": {
+        "zh": "DediOne 洛杉矶 CMIN2+CUII",
+        "en": "DediOne Los Angeles CMIN2+CUII",
+        "ja": "DediOne ロサンゼルス CMIN2+CUII",
+        "de": "DediOne Los Angeles CMIN2+CUII",
+        "fr": "DediOne Los Angeles CMIN2+CUII",
+        "es": "DediOne Los Ángeles CMIN2+CUII",
+        "pt": "DediOne Los Angeles CMIN2+CUII"
+      },
+      "url": "https://www.dedione.com/store/los-angeles-kvm-vps-cmin2-cuii",
+      "affiliateUrl": "https://dedione.com/aff.php?aff=661&pid=243",
+      "priceUsdPerYear": 29.99,
+      "cpu": 1,
+      "ram": "1 GB",
+      "disk": "10 GB NVMe",
+      "bandwidth": "200 Mbps",
+      "bandwidthMbps": 200,
+      "traffic": {
+        "zh": "每月 500 GB",
+        "en": "500 GB per month",
+        "ja": "月 500 GB",
+        "de": "500 GB pro Monat",
+        "fr": "500 Go par mois",
+        "es": "500 GB al mes",
+        "pt": "500 GB por mês"
+      },
+      "location": {
+        "zh": "美国洛杉矶",
+        "en": "Los Angeles, USA",
+        "ja": "米国ロサンゼルス",
+        "de": "Los Angeles, USA",
+        "fr": "Los Angeles, États-Unis",
+        "es": "Los Ángeles, EE. UU.",
+        "pt": "Los Angeles, EUA"
+      },
+      "route": {
+        "zh": "移动/联通走 CMIN2 + CUII 精品回国；没有电信 CN2。带宽 200Mbps，但月流量只有 500GB",
+        "en": "China Mobile/Unicom return path is CMIN2 + CUII premium. There is no China Telecom CN2. 200 Mbps, but only 500 GB of traffic per month.",
+        "ja": "中国移動・聯通の帰国経路は CMIN2 + CUII。中国電信 CN2 はない。帯域は 200Mbps だが、月間転送は 500GB のみ。",
+        "de": "Rückweg für China Mobile/Unicom über CMIN2 + CUII. Kein China-Telecom-CN2. 200 Mbps, aber nur 500 GB Traffic pro Monat.",
+        "fr": "Chemin retour Mobile/Unicom en CMIN2 + CUII. Pas de CN2 China Telecom. 200 Mbps, mais seulement 500 Go de trafic par mois.",
+        "es": "Ruta de vuelta Mobile/Unicom por CMIN2 + CUII. No hay CN2 de China Telecom. 200 Mbps, pero solo 500 GB de tráfico al mes.",
+        "pt": "Rota de retorno Mobile/Unicom em CMIN2 + CUII. Sem CN2 da China Telecom. 200 Mbps, mas apenas 500 GB de tráfego por mês."
+      },
+      "routeClass": "cmin2",
+      "testIp": "188.255.157.1",
+      "renewal": {
+        "zh": "请以结账页续费规则为准",
+        "en": "Confirm the renewal price on the checkout page.",
+        "ja": "更新料金は決済ページで確認。",
+        "de": "Verlängerungspreis auf der Checkout-Seite prüfen.",
+        "fr": "Vérifiez le tarif de renouvellement sur la page de paiement.",
+        "es": "Confirma el precio de renovación en la página de pago.",
+        "pt": "Confirme o preço de renovação na página de pagamento."
+      },
+      "stock": "in-stock",
+      "stockNote": {
+        "zh": "2026-11-13 核实官网常规档可下单；比 20 美元预算略高，但线路更好",
+        "en": "Confirmed orderable on the official regular page on 2026-11-13. A little above the $20 budget, but a better route.",
+        "ja": "2026-11-13 公式通常プランで注文可能。20ドル予算は少し超えるが、回線はより良い。",
+        "de": "Am 2026-11-13 auf der offiziellen Standardseite bestellbar. Etwas über dem 20-Dollar-Budget, dafür bessere Route.",
+        "fr": "Commandable sur la page officielle le 2026-11-13. Un peu au-dessus du budget de 20 $, mais une meilleure route.",
+        "es": "Se podía pedir en la página oficial el 2026-11-13. Algo por encima del presupuesto de 20 USD, pero con mejor ruta.",
+        "pt": "Disponível para pedido na página oficial em 2026-11-13. Um pouco acima do orçamento de US$ 20, mas com rota melhor."
+      },
+      "lastCheck": {
+        "at": "2026-11-21T01:30:05.647Z",
+        "httpStatus": 200,
+        "result": "ok"
+      }
+    },
+    {
+      "id": "cloudcone-halloween-ssd",
+      "vendor": "CloudCone",
+      "tier": "backup",
+      "name": {
+        "zh": "CloudCone 万圣节纯 SSD",
+        "en": "CloudCone Halloween pure SSD",
+        "ja": "CloudCone ハロウィン純 SSD",
+        "de": "CloudCone Halloween Pure SSD",
+        "fr": "CloudCone Halloween SSD pur",
+        "es": "CloudCone Halloween SSD puro",
+        "pt": "CloudCone Halloween SSD puro"
+      },
+      "url": "https://app.cloudcone.com/vps/536/create?token=frankenstein-26-ssd-vps-1",
+      "affiliateUrl": "https://app.cloudcone.com/vps/536/create?token=frankenstein-26-ssd-vps-1&ref=14836",
+      "priceUsdPerYear": 20.25,
+      "cpu": 2,
+      "ram": "1.25 GB",
+      "disk": "30 GB pure SSD",
+      "bandwidth": "1 Gbps",
+      "bandwidthMbps": 1000,
+      "traffic": {
+        "zh": "每月 4 TB",
+        "en": "4 TB per month",
+        "ja": "月 4 TB",
+        "de": "4 TB pro Monat",
+        "fr": "4 To par mois",
+        "es": "4 TB al mes",
+        "pt": "4 TB por mês"
+      },
+      "location": {
+        "zh": "美国洛杉矶 DC4",
+        "en": "Los Angeles DC4, USA",
+        "ja": "米国ロサンゼルス DC4",
+        "de": "Los Angeles DC4, USA",
+        "fr": "Los Angeles DC4, États-Unis",
+        "es": "Los Ángeles DC4, EE. UU.",
+        "pt": "Los Angeles DC4, EUA"
+      },
+      "route": {
+        "zh": "普通国际线路，不是中国优化或 CN2。更适合中控、监控或非回国业务",
+        "en": "Regular international transit, not a China-optimized or CN2 route. Better for control planes, monitoring, or non-China traffic.",
+        "ja": "通常の国際回線であり、中国向け最適化や CN2 ではない。管理・監視、中国向け以外の用途向き。",
+        "de": "Normale internationale Transitroute, keine China-optimierte oder CN2-Strecke. Besser für Steuerung, Monitoring oder Nicht-China-Traffic.",
+        "fr": "Transit international classique, pas une route optimisée Chine ni du CN2. Mieux pour le plan de contrôle, la supervision ou le trafic hors Chine.",
+        "es": "Tránsito internacional normal, no es una ruta optimizada a China ni CN2. Mejor para control, monitorización o tráfico que no vaya a China.",
+        "pt": "Trânsito internacional comum, não é rota otimizada para a China nem CN2. Melhor para plano de controle, monitoramento ou tráfego fora da China."
+      },
+      "routeClass": "international",
+      "testIp": "",
+      "renewal": {
+        "zh": "续费同价，支持支付宝",
+        "en": "Renews at the same price. Alipay is supported.",
+        "ja": "更新は同額。Alipay 対応。",
+        "de": "Verlängerung zum gleichen Preis. Alipay wird unterstützt.",
+        "fr": "Renouvellement au même prix. Alipay est accepté.",
+        "es": "Renovación al mismo precio. Admite Alipay.",
+        "pt": "Renovação pelo mesmo preço. Aceita Alipay."
+      },
+      "stock": "in-stock",
+      "stockNote": {
+        "zh": "2026-11-13 核实活动下单链接仍可打开",
+        "en": "Promo checkout link was still opening on 2026-11-13.",
+        "ja": "2026-11-13 時点でキャンペーン注文リンクは開いた。",
+        "de": "Der Aktions-Checkout-Link war am 2026-11-13 noch erreichbar.",
+        "fr": "Le lien de commande promotionnel s’ouvrait encore le 2026-11-13.",
+        "es": "El enlace de compra de la promoción seguía abriéndose el 2026-11-13.",
+        "pt": "O link promocional de checkout ainda abria em 2026-11-13."
+      },
+      "lastCheck": {
+        "at": "2026-11-21T01:30:06.600Z",
+        "httpStatus": 200,
+        "result": "ok"
+      }
+    },
+    {
+      "id": "cloudcone-9th-storage",
+      "vendor": "CloudCone",
+      "tier": "backup",
+      "name": {
+        "zh": "CloudCone 九周年存储款",
+        "en": "CloudCone 9th-anniversary storage plan",
+        "ja": "CloudCone 9周年ストレージプラン",
+        "de": "CloudCone 9-Jahres-Speicherplan",
+        "fr": "CloudCone stockage 9e anniversaire",
+        "es": "CloudCone almacenamiento 9.º aniversario",
+        "pt": "CloudCone armazenamento 9.º aniversário"
+      },
+      "url": "https://app.cloudcone.com/vps/528/create?token=ccturns9-stor-vps-1",
+      "affiliateUrl": "https://app.cloudcone.com/vps/528/create?token=ccturns9-stor-vps-1&ref=14836",
+      "priceUsdPerYear": 14.24,
+      "cpu": 1,
+      "ram": "1 GB",
+      "disk": "55 GB SSD-cached disk",
+      "bandwidth": "1 Gbps",
+      "bandwidthMbps": 1000,
+      "traffic": {
+        "zh": "每月 4 TB",
+        "en": "4 TB per month",
+        "ja": "月 4 TB",
+        "de": "4 TB pro Monat",
+        "fr": "4 To par mois",
+        "es": "4 TB al mes",
+        "pt": "4 TB por mês"
+      },
+      "location": {
+        "zh": "美国洛杉矶 DC4",
+        "en": "Los Angeles DC4, USA",
+        "ja": "米国ロサンゼルス DC4",
+        "de": "Los Angeles DC4, USA",
+        "fr": "Los Angeles DC4, États-Unis",
+        "es": "Los Ángeles DC4, EE. UU.",
+        "pt": "Los Angeles DC4, EUA"
+      },
+      "route": {
+        "zh": "普通国际线路，不是中国优化或 CN2。每账号限购 3 台",
+        "en": "Regular international transit, not a China-optimized or CN2 route. Limit of 3 per account.",
+        "ja": "通常の国際回線であり、中国向け最適化や CN2 ではない。1アカウントあたり 3 台まで。",
+        "de": "Normale internationale Transitroute, keine China-optimierte oder CN2-Strecke. Höchstens 3 Stück pro Konto.",
+        "fr": "Transit international classique, pas une route optimisée Chine ni du CN2. Limite de 3 par compte.",
+        "es": "Tránsito internacional normal, no es una ruta optimizada a China ni CN2. Máximo 3 por cuenta.",
+        "pt": "Trânsito internacional comum, não é rota otimizada para a China nem CN2. Limite de 3 por conta."
+      },
+      "routeClass": "international",
+      "testIp": "",
+      "renewal": {
+        "zh": "续费同价，每账号限 3 台",
+        "en": "Renews at the same price. Limit of 3 per account.",
+        "ja": "更新は同額。1アカウント 3 台まで。",
+        "de": "Verlängerung zum gleichen Preis. Höchstens 3 pro Konto.",
+        "fr": "Renouvellement au même prix. Limite de 3 par compte.",
+        "es": "Renovación al mismo precio. Máximo 3 por cuenta.",
+        "pt": "Renovação pelo mesmo preço. Limite de 3 por conta."
+      },
+      "stock": "in-stock",
+      "stockNote": {
+        "zh": "2026-11-13 核实活动下单链接仍可打开",
+        "en": "Promo checkout link was still opening on 2026-11-13.",
+        "ja": "2026-11-13 時点でキャンペーン注文リンクは開いた。",
+        "de": "Der Aktions-Checkout-Link war am 2026-11-13 noch erreichbar.",
+        "fr": "Le lien de commande promotionnel s’ouvrait encore le 2026-11-13.",
+        "es": "El enlace de compra de la promoción seguía abriéndose el 2026-11-13.",
+        "pt": "O link promocional de checkout ainda abria em 2026-11-13."
+      },
+      "lastCheck": {
+        "at": "2026-11-21T01:30:07.430Z",
+        "httpStatus": 200,
+        "result": "ok"
+      }
+    },
+    {
+      "id": "racknerd-1gb-kvm",
+      "vendor": "RackNerd",
+      "tier": "backup",
+      "name": {
+        "zh": "RackNerd 1GB KVM 特价",
+        "en": "RackNerd 1GB KVM special",
+        "ja": "RackNerd 1GB KVM 特価",
+        "de": "RackNerd 1GB-KVM-Angebot",
+        "fr": "RackNerd 1GB KVM promo",
+        "es": "RackNerd 1GB KVM oferta",
+        "pt": "RackNerd 1GB KVM oferta"
+      },
+      "url": "https://www.racknerd.com/specials/",
+      "affiliateUrl": "https://my.racknerd.com/aff.php?aff=21961&pid=952",
+      "priceUsdPerYear": 21.99,
+      "cpu": 1,
+      "ram": "1 GB",
+      "disk": "20 GB SSD",
+      "bandwidth": "1 Gbps",
+      "bandwidthMbps": 1000,
+      "traffic": {
+        "zh": "每月 3 TB",
+        "en": "3 TB per month",
+        "ja": "月 3 TB",
+        "de": "3 TB pro Monat",
+        "fr": "3 To par mois",
+        "es": "3 TB al mes",
+        "pt": "3 TB por mês"
+      },
+      "location": {
+        "zh": "美国（下单页再选具体机房）",
+        "en": "USA (pick the exact datacenter on the order page)",
+        "ja": "米国（具体的なデータセンターは注文ページで選択）",
+        "de": "USA (genaues Rechenzentrum auf der Bestellseite wählen)",
+        "fr": "États-Unis (choisir le datacenter exact sur la page de commande)",
+        "es": "EE. UU. (elige el centro de datos exacto en la página de pedido)",
+        "pt": "EUA (escolha o datacenter exato na página de pedido)"
+      },
+      "route": {
+        "zh": "普通美国国际线路，不是中国优化。购物车受 Cloudflare 保护，具体机房库存需进入下单页确认",
+        "en": "Regular US international transit, not China-optimized. The cart is behind Cloudflare; confirm the exact location and stock on the order page.",
+        "ja": "通常の米国国際回線で、中国向け最適化ではない。カートは Cloudflare 配下。拠点と在庫は注文ページで確認。",
+        "de": "Normale US-internationale Transitroute, nicht China-optimiert. Der Warenkorb ist durch Cloudflare geschützt; Standort und Bestand auf der Bestellseite prüfen.",
+        "fr": "Transit international américain classique, non optimisé pour la Chine. Le panier est derrière Cloudflare ; confirmez le site et le stock sur la page de commande.",
+        "es": "Tránsito internacional estadounidense normal, no optimizado a China. El carrito está detrás de Cloudflare; confirma sede y stock en la página de pedido.",
+        "pt": "Trânsito internacional americano comum, não otimizado para a China. O carrinho está atrás do Cloudflare; confirme o local e o estoque na página de pedido."
+      },
+      "routeClass": "international",
+      "testIp": "",
+      "renewal": {
+        "zh": "续费同价",
+        "en": "Renews at the same price.",
+        "ja": "更新は同額。",
+        "de": "Verlängerung zum gleichen Preis.",
+        "fr": "Renouvellement au même prix.",
+        "es": "Renovación al mismo precio.",
+        "pt": "Renovação pelo mesmo preço."
+      },
+      "stock": "in-stock",
+      "stockNote": {
+        "zh": "2026-11-13 特价页有效；因 Cloudflare 保护，脚本不会把 403 误判为下架",
+        "en": "Specials page was valid on 2026-11-13. Because of Cloudflare, a 403 is not treated as sold out.",
+        "ja": "2026-11-13 特価ページは有効。Cloudflare 配下のため、403 を売り切れとは見なさない。",
+        "de": "Die Aktionsseite war am 2026-11-13 gültig. Wegen Cloudflare gilt ein 403 nicht als ausverkauft.",
+        "fr": "La page des offres était valide le 2026-11-13. Un 403 Cloudflare n’est pas interprété comme une rupture de stock.",
+        "es": "La página de ofertas era válida el 2026-11-13. Un 403 de Cloudflare no se trata como agotado.",
+        "pt": "A página de ofertas era válida em 2026-11-13. Um 403 do Cloudflare não é tratado como esgotado."
+      },
+      "lastCheck": {
+        "at": "2026-11-21T01:30:07.813Z",
+        "httpStatus": 200,
+        "result": "ok"
+      }
+    }
+  ],
+  "footnotes": [
+    {
+      "id": "dedione-lax-cmin2-5m",
+      "vendor": "DediOne",
+      "url": "https://dedione.com/cart.php?a=add&pid=247",
+      "affiliateUrl": "https://dedione.com/aff.php?aff=661&pid=247",
+      "priceUsdPerYear": 19.99,
+      "testIp": "188.255.157.1",
+      "title": {
+        "zh": "DediOne 洛杉矶 CMIN2 特价（5Mbps）不作为大带宽推荐",
+        "en": "DediOne Los Angeles CMIN2 special (5 Mbps) is not a high-bandwidth pick",
+        "ja": "DediOne ロサンゼルス CMIN2 特価（5Mbps）は大帯域用途には推奨しない",
+        "de": "DediOne Los-Angeles-CMIN2-Angebot (5 Mbps) ist keine Empfehlung für hohe Bandbreite",
+        "fr": "L’offre CMIN2 Los Angeles de DediOne (5 Mbps) n’est pas recommandée pour le haut débit",
+        "es": "La oferta CMIN2 de DediOne en Los Ángeles (5 Mbps) no se recomienda para alto ancho de banda",
+        "pt": "A oferta CMIN2 da DediOne em Los Angeles (5 Mbps) não é recomendada para alta largura de banda"
+      },
+      "body": {
+        "zh": "2026-11-13 仍见现货，约 19.99 美元/年，1C/1G/10G SSD，CMIN2+CUII 精品线，测试 IP 188.255.157.1。线路不错，但带宽只有 5Mbps，只适合极轻量节点，不纳入本页「大带宽」推荐。",
+        "en": "Still seen in stock on 2026-11-13 at about $19.99/year (1C/1G/10G SSD, CMIN2+CUII, test IP 188.255.157.1). The route is decent, but the cap is only 5 Mbps, so it is for very light nodes only and is not a high-bandwidth recommendation on this page.",
+        "ja": "2026-11-13 時点でも在庫あり。約 19.99 ドル/年、1C/1G/10G SSD、CMIN2+CUII、テスト IP 188.255.157.1。回線は悪くないが帯域は 5Mbps のみのため、ごく軽い用途に限り、本ページの大帯域推奨には入れない。",
+        "de": "Am 2026-11-13 noch auf Lager, ca. 19,99 $/Jahr (1C/1G/10G SSD, CMIN2+CUII, Test-IP 188.255.157.1). Die Route ist brauchbar, die Bandbreite beträgt aber nur 5 Mbps — nur für sehr leichte Knoten, keine Empfehlung für hohe Bandbreite.",
+        "fr": "Encore en stock le 2026-11-13, environ 19,99 $/an (1C/1G/10G SSD, CMIN2+CUII, IP de test 188.255.157.1). La route est correcte, mais le débit n’est que de 5 Mbps : réservé aux nœuds très légers, pas une recommandation haut débit.",
+        "es": "Seguía en stock el 2026-11-13, unos 19,99 USD/año (1C/1G/10G SSD, CMIN2+CUII, IP de prueba 188.255.157.1). La ruta es decente, pero el ancho de banda es solo 5 Mbps: solo para nodos muy ligeros, no es una recomendación de alta capacidad.",
+        "pt": "Ainda em estoque em 2026-11-13, cerca de US$ 19,99/ano (1C/1G/10G SSD, CMIN2+CUII, IP de teste 188.255.157.1). A rota é razoável, mas a largura de banda é só 5 Mbps: apenas para nós muito leves, não é recomendação de alta banda."
+      },
+      "stock": "in-stock",
+      "lastCheck": {
+        "at": "2026-11-21T01:30:10.464Z",
+        "httpStatus": 200,
+        "result": "ok"
+      }
+    }
+  ]
+}

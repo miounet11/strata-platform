@@ -6,6 +6,8 @@ import { seoMetadata } from "@/lib/seo-messages";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
 import { SITE } from "@/lib/seo";
 
+export const revalidate = 1800;
+
 export async function generateMetadata({
   params,
 }: {

@@ -221,12 +221,20 @@ if (!pages.length) {
   process.exit(CANNOT_RUN);
 }
 
-// ── pass 2: document frequency, counted *per locale* ───────────────────────
+// ── pass 2: document frequency, counted *per locale and section* ───────────
 // Counting per locale rather than per build is the difference between a filter and a decoration.
 // On stratat, 341 vendor index pages are 0.8% of 42,665 pages, so a global 1% cutoff kept every
 // one of their template blocks and reported 7,769 "duplicate" pairs from `Other series` blocks
 // that sit inside `<main>` on every one of them. Inside their own locale those 341 pages are
 // ~5%, so the same cutoff removes them.
+//
+// Per locale alone was still a moving target: the cutoff is a *fraction*, so the absolute number
+// of pages a template may appear on grows with the locale. Between two builds that differed only
+// in `/issues` and `/pulls` page count (412 → 572 per locale, from the GitHub pipeline), the same
+// unchanged GPU pages moved from limit 62 to 68 — and the 1,376 duplicate pairs became 1,517 with
+// no page changing a byte. The fix is to count inside the section that owns the template: a
+// `/gpus` block is boilerplate relative to the `/gpus` pages that carry it, and a crawl of
+// `/pulls` cannot make it stop being boilerplate.
 //
 // A sorted flat array plus a parallel count array, looked up by binary search. A `Map` of 6.6M
 // entries costs hundreds of MB on a 42k-page build; this costs 8 bytes per *unique* shingle.
@@ -281,14 +289,23 @@ const dfLimitFor = (size) => (DF_CUTOFF > 0 ? Math.max(3, Math.round(DF_CUTOFF *
 let skippedBoilerplate = 0;
 const live = [];
 
-const byLocale = new Map();
+// Grouped by locale *and* top-level section, so a template is judged against the pages that
+// carry it. `path` is `/de/gpus/<slug>`, so the section is the second segment — `/de` alone for
+// a locale index, which becomes its own one-page group and is filtered against itself.
+const sectionOf = (path) => {
+  const segment = path.split("/")[2] ?? "";
+  return segment || "_index";
+};
+
+const groups = new Map();
 for (const page of pages) {
-  const group = byLocale.get(page.locale);
+  const key = `${page.locale}\u0000${sectionOf(page.path)}`;
+  const group = groups.get(key);
   if (group) group.push(page);
-  else byLocale.set(page.locale, [page]);
+  else groups.set(key, [page]);
 }
 
-for (const [locale, group] of byLocale) {
+for (const [, group] of groups) {
   const dfOf = dfTable(group);
   const limit = dfLimitFor(group.length);
   for (const page of group) {
@@ -409,7 +426,7 @@ for (const [left, right] of candidatePairs.values()) {
 hits.sort((a, b) => b.score - a.score);
 
 console.log(
-  `pages=${pages.length} skipped_thin=${skippedThin} skipped_boilerplate=${skippedBoilerplate} shingle=${SHINGLE} df<=${DF_CUTOFF > 0 ? `${DF_CUTOFF} per locale` : "off"} candidates=${candidatePairs.size} verified=${compared}`,
+  `pages=${pages.length} skipped_thin=${skippedThin} skipped_boilerplate=${skippedBoilerplate} shingle=${SHINGLE} df<=${DF_CUTOFF > 0 ? `${DF_CUTOFF} per locale+section` : "off"} candidates=${candidatePairs.size} verified=${compared}`,
 );
 console.log(
   `similarity max=${hits.length ? hits[0].score.toFixed(3) : "0.000"} threshold=${THRESHOLD} pairs=${hits.length} EXIT=${hits.length ? 1 : 0}`,

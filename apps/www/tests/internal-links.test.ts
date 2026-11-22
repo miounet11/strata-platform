@@ -6,6 +6,7 @@ import {
   breadcrumbLinks,
   classifyHref,
   findMentions,
+  guideCategoryPath,
   isInternalHref,
   isLinkableName,
   isPublicPath,
@@ -76,6 +77,10 @@ test("markdown: linksIn returns every href in document order", () => {
 
 test("isInternalHref: site paths and our own absolute URLs count, everything else does not", () => {
   assert.equal(isInternalHref("/guides/vram"), true);
+  assert.equal(isInternalHref("/can-i-run"), true);
+  assert.equal(isInternalHref("/search"), true);
+  assert.equal(isInternalHref(guideCategoryPath("troubleshoot")), true);
+  assert.equal(guideCategoryPath("troubleshoot"), "/guides/category/troubleshoot");
   assert.equal(isInternalHref("/gpus/rtx-4090"), true);
   assert.equal(isInternalHref("https://www.stratat.com/guides/vram"), true);
   assert.equal(isInternalHref("https://example.com/guides"), false);

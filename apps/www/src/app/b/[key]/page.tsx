@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { collectBoard, type DayRow } from "@/lib/dashboard/data";
+import { collectBoard, type DayRow, type TrafficCounts, type TrafficSnapshot } from "@/lib/dashboard/data";
 import { SESSION_COOKIE, loadSecret, pathMatches, verifySession } from "@/lib/dashboard/secret";
 
 /** Reads files the pipeline rewrites several times a day, so it must never be cached. */
@@ -29,7 +29,16 @@ const LOCALE_LABEL: Record<string, string> = {
   fr: "法语",
   es: "西语",
   pt: "葡语",
+  other: "其他",
 };
+
+function botShare(row: TrafficCounts) {
+  return pct(row.botPv, row.humanPv + row.botPv);
+}
+
+function ipCell(value: number, capped: boolean) {
+  return capped ? `${n(value)}+` : n(value);
+}
 
 function n(value: number) {
   return value.toLocaleString("en-US");
@@ -38,6 +47,134 @@ function n(value: number) {
 function pct(part: number, total: number) {
   if (!total) return "—";
   return `${Math.round((part / total) * 100)}%`;
+}
+
+function TrafficSection({ snapshot }: { snapshot: TrafficSnapshot }) {
+  const generated = new Date(snapshot.generatedAt).toLocaleString("zh-CN", { hour12: false, timeZone: "Asia/Shanghai" });
+  const hot = snapshot.sites.flatMap((site) => site.pages.map(([uri, views]) => ({ site: site.site, uri, views })));
+  return (
+    <>
+      <section>
+        <h2>流量与爬虫 · 各站点</h2>
+        <p className="sub">
+          统计写于 {generated}（上海）· {snapshot.from} 至 {snapshot.today}
+          {snapshot.partial ? "，今天尚未结束" : ""}。独立 IP 不是人数。爬虫按 User-Agent 判断，可被伪造。已排除静态资源和
+          RSC 预取。打开本页只读快照，不扫描访问日志。
+        </p>
+        <div className="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>站点</th>
+                <th className="num">今日浏览</th>
+                <th className="num">今日 IP</th>
+                <th className="num">今日爬虫</th>
+                <th className="num">近7日浏览</th>
+                <th className="num">近7日 IP</th>
+                <th className="num">近7日爬虫</th>
+                <th className="num">爬虫占比</th>
+                <th>主要爬虫</th>
+              </tr>
+            </thead>
+            <tbody>
+              {snapshot.sites.map((site) => (
+                <tr key={site.site} className={site.site === "other" ? "" : undefined}>
+                  <td>
+                    {LOCALE_LABEL[site.site] ?? site.site} <span className="muted">/{site.site === "other" ? "*" : site.site}</span>
+                  </td>
+                  <td className="num">{n(site.today.humanPv)}</td>
+                  <td className="num">{ipCell(site.today.humanIps, site.today.humanIpsCapped)}</td>
+                  <td className="num">{n(site.today.botPv)}</td>
+                  <td className="num">{n(site.days7.humanPv)}</td>
+                  <td className="num">{ipCell(site.days7.humanIps, site.days7.humanIpsCapped)}</td>
+                  <td className="num">{n(site.days7.botPv)}</td>
+                  <td className="num muted">{botShare(site.days7)}</td>
+                  <td className="muted">
+                    {site.bots.length ? site.bots.map(([name, count]) => `${name} ${n(count)}`).join(" · ") : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>流量与爬虫 · 近7日</h2>
+        <div className="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th className="num">浏览</th>
+                <th className="num">独立 IP</th>
+                <th className="num">爬虫浏览</th>
+                <th className="num">爬虫 IP</th>
+                <th className="num">爬虫占比</th>
+              </tr>
+            </thead>
+            <tbody>
+              {snapshot.trend.map((day) => (
+                <tr key={day.date} className={day.date === snapshot.today ? "today" : undefined}>
+                  <td>
+                    {day.date}
+                    {day.date === snapshot.today ? " · 今天" : ""}
+                  </td>
+                  <td className="num">{n(day.humanPv)}</td>
+                  <td className="num">{ipCell(day.humanIps, day.humanIpsCapped)}</td>
+                  <td className="num">{n(day.botPv)}</td>
+                  <td className="num">{ipCell(day.botIps, day.botIpsCapped)}</td>
+                  <td className="num muted">{botShare(day)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>今日热门页面</h2>
+        <p className="sub">只计人侧页面。每个站点最多保留先看到的 500 个路径，再取前 8。</p>
+        <div className="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>站点</th>
+                <th>页面</th>
+                <th className="num">浏览</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hot.length ? (
+                hot.map((row) => (
+                  <tr key={`${row.site}${row.uri}`}>
+                    <td>{LOCALE_LABEL[row.site] ?? row.site}</td>
+                    <td>{row.uri}</td>
+                    <td className="num">{n(row.views)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="muted">
+                    今天还没有人侧页面访问
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {snapshot.sites.some((site) => site.pageOverflow > 0) ? (
+          <p className="sub">
+            未列入热门的浏览：
+            {snapshot.sites
+              .filter((site) => site.pageOverflow > 0)
+              .map((site) => `${LOCALE_LABEL[site.site] ?? site.site} ${n(site.pageOverflow)}`)
+              .join(" · ")}
+          </p>
+        ) : null}
+      </section>
+    </>
+  );
 }
 
 function dayClass(day: DayRow, today: string) {
@@ -135,6 +272,8 @@ export default async function BoardPage({
           </ul>
         </section>
       ) : null}
+
+      {board.traffic.snapshot ? <TrafficSection snapshot={board.traffic.snapshot} /> : null}
 
       <section>
         <h2>内容架构 · 按类型</h2>

@@ -7,8 +7,9 @@ import { guidePath, releasePath } from "@/lib/routes";
 import { getReleases } from "@/lib/releases";
 import { latestPosts, postHeadline } from "@/lib/creator";
 import { comparisonSignals, latestXSignals, upgradeSignals, worthReading } from "@/lib/intelligence";
-import { jsonLdGraph } from "@/lib/jsonld";
-import { siteMetadata, softwareJsonLd } from "@/lib/seo";
+import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { SITE, siteMetadata } from "@/lib/seo";
+import { siteEntityNodes } from "@/lib/site-entities";
 
 export const revalidate = 1800;
 
@@ -45,7 +46,14 @@ export default async function HomePage({
     .slice(0, 6);
   const latest = getReleases().releases[0];
   const version = latest?.tag ?? "v0.1.40.3";
-  const jsonLd = softwareJsonLd();
+  // One graph per page: the site entities are named once and referenced by id, so the homepage
+  // does not restate the product in a node that shares nothing with the pages that link to it.
+  const jsonLd = siteEntityNodes().concat([
+    pageLd(SITE, locale, "", t("heroTitle"), {
+      description: t("heroSub"),
+      type: "WebPage",
+    }),
+  ]);
   const fresh = worthReading(4);
   const freshIds = new Set(fresh.map((signal) => signal.id));
   const posts = latestPosts(12)
@@ -56,7 +64,7 @@ export default async function HomePage({
     <div className="container hero">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([jsonLd])) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(jsonLd)) }}
       />
       <p className="eyebrow">{version}</p>
       <h1>{t("heroTitle")}</h1>
@@ -65,12 +73,19 @@ export default async function HomePage({
         <Link href="/install" className="btn btn-primary btn-lg">
           {t("ctaInstall")}
         </Link>
+        <Link href="/can-i-run" className="btn btn-lg">
+          {tn("canIRun")}
+        </Link>
         <Link href={latest ? releasePath(latest.tag) : "/releases"} className="btn btn-lg">
           {t("ctaRelease", { version })}
         </Link>
       </div>
       <div className="hero-links">
+        <Link href="/best">{tn("best")}</Link>
+        <span aria-hidden>·</span>
         <Link href="/benchmarks">{t("ctaBenchmarks")}</Link>
+        <span aria-hidden>·</span>
+        <Link href="/search">{tn("search")}</Link>
         <span aria-hidden>·</span>
         <Link href="/community">{t("ctaCommunity")}</Link>
         <span aria-hidden>·</span>

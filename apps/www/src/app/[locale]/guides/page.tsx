@@ -4,10 +4,11 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getLiveArticles } from "@/lib/articles";
-import { GUIDE_KINDS, guideKindOrder, guidePath } from "@/lib/routes";
+import { GUIDE_KINDS, guideCategoryPath, guideKindOrder, guidePath } from "@/lib/routes";
 import { GUIDES_LISTED } from "@/lib/page-budget";
 import { siteMetadata, SITE } from "@/lib/seo";
 import { jsonLdGraph, pageLd } from "@/lib/jsonld";
+import { siteEntityNodes } from "@/lib/site-entities";
 
 export const revalidate = 1800;
 
@@ -22,9 +23,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "seo" });
-  // Guides are written per language, so only the locales that actually have one advertise the
-  // page. A locale without guides still renders (the navigation links here), but it is a list of
-  // nothing — indexing six empty indexes costs crawl budget and reads as thin content.
   const published = [...new Set(getLiveArticles().map((article) => article.locale))];
   return siteMetadata(
     locale,
@@ -40,24 +38,18 @@ export default async function GuidesIndexPage({ params }: { params: Promise<{ lo
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("guides");
+  const tn = await getTranslations("nav");
+  const kindsMap = t.raw("kinds") as Record<string, string>;
 
-  // Only the language's own articles: the generator writes per locale rather than translating,
-  // so listing other languages' guides here would send readers to a page that does not exist.
   const articles = getLiveArticles(locale).sort(
     (a, b) => guideKindOrder(a.kind) - guideKindOrder(b.kind) || a.order - b.order,
   );
 
-  // Each kind lists its newest entries only. The corpus grows without bound, so rendering every
-  // article put this page past the 180 KB budget once the generator passed ~140 guides per
-  // locale — see GUIDES_LISTED in lib/page-budget. Guides not listed here keep their own pages,
-  // and every one of those is in the sitemap, so nothing is orphaned.
   const groups = GUIDE_KINDS.map((kind) => {
     const items = articles.filter((article) => article.kind === kind);
     return { kind, items: items.slice(0, GUIDES_LISTED), total: items.length };
   }).filter((group) => group.items.length > 0);
 
-  // Anything with a kind the model file does not know about still gets listed, rather than
-  // silently disappearing from the only index that links to it.
   const otherAll = articles.filter((article) => !(GUIDE_KINDS as readonly string[]).includes(article.kind));
   const other = otherAll.slice(0, GUIDES_LISTED);
 
@@ -67,19 +59,46 @@ export default async function GuidesIndexPage({ params }: { params: Promise<{ lo
     <div className="container page">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph([pageLd(SITE, locale, "/guides", pageTitle, { type: "CollectionPage" })])) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            jsonLdGraph([
+              ...siteEntityNodes(),
+              pageLd(SITE, locale, "/guides", pageTitle, { type: "CollectionPage" }),
+            ]),
+          ),
+        }}
       />
 
       <Breadcrumbs label={t("title")} />
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
-      <p className="meta">{t("count", { n: articles.length })}</p>
+      <p className="meta">
+        {t("count", { n: articles.length })} · <Link href="/can-i-run">{tn("canIRun")}</Link>
+        {" · "}
+        <Link href="/best">{tn("best")}</Link>
+        {" · "}
+        <Link href="/search">{tn("search")}</Link>
+      </p>
+
+      {groups.length > 0 ? (
+        <div className="row" style={{ marginTop: "1rem" }}>
+          {groups.map((group) => (
+            <Link key={group.kind} href={guideCategoryPath(group.kind)} className="btn">
+              {kindsMap[group.kind] ?? group.kind} ({group.total})
+            </Link>
+          ))}
+        </div>
+      ) : null}
 
       {articles.length === 0 ? <p className="meta">{t("empty")}</p> : null}
 
       {groups.map((group) => (
         <section className="section" key={group.kind}>
-          <h2>{t(`kinds.${group.kind}`)}</h2>
+          <h2>
+            <Link href={guideCategoryPath(group.kind)} style={{ color: "inherit" }}>
+              {kindsMap[group.kind] ?? group.kind}
+            </Link>
+          </h2>
           <ul className="guide-list">
             {group.items.map((article) => (
               <li key={article.slug}>
@@ -89,7 +108,10 @@ export default async function GuidesIndexPage({ params }: { params: Promise<{ lo
             ))}
           </ul>
           {group.total > group.items.length ? (
-            <p className="meta">{t("showing", { shown: group.items.length, total: group.total })}</p>
+            <p className="meta">
+              {t("showing", { shown: group.items.length, total: group.total })} ·{" "}
+              <Link href={guideCategoryPath(group.kind)}>{t("viewAllCategory")} →</Link>
+            </p>
           ) : null}
         </section>
       ))}

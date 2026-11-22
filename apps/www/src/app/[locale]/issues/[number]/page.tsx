@@ -4,13 +4,14 @@ import { Link } from "@/i18n/navigation";
 import { EnrichedImage } from "@/components/EnrichedBlock";
 import { CommunityBody } from "@/components/CommunityBody";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { excerpt, getCommunity, getIssue, relatedLinks } from "@/lib/community";
+import { excerpt, getIndexableIssues, getIssue, isSubstantiveIssue, relatedLinks } from "@/lib/community";
 import { jsonLdGraph } from "@/lib/jsonld";
 import { SITE, siteMetadata } from "@/lib/seo";
 
+export const revalidate = 3600;
+
 export function generateStaticParams() {
-  const { issues } = getCommunity();
-  return issues.map((i) => ({ number: String(i.number) }));
+  return getIndexableIssues().map((i) => ({ number: String(i.number) }));
 }
 
 export async function generateMetadata({
@@ -21,7 +22,13 @@ export async function generateMetadata({
   const { locale, number } = await params;
   const issue = getIssue(Number(number));
   if (!issue) return {};
-  return siteMetadata(locale, `Issue #${issue.number}`, excerpt(issue.body || issue.title), `/issues/${issue.number}`);
+  return siteMetadata(
+    locale,
+    `Issue #${issue.number}`,
+    excerpt(issue.body || issue.title),
+    `/issues/${issue.number}`,
+    isSubstantiveIssue(issue),
+  );
 }
 
 export default async function IssueDetailPage({

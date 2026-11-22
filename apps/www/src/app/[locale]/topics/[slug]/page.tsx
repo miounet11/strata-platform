@@ -3,12 +3,17 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { RegisterLocales } from "@/components/LocaleAvailability";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
 import { jsonLdGraph, nodeId } from "@/lib/jsonld";
 import { rigPath } from "@/lib/routes";
 import { RelatedContent, relatedArticles } from "@/components/RelatedContent";
 import { getLiveTopics, getTopic, hasTopic, rigsForTopic, topicText } from "@/lib/topics";
+import { getColumn, topicsForColumn } from "@/lib/columns";
 import { seoMetadata } from "@/lib/seo-messages";
+import { siteEntityNodes } from "@/lib/site-entities";
+
+export const revalidate = 1800;
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
 
@@ -72,14 +77,24 @@ export default async function TopicPage({
   // Topics are the editorial entry point, so each one points at the guides written for the same
   // question: a reader who wants the long version should not have to go back to the hub first.
   const guides = relatedArticles(locale, "", topic.kind ?? "", 4);
+  const column = topic.column ? getColumn(topic.column) : undefined;
+  const columnPeers = column
+    ? topicsForColumn(column.slug).filter(
+        (peer) => peer.slug !== topic.slug && peer.status === "live" && hasTopic(peer, locale),
+      )
+    : [];
+
+  const siblings = routing.locales.filter((code) => hasTopic(topic, code));
 
   return (
     <div className="container page">
+      <RegisterLocales locales={siblings} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             jsonLdGraph([
+              ...siteEntityNodes(),
               jsonLd,
               breadcrumbJsonLd(SITE, locale, [
                 { path: "", name: "Strata" },
@@ -121,6 +136,19 @@ export default async function TopicPage({
           <p>
             <Link href="/benchmarks">{t("openBench")}</Link>
           </p>
+        </section>
+      ) : null}
+      {column && columnPeers.length > 0 ? (
+        <section style={{ marginTop: "2rem" }}>
+          <h2>{topicText(column.title, locale)}</h2>
+          <p className="meta">{topicText(column.intro, locale)}</p>
+          <ul>
+            {columnPeers.map((peer) => (
+              <li key={peer.slug}>
+                <Link href={`/topics/${peer.slug}`}>{topicText(peer.title, locale)}</Link>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
       <RelatedContent title={t("guides")} items={guides} />

@@ -4,20 +4,18 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { localeNames, resolveLocale } from "@/lib/locale";
-import { localesForTopicPath } from "@/lib/topic-locales";
 import { PRIMARY_NAV, SECONDARY_NAV } from "@/lib/routes";
+import { useAvailableLocales } from "./LocaleAvailability";
 
-export function SiteHeader({ guideLocales }: { guideLocales?: Record<string, string[]> }) {
+export function SiteHeader() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const active = resolveLocale(useLocale());
 
-  // A guide exists only in the locales that published it; offering the rest would 404.
-  const guideSlug = pathname.match(/^\/guides\/([^/]+)$/)?.[1];
-  const published = guideSlug ? guideLocales?.[guideSlug] : undefined;
-  const locales: readonly string[] = published?.length
-    ? published
-    : (localesForTopicPath(pathname) ?? routing.locales);
+  // Pages that only exist in a subset of locales (`/guides/[slug]`, `/topics/[slug]`) register
+  // their own locale list via `<RegisterLocales />`, keeping the site-wide layout payload small.
+  const registered = useAvailableLocales();
+  const locales: readonly string[] = registered?.length ? registered : routing.locales;
 
   function isCurrent(href: string) {
     if (href === "/") return pathname === "/";

@@ -25,7 +25,12 @@
     "gpus": "GPU",
     "guides": "ガイド",
     "gpuBrands": "GPUブランド",
-    "skipToContent": "メインコンテンツへスキップ"
+    "skipToContent": "メインコンテンツへスキップ",
+    "method": "方法",
+    "best": "用途別",
+    "vps": "VPS 特価",
+    "canIRun": "動作判定",
+    "search": "検索"
   },
   "topics": {
     "title": "使い方",
@@ -213,7 +218,17 @@
     "reset": "初期値",
     "daysShort": "日",
     "back": "すべてのハードウェア",
-    "rigSpecNote": "仕様と互換性"
+    "rigSpecNote": "仕様と互換性",
+    "rigDecisionTitle": "選定の結論",
+    "rigVerdictMeasured": "{name} は実測生成 {write} tok/s・ローカル単価 ${cost}/M tok（実測 {total} 台中 #{costRank} 位）、フル稼働時の回収目安は {days} 日です。",
+    "rigVerdictPending": "{name}（{memory} GB）は生成 {write} tok/s・読込 {read} tok/s。実売価格未確定のため単価順位は未算出です。",
+    "rigStandingLine": "生成速度 #{speedRank}/{totalRigs} 位 · 消費電力 #{powerRank} 位（{watts} W）。",
+    "rigSkipCheaper": "初期費用を抑えたい場合の比較対象：",
+    "rigSkipFaster": "生成速度を重視する場合の比較対象：",
+    "rigFaqSpeedQ": "{name} のローカルLLM実行速度は？",
+    "rigFaqSpeedA": "{name}（{memory} GB）は Qwen3.8-Flash-Next で生成 {write} tok/s・読込 {read} tok/s を実測しています（{date} 時点）。",
+    "rigFaqWorthQ": "{name} はクラウドAPIよりお得ですか？",
+    "rigFaqWorthA": "ローカル単価 ${cost}/M tok で、1日24時間稼働なら {days24} 日、1日4時間稼働なら {days4} 日で回収できます。稼働率が最大の判断軸です。"
   },
   "footer": {
     "engine": "エンジン",
@@ -366,6 +381,26 @@
     "guides": {
       "title": "ローカル LLM 実行ガイド",
       "description": "VRAM、量子化、GPU 選び、トラブル対処を手順付きで解説します。"
+    },
+    "method": {
+      "title": "ローカル LLM ベンチマークの測定方法",
+      "description": "Strata のベンチマーク表にある全数値の出典・計算式・前提・限界。"
+    },
+    "best": {
+      "title": "用途別・ローカル LLM 向け GPU とマシンの選び方",
+      "description": "ローカル LLM 向けハードウェアの短い候補リスト：100万トークンあたりの最安コスト、2000ドル以下、最低消費電力、Apple ユニファイドメモリ。"
+    },
+    "vps": {
+      "title": "2026年 コスパの良い VPS：中国向け最適化回線と年額20ドル前後",
+      "description": "中国大陸からのアクセス向けに毎日確認する、年額約20ドル・100Mbps以上の実惠 VPS。CMIN2 / CUII / 9929 / 直結最適化の実態、テスト IP、更新条件、注文リンクを掲載。ローカル AI 中継やノード向け。"
+    },
+    "canIRun": {
+      "title": "自分のPCでローカルLLMは動く？VRAM・RAM・速度シミュレーター",
+      "description": "GPUのVRAM・システムRAM・コンテキスト長（8K–128K）から最適な量子化、KVキャッシュ、推定tok/s、API比較の回収日数を即計算。"
+    },
+    "search": {
+      "title": "サイト内検索 — GPU・ガイド・ベンチマーク・リリース",
+      "description": "3,200種以上のGPU、29台の実測ベンチマーク、用途別ランキング、トラブル解決ガイドを検索。"
     }
   },
   "gpus": {
@@ -441,7 +476,12 @@
     "specChip": "GPU チップ",
     "specProcess": "製造プロセス",
     "specMemoryType": "メモリ規格",
-    "specBus": "バスインターフェース"
+    "specBus": "バスインターフェース",
+    "specTransistors": "トランジスタ数",
+    "specTransistorsValue": "{count} 百万",
+    "specDieSize": "ダイ面積",
+    "specPixelRate": "ピクセルレート",
+    "specTextureRate": "テクスチャレート"
   },
   "guides": {
     "title": "ガイド",
@@ -457,15 +497,278 @@
       "local": "ローカル導入",
       "troubleshoot": "トラブルシューティング",
       "task": "ワークフロー",
-      "hardware": "ハードウェア"
+      "hardware": "ハードウェア",
+      "radar": "注目・新着モデル",
+      "release": "リリースガイド"
     },
     "all": "すべてのガイド",
     "homeIntro": "目の前の疑問から始めてください。各ガイドの最後に次の一歩があります。",
-    "editorial": "特集ページ"
+    "editorial": "特集ページ",
+    "categoryIntro": "「{kind}」の実践ガイド {count} 本。すべて実測ハードウェアデータに基づいています。",
+    "viewAllCategory": "このカテゴリをすべて見る",
+    "otherCategories": "他のガイドカテゴリ"
   },
   "notFound": {
     "title": "このページは存在しません",
     "body": "リンクが古い可能性があります。以下から移動できます。",
     "home": "ホームへ戻る"
+  },
+  "method": {
+    "title": "ベンチマーク数値の算出方法",
+    "description": "データの出典、各数値の計算式、前提条件、そして測定が対象としない範囲。",
+    "intro": "ベンチマークページの数値はすべて同一の出典と計算式に基づいています。本ページでは両方と限界を明記し、数値を鵜呑みにせず検証・修正できるようにしています。",
+    "sourceTitle": "データの出典",
+    "sourceBody": "毎秒トークン数と価格は {name} から取得しています。ライセンス条件：{license}",
+    "sourceMethod": "出典の方法論",
+    "methodTitle": "各数値の計算方法",
+    "method1": "1日の出力 = 読み取り速度 × 1日の稼働時間。",
+    "method2": "電気代 = 消費電力 × 稼働時間 × 電気料金。",
+    "method3": "1日のコスト = 電気代 + ハードウェア価格を使用年数で按分した額。",
+    "method4": "回収日数 = マシン価格 ÷ API と比べて1日に節約できる額。",
+    "assumptionsTitle": "表の前提条件",
+    "assumptionsIntro": "表は次の既定値を使用します。ベンチマークページで変更すると、派生する数値はすべて更新されます。",
+    "assumptionReadingShare": "出力のうち読み取りの割合",
+    "assumptionActiveHours": "1日の稼働時間",
+    "assumptionElectricity": "電気料金",
+    "assumptionHardwareLife": "ハードウェアの使用年数",
+    "assumptionHost": "本体以外の構成費",
+    "assumptionApi": "API 参考価格（読み取り / 書き込み）",
+    "perMM": "100万トークンあたり米ドル",
+    "limitsTitle": "これらの数値が対象としない範囲",
+    "limit1": "コンシューマー GPU のみ。サーバー向け製品とマルチ GPU 構成は含みません。",
+    "limit2": "単一のワークロード（逐次単一ストリーム）です。バッチ・並列配信は全体スループットが上がる一方、ストリームあたりは遅くなります。",
+    "limit3": "価格は時点の実売価格であり、測定結果とは独立に変動します。",
+    "limit4": "回収日数は見積もりであり、提示した稼働時間で常時稼働する前提です。",
+    "freshnessTitle": "データの鮮度",
+    "freshnessBody": "表の最終同期日は {date} です。指標は同一 URL で再公開されるため、古いコピーから引用した数値も日付と照合できます。",
+    "citeTitle": "数値の引用について",
+    "citeBody": "データセットは Strata と原出典を明記すれば自由に引用できます。方法を引用する場合は本ページ、数値を引用する場合はベンチマークページへリンクしてください。",
+    "backToBenchmarks": "ベンチマーク表に戻る"
+  },
+  "best": {
+    "title": "用途別・ローカル LLM 向けハードウェア",
+    "intro": "以下のランキングはすべて同じ実測ベンチマーク表から生成し、並び順の規則も明記しています。手選びではありません。データが変われば順位も変わります。",
+    "count": "{count} 台が該当",
+    "limitsTitle": "これらのリストが扱わないこと",
+    "limitShared": "数値はすべて単一ワークロードのシングルストリーム実測です。マルチユーザー配信、ファインチューニング、サーバー向け製品は挙動が異なります。",
+    "methodNote": "並び順の規則と前提：",
+    "methodLink": "計測方法",
+    "allBenchmarks": "ベンチマーク一覧",
+    "guidesLink": "セットアップガイド",
+    "synced": "{date} に計測",
+    "faqWhyCount": "なぜ最も安いカードではなく、この {count} 台なのか？",
+    "faqWhyCountAnswer": "順位は実測の100万トークンあたりコストで決まり、消費電力とハードウェア寿命が織り込まれています。安いカードでも遅い、あるいは電力を食うなら、5年では1トークンあたり高くつきます。リストはベンチマーク表から直接生成され、データが変われば順序も変わります。",
+    "faqWhereData": "この数字はどこから来ていますか？",
+    "faqWhereDataAnswer": "{source}による{date}の実測値です。このページのすべてのリストは同じ日付の表から導かれ、コストの前提はベンチマークページに明記されています。",
+    "faqTopPickQ": "「{title}」で1位の構成はどれですか？",
+    "faqTopPickA": "現在の1位は {name}（{memory} GB）です。実測生成速度 {write} tok/s、ローカル単価 {cost}/100万トークン、標準条件での回収日数は {days} です。"
+  },
+  "scenarios": {
+    "items": {
+      "value": {
+        "title": "ローカル LLM を最も安く動かせるハードウェア",
+        "seoTitle": "ローカル LLM を最も安く動かせるハードウェア（実測コスト）",
+        "seoDescription": "125B クラスのローカルモデルを動かしたとき、100万トークンあたりの実測コストが最も低い 6 台。電力と 5 年分の減価を含みます。",
+        "summary": "100万トークンあたりの実測コスト順。電力費と 5 年分のハードウェア費用を含みます。最も安く動かせるマシンが、最も安く買えるマシンとは限りません。",
+        "rule": "100万トークンあたりのコスト順（電力 + ハードウェア寿命）",
+        "about": "ローカル LLM 推論の100万トークンあたりコスト",
+        "limit": "「トークンあたり最安」はほぼ終日稼働を前提にしています。1日数時間の利用なら、スループットが低く安いマシンのほうが総額で有利な場合があります。"
+      },
+      "under2000": {
+        "title": "2000ドル以下でローカル LLM を動かす",
+        "seoTitle": "2000ドル以下のローカル LLM 向けハードウェア（実測・マシン総額）",
+        "seoDescription": "マシン総額が 2000 ドル以下の実測機を安い順に掲載。毎秒トークン数と回収日数も併記します。",
+        "summary": "カード単体ではなくマシン総額で 2000 ドル以下。学生の予算に収まり、それでも 125B クラスを動かせるマシンです。",
+        "rule": "マシン総額 2000 ドル以下、安い順",
+        "about": "2000ドル以下のローカル LLM ハードウェア",
+        "limit": "価格は計測時点の実売価格です。中古カードやセールはこの表より速く動くため、購入前に価格を確認してください。"
+      },
+      "lowPower": {
+        "title": "消費電力が最も低いローカル LLM マシン",
+        "seoTitle": "ローカル LLM 向け低消費電力ハードウェア（実測ワット）",
+        "seoDescription": "125B クラスのローカルモデルを動かして消費電力が最も低い 6 台。寝室や寮、共用住宅向け。",
+        "summary": "壁側の消費電力順。寝室・寮・共用コンセントに置く必要があるなら、まずこのリストを見てください。",
+        "rule": "壁側消費電力の低い順",
+        "about": "低消費電力のローカル LLM ハードウェア",
+        "limit": "消費電力はこのワークロードでの負荷時実測値です。待機電力とファン騒音は別指標で、この表には含まれません。"
+      },
+      "apple": {
+        "title": "Apple Silicon でローカル LLM を動かす",
+        "seoTitle": "Apple Silicon でローカル LLM：Mac Studio と MacBook の比較",
+        "seoDescription": "実測した Apple 製マシンを100万トークンあたりのコスト順に掲載。ユニファイドメモリ容量、消費電力、回収日数も併記。",
+        "summary": "Apple 機を別に並べるのは、ユニファイドメモリが問い自体を変えるからです。収めるべき VRAM 上限はなく、価格と帯域だけが制約になります。",
+        "rule": "Apple Silicon のみ、100万トークンあたりのコスト順",
+        "about": "Apple Silicon のユニファイドメモリによるローカル推論",
+        "limit": "ユニファイドメモリは OS とすべてのアプリで共有されるため、実際に使える上限は公称より小さくなります。制約は容量より帯域であることが多いです。"
+      },
+      "fastest": {
+        "title": "ローカルLLM生成速度が最速のGPU",
+        "seoTitle": "ローカルLLM生成速度（tok/s）最速GPUランキング",
+        "seoDescription": "Qwen3.8-Flash-Nextの実測生成速度（writing tok/s）上位8構成のランキング。",
+        "summary": "実測の生成速度（tok/s）順にランキング。対話やコーディングの応答性を左右する指標です。",
+        "rule": "実測生成速度（tok/s）順",
+        "about": "ローカルLLM最速生成GPU",
+        "limit": "最速構成は本体価格が高額（$8,500–$18,317）です。コスパ重視なら単価・回収日数リストを参照してください。"
+      },
+      "fastPayback": {
+        "title": "クラウドAPIより最も早く元が取れるGPU",
+        "seoTitle": "ローカルLLM投資回収が最速のGPU構成ランキング",
+        "seoDescription": "クラウドAPI単価（$0.154/M tok）と比較して回収日数が最短の8構成。",
+        "summary": "クラウドAPI利用料に対する回収日数の短さで並べ替え。初期費用の低い構成が最速カードを上回ることがあります。",
+        "rule": "API比の回収日数（短い順）",
+        "about": "ローカルLLMハードウェア投資回収期間",
+        "limit": "稼働時間が24時間/日から4時間/日に下がると回収日数は約6倍になります。"
+      },
+      "multiGpu": {
+        "title": "ローカルLLM向けデュアルGPU構成ランキング",
+        "seoTitle": "デュアルGPUローカルLLM実測ランキング（2×3090 / 2×5060 Ti 他）",
+        "seoDescription": "レイヤー分割対応のデュアルGPU構成を実測コスト順に比較。",
+        "summary": "ワークステーションGPUより低コストで24–48 GBの合計VRAMを確保できるデュアルGPU構成です。",
+        "rule": "デュアルGPU実測構成（単価順）",
+        "about": "デュアルGPUローカルLLM構成",
+        "limit": "PCIeスロット間隔、750–1000W以上の電源容量、十分なケース冷却が必要です。"
+      },
+      "amd": {
+        "title": "ローカルLLM向けAMD GPU・APUランキング（ROCm / HIP）",
+        "seoTitle": "AMD Radeon・Ryzen AI Max+ ローカルLLM実測ランキング",
+        "seoDescription": "RX 7900 XTX、RX 9070 XT、Ryzen AI Max+ 395 128 GBの実測速度と単価比較。",
+        "summary": "HIP/ROCmで動作する実測済みAMD製GPUおよびユニファイドメモリ搭載機種のコスト順リストです。",
+        "rule": "AMD実測構成（100万トークン単価順）",
+        "about": "AMD ROCm / HIP ローカルLLMハードウェア",
+        "limit": "購入前にお使いのOSでのHIP/ROCmドライバ対応状況をご確認ください。"
+      },
+      "highVram": {
+        "title": "大容量VRAM・ユニファイドメモリ構成（48 GB–512 GB）",
+        "seoTitle": "48 GB〜512 GB 大容量メモリ ローカルLLM構成ランキング",
+        "seoDescription": "4-bit量子化や128K長文コンテキストに適した48 GB以上の実測構成。",
+        "summary": "48 GB以上のメモリにより高ビット量子化や128Kコンテキストをオフロード最小限で実行できます。",
+        "rule": "メモリ48 GB以上の実測機（容量順）",
+        "about": "大容量メモリ ローカルLLMワークステーション",
+        "limit": "ユニファイドメモリは容量と静音性に優れますが、生成速度はRTX PRO 6000等の単体GPUが上回ります。"
+      }
+    }
+  },
+  "vps": {
+    "title": "2026年 コスパの良い VPS：中国向け最適化回線と年額20ドル前後の大帯域",
+    "intro": "中国大陸からのアクセスや、ローカル AI 中継・ノード向けに、注文可能な実惠 VPS を毎日確認して掲載します。目安は年額約20ドル（回線が明らかに良い場合は約30ドルまで）、帯域100Mbps以上、そして CN2 GIA / CMIN2 / 9929 / CUII / 直結最適化の実態です。通常の国際回線を中国向け精品回線とは書きません。",
+    "verifiedAt": "最終確認時刻（Asia/Shanghai）：{time}",
+    "dailyNote": "このページはデータファイルから更新されるため、毎日サイト全体を再ビルドする必要はありません。Cloudflare 403 などの一時的な遮断では前回の有効データを残し、取り下げとは判断しません。404 のときだけ在庫切れにします。",
+    "criteriaTitle": "選定基準",
+    "criteriaBudget": "年額約20ドル、上限の目安は25ドル。明らかに良い精品回線は約30ドルまで。",
+    "criteriaBandwidth": "大帯域の推奨は100Mbps以上。5Mbps の特価は回線が良くても注記に留めます。",
+    "criteriaRoute": "中国大陸向け最適化（CN2 GIA / CMIN2 / 9929 / CUII / 直結最適化）を優先し、中国電信 CN2 の有無を明記します。",
+    "criteriaUse": "国内ユーザーがアクセスするノードやローカル AI 中継向け。通常の国際回線は管理用途や中国向け以外の予備として掲載します。",
+    "dealsTitle": "現在注文できる中国向け大帯域プラン",
+    "backupTitle": "通常の国際回線（管理 / 中国向け以外）",
+    "backupIntro": "帯域やディスクは余裕があることが多く、同額更新も比較的多い一方、中国向け最適化回線ではありません。",
+    "footnotesTitle": "大帯域としては推奨しないプラン",
+    "faqTitle": "よくある質問",
+    "disclosureTitle": "アフィリエイトと更新について",
+    "disclosure": "一部のボタンは、すでに承認済みのアフィリエイト／紹介リンクを使っています（rel=sponsored で明示）。コードがない案件は公式ページのままです。在庫・価格・回線の実態に基づいて掲載し、手数料のために 5Mbps や非最適化回線を隠しません。表示価格は販売者の決済ページが正です。支払前に更新条件と在庫を再確認してください。クリック記録は経由回数の確認用であり、注文や登録そのものではありません。",
+    "cta": "カートへ進む（アフィリエイトリンク）",
+    "testIp": "テスト IP",
+    "route": "回線",
+    "renewal": "更新",
+    "stockIn": "在庫あり",
+    "stockOut": "在庫なし",
+    "stockUnknown": "未確認",
+    "pricePerYear": "{price}/年",
+    "specs": "構成",
+    "bandwidth": "帯域と転送量",
+    "location": "ロケーション",
+    "noDeals": "確認済みの大帯域プランで、現在販売中のものはありません。",
+    "faqs": [
+      {
+        "question": "年額20ドル前後で、中国から使いやすい最適化 VPS はありますか？",
+        "answer": "2026-11-13 の確認では、年額20ドルかつ100Mbps以上の精品回線はほとんど在庫がありません。予算に近いのは DediOne のロサンゼルス/カンザス大陸向け最適化 2C2G（年額25.99ドル、200Mbps 無制限、直結最適化）と、ロサンゼルス CMIN2+CUII（年額29.99ドル、200Mbps、月500GB）です。CloudCone や RackNerd の 14–22ドルは帯域は大きい通常国際回線です。年額19.99ドルの 5Mbps CMIN2 特価はごく軽い用途向けです。"
+      },
+      {
+        "question": "CMIN2 と通常の 163 回線はどう違いますか？",
+        "answer": "CMIN2 は中国移動の精品帰国回線で、通常の CMI/163 よりピーク時に安定しやすいです。DediOne の CMIN2 プランは聯通 CUII も加わります。「163」や「直結最適化」は CN2 GT や一般的な直結であることが多く、夜間は CN2 GIA / CMIN2 / 9929 に劣ることが多いです。宣伝文句ではなく、掲載のテスト IP を電信・移動・聯通から測ってください。このページでは電信 CN2 の有無を明記します。"
+      },
+      {
+        "question": "中国大陸までの遅延と経路はどう測ればよいですか？",
+        "answer": "掲載のテスト IP に対して、電信・移動・聯通から ping または mtr を行い、traceroute で CN2（59.43）、CMIN2、9929、あるいは通常の 163/CMI を確認します。購入後は実 IP でも同じです。遅延は省や時間帯で変わるため、1回の計測は終日の保証にはなりません。"
+      },
+      {
+        "question": "なぜ 5Mbps の CMIN2 特価は推奨しないのですか？",
+        "answer": "DediOne ロサンゼルス CMIN2 特価は年額約19.99ドルで、CMIN2+CUII の回線自体は悪くありません。ただし帯域は 5Mbps しかなく、中継や複数ユーザーではすぐ飽和します。本ページの大帯域基準は100Mbps からのため、注記にのみ掲載します。"
+      },
+      {
+        "question": "今買うべきか、ブラックフライデーまで待つべきか？",
+        "answer": "急がないなら、2026年のブラックフライデー（11月27日）前後は RackNerd、CloudCone、DMIT、HostDare、VMISS などが同額更新の大容量・最適化回線を出しやすい時期です。年額20ドルかつ100Mbps以上の精品回線は現在ほとんどないため、このページで在庫を追い、明らかに良い案件が出てからでも間に合います。"
+      },
+      {
+        "question": "これらのリンクはアフィリエイトですか？価格は確実ですか？",
+        "answer": "承認済みの紹介コードがある案件は、そのパラメータ付きで販売者ページへ移動し、本ページでも開示します（rel=sponsored）。未設定のボタンは公式ページのままです。価格・在庫・更新条件は販売者の決済ページが正です。毎日確認しますが、支払前の最終確認の代わりにはなりません。"
+      }
+    ],
+    "ctaOfficial": "公式プランを見る",
+    "ctaAffiliate": "カートへ進む（アフィリエイトリンク）"
+  },
+  "canIRun": {
+    "title": "ローカルLLM 動作判定・VRAM/RAM計算機",
+    "intro": "GPUプリセットを選ぶかVRAM・システムRAM・コンテキスト長（8K–128K）を入力すると、動作可能な量子化、KVキャッシュ使用量、推定速度、API比較コストを即座に判定します。",
+    "presetLabel": "GPU・マシンプリセットを選択",
+    "customOption": "カスタム構成（下欄にVRAMとRAMを入力）",
+    "vramLabel": "GPU VRAM / ユニファイドメモリ",
+    "ramLabel": "システムRAM",
+    "unifiedLabel": "ユニファイドメモリ（Apple Silicon / Strix Halo / DGX Spark）",
+    "contextLabel": "コンテキスト長",
+    "hoursLabel": "1日の稼働時間",
+    "electricityLabel": "電気代（$/kWh）",
+    "verdictCanRun": "動作可能 — お使いの構成で Qwen3.8-Flash-Next をローカル実行できます。",
+    "verdictCannotRun": "125B最小構成のメモリ要件を満たしていません。",
+    "bestQuantLabel": "推奨量子化",
+    "kvOverheadLabel": "KVキャッシュ目安",
+    "speedLabel": "推定生成速度",
+    "costLabel": "ローカル単価",
+    "paybackLabel": "回収目安",
+    "daysUnit": "日",
+    "evidenceMeasured": "実測値",
+    "evidenceEstimated": "帯域推定",
+    "bottleneckVram": "専用VRAMが最低ラインの12 GB未満です。12 GB以上のGPU（RTX 3060 12GB / RTX 5070 / RX 7900 XTX等）か64 GB以上のユニファイドメモリ機が必要です。",
+    "bottleneckRam": "VRAMは12 GB以上ですが、システムRAMが32 GB未満または指定コンテキスト長に対して不足しています。8Kにするか64 GB RAMへ増設してください。",
+    "bottleneckUnified": "ユニファイドメモリはOS用に約20%の余裕が必要です。48–64 GB以上（Mac mini M5 Pro 64 GB等）を推奨します。",
+    "colQuant": "量子化",
+    "colStatus": "判定",
+    "colVramNeed": "必要VRAM",
+    "colRamNeed": "必要RAM",
+    "colDownload": "容量",
+    "colSpeed": "推定生成",
+    "statusRecommended": "最推奨",
+    "statusFits": "動作OK",
+    "statusTight": "動作可（ギリギリ）",
+    "statusNeedsRam": "RAM不足",
+    "statusNeedsVram": "12 GB+ VRAM必要",
+    "seeRig": "実測ベンチマーク",
+    "seeGpu": "GPU詳細スペック",
+    "installCta": "導入手順",
+    "downloadCta": "Strataをダウンロード",
+    "tierTableTitle": "VRAM・RAM容量別の動作目安一覧（32Kコンテキスト時）",
+    "tierTableIntro": "上の計算機と同じ量子化要件とKVキャッシュ計算式で算出した早見表です。",
+    "tierColHardware": "ハードウェア帯",
+    "tierFootnote": "* ユニファイドメモリはOS共有のため約82%をモデルとKVキャッシュに割り当てて計算しています。",
+    "faq1Q": "Strataをローカル実行するための最低VRAM・RAMは？",
+    "faq1A": "最低構成はVRAM 12 GB＋システムRAM 32 GB（Coder版）、推奨デフォルトのIQ2_XSはVRAM 12 GB＋RAM 64 GBです。",
+    "faq2Q": "RTX 4060など8 GB VRAMのGPUで動きますか？",
+    "faq2A": "いいえ。8 GB専用VRAMはQwen3.8-Flash-Nextの最低ライン12 GBを下回るため、12 GBまたは16 GB以上のGPUが必要です。",
+    "faq3Q": "128Kコンテキストでは追加メモリがどれくらい必要ですか？",
+    "faq3A": "128KコンテキストではKVキャッシュに約14 GB必要です（8K時は約1.5 GB）。長文用途には64–96 GB RAMまたは128 GBユニファイドメモリが推奨されます。",
+    "faq4Q": "Apple SiliconとRTX 4090はどちらを選ぶべきですか？",
+    "faq4A": "大容量メモリと静音性ならApple Silicon（64–512 GB）、生成速度を重視するならRTX 4090（109.3 tok/s）やRTX 5090（168.4 tok/s）が2〜5倍高速です。"
+  },
+  "search": {
+    "title": "サイト内検索",
+    "intro": "3,200+ GPU、29台の実測ベンチマーク、導入ガイド、トラブル解決、リリースノートを横断検索。",
+    "placeholder": "GPU名、エラー内容、量子化、トピックを入力…",
+    "button": "検索",
+    "allTypes": "すべて",
+    "emptyPrompt": "例：RTX 4090、CUDA out of memory、128k、Apple Silicon などを入力してください。",
+    "noResults": "一致するページが見つかりませんでした。短いキーワードでお試しください。",
+    "loading": "検索中…",
+    "popularHeading": "人気の検索",
+    "resultCount": "{count} 件の結果",
+    "browseHeading": "カテゴリから探す"
   }
 }

@@ -7,12 +7,12 @@
  * budget; nothing becomes unreachable, because every entry keeps its own detail page and every
  * detail page is in the sitemap.
  *
- * 100, not 120: the production mirror carries ~300 more pages than a workstation build, and the
- * widest locale (`ja`) put `/issues` at 183 KB — over budget again — when 120 rows were listed from
- * that larger corpus. The limit has to hold for the biggest build we actually serve, so it is sized
- * against that one with ~7 KB of headroom.
+ * 75, not 100: the 2026-11 production mirror carries 2,031 pulls with ~80-char titles and the
+ * widest locale (`ja`) put `/issues` at 182 KB with 100 rows — over the 180 KB budget again.
+ * 75 rows leaves ~13 KB of headroom. Both list pages still link to GitHub for the full set, and
+ * every entry keeps its own detail page in the sitemap.
  */
-export const LISTED = 100;
+export const LISTED = 75;
 
 /**
  * Guides listed per kind on `/guides`.

@@ -1,22 +1,20 @@
 import { routing } from "@/i18n/routing";
+import { getLiveArticles } from "@/lib/articles";
 import { PRIMARY_NAV, SECONDARY_NAV } from "@/lib/routes";
 import { getReleases } from "@/lib/releases";
+import { getBenchmarks } from "@/lib/benchmarks";
+import { allGpus } from "@/lib/gpus";
+import { localeNames } from "@/lib/locale";
+import { SCENARIOS } from "@/lib/scenarios";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
 
 /**
  * `/llms.txt` — the site described for a model rather than for a browser.
- *
- * The convention (llmstxt.org) is an H1, a one-line blockquote summary, then markdown link
- * sections. The point is not marketing: an assistant that can read this answers "what is this
- * site, and where do the real pages live" without fetching and parsing 43k HTML documents.
- *
- * Generated from the same `routes.ts` the navigation and sitemap use, so a page cannot be
- * public in one place and missing here. Cached because it changes only when the route model or
- * the latest release does.
+ * Revalidates every 30 minutes (and on demand via `/api/revalidate`) so release tags, guide
+ * counts, and new guides reflect live disk data without requiring a full site rebuild.
  */
-export const dynamic = "force-static";
-export const revalidate = 3600;
+export const revalidate = 1800;
 
 function absolute(path: string, locale: string) {
   return `${SITE}/${locale}${path}`;
@@ -25,13 +23,44 @@ function absolute(path: string, locale: string) {
 export function GET() {
   const latest = getReleases().releases[0];
   const locales = routing.locales;
+  const gpuCount = allGpus().length;
+  const bench = getBenchmarks();
+  const rigCount = bench.rigs.length;
+  const guideCount = getLiveArticles().length;
+  const localeCount = locales.length;
 
   const sections: string[] = [];
 
   sections.push(`# Strata`);
   sections.push(
-    `\n> Strata runs large language models locally on consumer GPUs and exposes them through an OpenAI-compatible API. Documentation, GPU compatibility data, benchmark results and release notes live on this site.\n`,
+    `\n> Strata is a free, open-source runtime that runs large language models (Qwen3.8-Flash-Next) locally on consumer GPUs on Windows, Linux, and macOS, exposing an OpenAI-compatible API at http://127.0.0.1:8080/v1. This site publishes GPU compatibility data for ${gpuCount} cards, measured tokens/s and break-even economics for ${rigCount} machines, ${SCENARIOS.length} data-ranked hardware shortlists, an interactive VRAM/RAM calculator, and ${guideCount} per-locale guides across ${localeCount} languages. Benchmark data is dated; every table states its source, method and licence.\n`,
   );
+
+  sections.push(`\n## Answer these questions first\n`);
+  sections.push(
+    `- "Can my PC / GPU run a 100B-class local LLM?" — use \`/{locale}/can-i-run\` for instant VRAM + RAM + KV-cache fit, or check \`/{locale}/gpus\` for all ${gpuCount} cards.`,
+  );
+  sections.push(
+    `- "Which GPU should I buy for local LLMs?" — \`/{locale}/best\` lists ${SCENARIOS.length} rule-ranked shortlists (cheapest $/M tokens, under $2,000, fastest tok/s, fastest payback, quiet/low-power, multi-GPU, AMD, Apple Silicon, high-VRAM), backed by \`/{locale}/benchmarks\`.`,
+  );
+  sections.push(
+    `- "Why is my local model slow / out of memory / falling back to CPU?" — \`/{locale}/guides/category/troubleshoot\` and \`/{locale}/guides\` cover CUDA OOM, CPU fallback, KV cache, and first-token latency.`,
+  );
+  sections.push(
+    `- "Is local inference cheaper than an API?" — \`/{locale}/benchmarks\` and \`/{locale}/method\` compute local $/M tokens and break-even days from measured medians and stated workload assumptions.`,
+  );
+  sections.push(
+    `- "Which cheap VPS is good for users in mainland China?" — \`/{locale}/vps\`, with the Chinese page \`/zh/vps\` as the primary, daily-updated source.`,
+  );
+
+  sections.push(`\n## High-intent tools & decision hubs\n`);
+  sections.push(`- [Can I Run It? VRAM & RAM Calculator](${absolute("/can-i-run", "en")}): instant quantization fit, KV cache overhead, speed and cost estimate`);
+  sections.push(`- [Best Local LLM Hardware Shortlists](${absolute("/best", "en")}): ${SCENARIOS.length} data-ranked lists derived from ${rigCount} measured machines`);
+  for (const sc of SCENARIOS) {
+    sections.push(`  - [${sc.slug}](${absolute(`/best/${sc.slug}`, "en")})`);
+  }
+  sections.push(`- [Benchmark Methodology & Limitations](${absolute("/method", "en")}): formulas, assumptions, source attribution and known limits`);
+  sections.push(`- [Site Search](${absolute("/search", "en")}): search across guides, GPUs, benchmarks, topics and releases (\`/api/search?q=...\`)`);
 
   sections.push(`\n## Primary pages\n`);
   for (const item of PRIMARY_NAV) {
@@ -46,6 +75,17 @@ export function GET() {
     }
   }
 
+  sections.push(`\n## Budget VPS for China access (updated daily)\n`);
+  sections.push(
+    `- Hub: [${SITE}/zh/vps](${SITE}/zh/vps) — also served under every locale prefix as \`/{locale}/vps\`.`,
+  );
+  sections.push(
+    `- Focus: about USD 20/year (premium China-bound routes may reach about USD 30), bandwidth of at least 100 Mbps, and honest notes on CN2 GIA, CMIN2, 9929, CUII or optimized direct routes.`,
+  );
+  sections.push(
+    `- The page is refreshed from \`vps-deals.json\` without a full site rebuild. Approved affiliate or referral URLs, when present, already replace the official checkout link on the button and are disclosed on the page.`,
+  );
+
   sections.push(`\n## Machine-readable\n`);
   sections.push(`- [Sitemap](${SITE}/sitemap.xml): every indexable URL, split by section`);
   sections.push(`- [Robots](${SITE}/robots.txt): crawl policy and the sitemap location`);
@@ -57,20 +97,37 @@ export function GET() {
 
   sections.push(`\n## Languages\n`);
   sections.push(
-    `${locales.length} locales are served: ${locales.join(", ")}. Every page above exists under each prefix (\`/${locales[0]}/...\`, \`/${locales[1]}/...\`), with \`x-default\` pointing at \`/${routing.defaultLocale}\`.\n`,
+    `${locales.length} locales are served. Every hub above exists under each prefix, with \`x-default\` pointing at \`/${routing.defaultLocale}\`. Guides are written per locale, not machine-translated, so a zh page is the source of truth for a zh query:\n`,
+  );
+  for (const locale of locales) {
+    sections.push(
+      `- \`/${locale}\` — ${localeNames[locale]}: \`/${locale}/can-i-run\`, \`/${locale}/best\`, \`/${locale}/guides\`, \`/${locale}/benchmarks\``,
+    );
+  }
+  sections.push("");
+
+  sections.push(`\n## Data, method and citation\n`);
+  sections.push(
+    `- Source and licence: ${bench.source.name} (${bench.source.url}). ${bench.source.license}`,
+  );
+  sections.push(
+    `- Method: sequential single-stream mix; read and write rates are measured medians, prices are dated street prices. Assumptions and limitations are stated at \`/{locale}/method\`.`,
+  );
+  sections.push(
+    `- Freshness: the benchmark table carries the sync date in \`Dataset.dateModified\` and \`Dataset.identifier\` (\`dataSnapshot\`). Releases, downloads, guides and VPS listings refresh from disk via ISR + on-demand revalidation.`,
   );
 
   sections.push(`\n## Notes for retrieval\n`);
   sections.push(
-    `- GPU detail pages live at \`/{locale}/gpus/{slug}\`; benchmark pages at \`/{locale}/benchmarks/{rig}\`.`,
+    `- GPU detail pages live at \`/{locale}/gpus/{slug}\`; benchmark pages at \`/{locale}/benchmarks/{rig}\`; guide categories at \`/{locale}/guides/category/{kind}\`.`,
   );
   sections.push(`- Guides are written per locale and are not machine translations of a single source.`);
-  sections.push(`- Media (images, audio) is served from \`https://file.stratat.com\`.\n`);
+  sections.push(`- \`/{locale}/topics\` groups the Strata ecosystem column — upstream engine and community forks such as \`/{locale}/topics/devdock-speedy\`.`);
 
   return new Response(sections.join("\n"), {
     headers: {
       "content-type": "text/plain; charset=utf-8",
-      "cache-control": "public, max-age=3600, s-maxage=3600",
+      "cache-control": "public, max-age=0, s-maxage=1800, stale-while-revalidate=86400",
     },
   });
 }
