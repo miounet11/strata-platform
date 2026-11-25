@@ -257,43 +257,49 @@ export default async function GpuPage({
         </tbody>
       </table>
 
-      <GpuConfigPanel
-        gpu={gpu}
-        labels={{
-          configHeading: tc("configHeading"),
-          configIntro: tc("configIntro"),
-          psuLabel: tc("psuLabel"),
-          connectorLabel: tc("connectorLabel"),
-          hostRamLabel: tc("hostRamLabel"),
-          pcieLabel: tc("pcieLabel"),
-          slotCoolingLabel: tc("slotCoolingLabel"),
-          multiGpuLabel: tc("multiGpuLabel"),
-          efficiencyLabel: tc("efficiencyLabel"),
-          annualPowerLabel: tc("annualPowerLabel"),
-          quantHeading: tc("quantHeading"),
-          quantColModel: tc("quantColModel"),
-          quantColFit: tc("quantColFit"),
-          quantColSplit: tc("quantColSplit"),
-          quantColSpeed: tc("quantColSpeed"),
-          quantColContext: tc("quantColContext"),
-          fitFullVram: tc("fitFullVram"),
-          fitHybrid: tc("fitHybrid"),
-          fitTooSmall: tc("fitTooSmall"),
-          yes: tc("yes"),
-          no: tc("no"),
-          unifiedSystem: tc("unifiedSystem"),
-          coolingLabels: {
-            "unified-silent": tc("coolingLabels.unified-silent"),
-            "compact-air": tc("coolingLabels.compact-air"),
-            "high-airflow-tower": tc("coolingLabels.high-airflow-tower"),
-            "workstation-blower-or-aio": tc("coolingLabels.workstation-blower-or-aio"),
-          },
-          ramUnit: tc("ramUnit"),
-          wattsUnit: tc("wattsUnit"),
-          perYear4h: tc("perYear4h"),
-          tpsPer100WUnit: tc("tpsPer100WUnit"),
-        }}
-      />
+      {gpu.support !== "not-supported" &&
+      ((!gpu.id.includes("-") && gpu.vendor !== "apple") ||
+        assembled.length > 0 ||
+        gpu.evidence === "measured") ? (
+        <GpuConfigPanel
+          gpu={gpu}
+          showQuantMatrix={gpu.evidence === "measured" || assembled.length > 0}
+          labels={{
+            configHeading: tc("configHeading"),
+            configIntro: tc("configIntro"),
+            psuLabel: tc("psuLabel"),
+            connectorLabel: tc("connectorLabel"),
+            hostRamLabel: tc("hostRamLabel"),
+            pcieLabel: tc("pcieLabel"),
+            slotCoolingLabel: tc("slotCoolingLabel"),
+            multiGpuLabel: tc("multiGpuLabel"),
+            efficiencyLabel: tc("efficiencyLabel"),
+            annualPowerLabel: tc("annualPowerLabel"),
+            quantHeading: tc("quantHeading"),
+            quantColModel: tc("quantColModel"),
+            quantColFit: tc("quantColFit"),
+            quantColSplit: tc("quantColSplit"),
+            quantColSpeed: tc("quantColSpeed"),
+            quantColContext: tc("quantColContext"),
+            fitFullVram: tc("fitFullVram"),
+            fitHybrid: tc("fitHybrid"),
+            fitTooSmall: tc("fitTooSmall"),
+            yes: tc("yes"),
+            no: tc("no"),
+            unifiedSystem: tc("unifiedSystem"),
+            coolingLabels: {
+              "unified-silent": tc("coolingLabels.unified-silent"),
+              "compact-air": tc("coolingLabels.compact-air"),
+              "high-airflow-tower": tc("coolingLabels.high-airflow-tower"),
+              "workstation-blower-or-aio": tc("coolingLabels.workstation-blower-or-aio"),
+            },
+            ramUnit: tc("ramUnit"),
+            wattsUnit: tc("wattsUnit"),
+            perYear4h: tc("perYear4h"),
+            tpsPer100WUnit: tc("tpsPer100WUnit"),
+          }}
+        />
+      ) : null}
 
       <p className="meta">
         {gpu.evidence === "measured" ? t("noteMeasured") : t("noteEstimated")}

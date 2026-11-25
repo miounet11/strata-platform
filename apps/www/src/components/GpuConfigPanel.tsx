@@ -57,13 +57,15 @@ export function GpuConfigPanel({
   gpu,
   labels,
   variants = gpuVariants,
+  showQuantMatrix = gpu.evidence === "measured",
 }: {
   gpu: Gpu;
   labels: GpuConfigPanelLabels;
   variants?: readonly QuantVariant[];
+  showQuantMatrix?: boolean;
 }) {
+  if (gpu.support === "not-supported") return null;
   const profile = gpuHardwareProfile(gpu, variants);
-  const legacy = gpu.support === "not-supported";
   const psu =
     profile.recommendedPsuWatts == null
       ? labels.unifiedSystem
@@ -79,44 +81,29 @@ export function GpuConfigPanel({
     <section className="gpu-config-panel" data-gpu={gpu.slug}>
       <h2>{labels.configHeading}</h2>
       <p>{labels.configIntro}</p>
-      {legacy ? (
-        <dl className="gpu-config-grid">
-          <dt>{labels.pcieLabel}</dt>
-          <dd>{profile.pcieInterface}</dd>
-          <dt>TDP</dt>
-          <dd>
-            {num(profile.tdpWatts)} {labels.wattsUnit}
-          </dd>
-          <dt>{labels.connectorLabel}</dt>
-          <dd>{profile.powerConnector}</dd>
-          <dt>{labels.slotCoolingLabel}</dt>
-          <dd>{profile.slotWidth}</dd>
-        </dl>
-      ) : (
-        <dl className="gpu-config-grid">
-          <dt>{labels.psuLabel}</dt>
-          <dd>{psu}</dd>
-          <dt>{labels.connectorLabel}</dt>
-          <dd>{profile.powerConnector}</dd>
-          <dt>{labels.hostRamLabel}</dt>
-          <dd>{ram}</dd>
-          <dt>{labels.pcieLabel}</dt>
-          <dd>{profile.pcieInterface}</dd>
-          <dt>{labels.slotCoolingLabel}</dt>
-          <dd>
-            {profile.slotWidth} · {labels.coolingLabels[profile.coolingTier]}
-          </dd>
-          <dt>{labels.multiGpuLabel}</dt>
-          <dd>{profile.multiGpuViable ? labels.yes : labels.no}</dd>
-          <dt>{labels.efficiencyLabel}</dt>
-          <dd>{efficiency}</dd>
-          <dt>{labels.annualPowerLabel}</dt>
-          <dd>
-            {num(profile.annualPower4hUsd)} {labels.perYear4h}
-          </dd>
-        </dl>
-      )}
-      {legacy ? null : (
+      <dl className="gpu-config-grid">
+        <dt>{labels.psuLabel}</dt>
+        <dd>{psu}</dd>
+        <dt>{labels.connectorLabel}</dt>
+        <dd>{profile.powerConnector}</dd>
+        <dt>{labels.hostRamLabel}</dt>
+        <dd>{ram}</dd>
+        <dt>{labels.pcieLabel}</dt>
+        <dd>{profile.pcieInterface}</dd>
+        <dt>{labels.slotCoolingLabel}</dt>
+        <dd>
+          {profile.slotWidth} · {labels.coolingLabels[profile.coolingTier]}
+        </dd>
+        <dt>{labels.multiGpuLabel}</dt>
+        <dd>{profile.multiGpuViable ? labels.yes : labels.no}</dd>
+        <dt>{labels.efficiencyLabel}</dt>
+        <dd>{efficiency}</dd>
+        <dt>{labels.annualPowerLabel}</dt>
+        <dd>
+          {num(profile.annualPower4hUsd)} {labels.perYear4h}
+        </dd>
+      </dl>
+      {showQuantMatrix ? (
         <>
           <h3>{labels.quantHeading}</h3>
           <table className="gpu-quant-table">
@@ -152,7 +139,7 @@ export function GpuConfigPanel({
             </tbody>
           </table>
         </>
-      )}
+      ) : null}
     </section>
   );
 }
