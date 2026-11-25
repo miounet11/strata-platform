@@ -13,6 +13,7 @@ apps/desktop/src-tauri/target
 .DS_Store
 .cache/intake
 .logs/
+grok/logs/
 .clavue/
 .cursor/
 .env.*
