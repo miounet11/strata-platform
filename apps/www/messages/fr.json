@@ -30,7 +30,8 @@
     "best": "Usages",
     "vps": "Offres VPS",
     "canIRun": "Calculateur VRAM",
-    "search": "Recherche"
+    "search": "Recherche",
+    "builds": "Configurations PC"
   },
   "topics": {
     "title": "Usages",
@@ -55,7 +56,10 @@
     "featureSpeedBody": "Le tableau compare les tokens par jour, l'électricité et le seuil de rentabilité.",
     "featureAgentsBody": "Téléchargez le moteur, puis pointez Cursor ou Codex vers 127.0.0.1:8080.",
     "aiPromptTitle": "Laisser l'IA installer",
-    "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository."
+    "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
+    "buildsTitle": "PC mis en avant pour l'IA locale",
+    "buildsIntro": "Quatre machines complètes : nomenclature, prix constaté, VRAM et débit d'écriture.",
+    "buildsCta": "Voir toutes les configurations"
   },
   "releases": {
     "title": "Notes de version",
@@ -401,6 +405,10 @@
     "search": {
       "title": "Rechercher sur Strata — GPU, Benchmarks, Guides & Versions",
       "description": "Recherchez parmi 3 200+ GPU, 29 benchmarks mesurés, classements et guides locaux."
+    },
+    "builds": {
+      "title": "PC complets pour l'IA locale",
+      "description": "Vingt-quatre postes chiffrés pour l'IA locale, avec nomenclature, VRAM, consommation, bruit et tokens par seconde estimés."
     }
   },
   "gpus": {
@@ -481,7 +489,45 @@
     "specTransistorsValue": "{count} millions",
     "specDieSize": "Surface du die",
     "specPixelRate": "Taux de remplissage de pixels",
-    "specTextureRate": "Taux de remplissage de textures"
+    "specTextureRate": "Taux de remplissage de textures",
+    "seeBuilds": "Configurations PC",
+    "seeCanIRun": "Mon PC peut-il le faire tourner ?",
+    "assembledTitle": "PC montés autour de ce GPU",
+    "buildsCallout": "Voir les PC montés autour de ces cartes, ou vérifier si votre machine actuelle suffit déjà.",
+    "config": {
+      "configHeading": "Alimentation, refroidissement et mémoire",
+      "configIntro": "Ce qu'il faut prévoir en plus de la carte : bloc d'alimentation, câbles, flux d'air, RAM système, et la quantification qui tient vraiment.",
+      "psuLabel": "Alimentation conseillée",
+      "connectorLabel": "Connecteur d'alimentation",
+      "hostRamLabel": "Mémoire système",
+      "pcieLabel": "PCIe / liaison",
+      "slotCoolingLabel": "Slots et refroidissement",
+      "multiGpuLabel": "Second GPU",
+      "efficiencyLabel": "Efficacité",
+      "annualPowerLabel": "Électricité, 4 h/jour",
+      "quantHeading": "Quantification adaptée",
+      "quantColModel": "Variante",
+      "quantColFit": "Ajustement",
+      "quantColSplit": "Répartition mémoire",
+      "quantColSpeed": "Écriture / lecture tok/s",
+      "quantColContext": "Contexte",
+      "fitFullVram": "Tient dans la VRAM",
+      "fitHybrid": "VRAM + délestage RAM",
+      "fitTooSmall": "Trop juste",
+      "yes": "Oui",
+      "no": "Non",
+      "unifiedSystem": "Utilise l'alimentation du système",
+      "coolingLabels": {
+        "unified-silent": "Châssis unifié silencieux",
+        "compact-air": "Refroidissement à air compact",
+        "high-airflow-tower": "Tour à fort débit d'air",
+        "workstation-blower-or-aio": "Turbine workstation ou watercooling AiO"
+      },
+      "ramUnit": "Go",
+      "wattsUnit": "W",
+      "perYear4h": "USD/an à 4 h/jour",
+      "tpsPer100WUnit": "tok/s pour 100 W"
+    }
   },
   "guides": {
     "title": "Guides",
@@ -769,6 +815,101 @@
     "loading": "Recherche…",
     "popularHeading": "Recherches populaires",
     "resultCount": "{count} résultat(s)",
-    "browseHeading": "Parcourir par rubrique"
+    "browseHeading": "Parcourir par rubrique",
+    "filterBuild": "Configurations"
+  },
+  "builds": {
+    "title": "Configurations PC",
+    "intro": "Postes complets pour l'IA locale : pièces, prix constaté, VRAM, puissance, bruit et tokens par seconde. Filtrez par budget ou comparez-en trois.",
+    "directoryTitle": "Toutes les configurations",
+    "search": "Chercher une configuration",
+    "searchPlaceholder": "GPU, gamme ou nom",
+    "tier": "Gamme",
+    "vendor": "Marque",
+    "minVram": "VRAM minimale",
+    "maxBudget": "Budget max",
+    "sort": "Tri",
+    "all": "Tous",
+    "tiers": {
+      "budget": "Budget",
+      "sweet-spot": "Meilleur rapport",
+      "dual-gpu": "Double GPU",
+      "workstation": "Station de travail",
+      "compact-unified": "Compact à mémoire unifiée",
+      "flagship": "Haut de gamme"
+    },
+    "vendors": {
+      "nvidia": "NVIDIA",
+      "amd": "AMD",
+      "apple": "Apple"
+    },
+    "anyBudget": "Tous budgets",
+    "sortCost": "Coût par token le plus bas",
+    "sortSpeed": "Écriture la plus rapide",
+    "sortPrice": "Prix le plus bas",
+    "sortVram": "Plus de VRAM",
+    "sortPower": "Consommation la plus basse",
+    "compare": "Comparer",
+    "compareHint": "Jusqu'à trois configurations",
+    "compareLimit": "Trois configurations maximum. Retirez-en une pour en ajouter une autre.",
+    "clearCompare": "Effacer",
+    "empty": "Aucune configuration ne correspond à ces filtres.",
+    "price": "Prix total",
+    "vram": "VRAM",
+    "systemRam": "Mémoire système",
+    "write": "Écriture tok/s",
+    "read": "Lecture tok/s",
+    "watts": "Puissance en charge",
+    "noise": "Bruit",
+    "costPerM": "Coût par million de tokens",
+    "breakEven": "Seuil de rentabilité",
+    "quant": "Quantification conseillée",
+    "view": "Ouvrir la configuration",
+    "days": "jours",
+    "na": "n. d.",
+    "overview": "Aperçu",
+    "bestForTitle": "Convient pour",
+    "tradeoffsTitle": "Compromis",
+    "loadIdle": "Charge / veille",
+    "annual4h": "Électricité, 4 h/jour",
+    "annual24h": "Électricité, 24 h/jour",
+    "recommended": "Quantification et contexte",
+    "runtime": "Runtime",
+    "evidence": "Source des chiffres",
+    "evidenceMeasured": "Mesuré",
+    "evidenceEstimated": "Estimé",
+    "bomTitle": "Nomenclature",
+    "bomRole": "Rôle",
+    "bomModel": "Modèle",
+    "bomSpec": "Spécification",
+    "bomPrice": "Prix constaté estimé (USD)",
+    "bomTotal": "Total",
+    "roles": {
+      "gpu": "GPU",
+      "cpu": "Processeur",
+      "motherboard": "Carte mère",
+      "ram": "Mémoire",
+      "psu": "Alimentation",
+      "cooling": "Refroidissement",
+      "chassis": "Boîtier",
+      "storage": "Stockage",
+      "system": "Système"
+    },
+    "workloadsTitle": "Performance multi-modèles",
+    "workloadModel": "Modèle",
+    "workloadQuant": "Quantification",
+    "workloadFit": "Ajustement mémoire",
+    "workloadWrite": "Écriture estimée tok/s",
+    "workloadContext": "Contexte max",
+    "fitFull": "Tient dans la VRAM",
+    "fitHybrid": "Délestage hybride",
+    "fitUnified": "Mémoire unifiée",
+    "assemblyTitle": "Liste de montage, BIOS et pilotes",
+    "faqTitle": "Questions sur cette configuration",
+    "relatedBuilds": "Configurations proches",
+    "seeGpu": "Fiche du GPU",
+    "seeRig": "Benchmark mesuré",
+    "seeCanIRun": "Vérifier votre PC",
+    "backToBuilds": "Toutes les configurations PC"
   }
 }

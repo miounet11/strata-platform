@@ -104,6 +104,10 @@
     "search": {
       "title": "Search Strata — Guides, GPUs, Benchmarks & Releases",
       "description": "Search 3,200+ GPUs, 29 measured benchmarks, hardware shortlists, setup guides, and Strata releases."
+    },
+    "builds": {
+      "title": "Complete local-AI PC builds",
+      "description": "Twenty-four priced local-AI workstations with a full parts list, VRAM, power draw, noise, and estimated tokens per second."
     }
   },
   "nav": {
@@ -133,7 +137,8 @@
     "best": "Best",
     "vps": "VPS deals",
     "canIRun": "Can I Run It?",
-    "search": "Search"
+    "search": "Search",
+    "builds": "PC builds"
   },
   "topics": {
     "title": "Guides",
@@ -158,7 +163,10 @@
     "featureAgentsBody": "Paste one address and Cursor or Claude Code can use it.",
     "aiPromptTitle": "Let your AI install Strata",
     "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
-    "ctaBenchmarks": "See benchmarks"
+    "ctaBenchmarks": "See benchmarks",
+    "buildsTitle": "Featured local-AI PC builds",
+    "buildsIntro": "Four complete machines with a parts list, street price, VRAM, and write speed.",
+    "buildsCta": "See all PC builds"
   },
   "releases": {
     "title": "Release notes",
@@ -481,7 +489,45 @@
     "specTransistorsValue": "{count} million",
     "specDieSize": "Die size",
     "specPixelRate": "Pixel rate",
-    "specTextureRate": "Texture rate"
+    "specTextureRate": "Texture rate",
+    "seeBuilds": "PC builds",
+    "seeCanIRun": "Can I run it?",
+    "assembledTitle": "Assembled PC builds using this GPU",
+    "buildsCallout": "See complete PCs built around these cards, or check whether your current machine already fits.",
+    "config": {
+      "configHeading": "Power, cooling, and host memory",
+      "configIntro": "What to budget beside the card: PSU, cables, case airflow, system RAM, and which quantization actually fits.",
+      "psuLabel": "Recommended PSU",
+      "connectorLabel": "Power connector",
+      "hostRamLabel": "Host RAM",
+      "pcieLabel": "PCIe / link",
+      "slotCoolingLabel": "Slots and cooling",
+      "multiGpuLabel": "Second GPU",
+      "efficiencyLabel": "Efficiency",
+      "annualPowerLabel": "Electricity, 4 h/day",
+      "quantHeading": "Quantization fit",
+      "quantColModel": "Build",
+      "quantColFit": "Fit",
+      "quantColSplit": "Memory split",
+      "quantColSpeed": "Write / read tok/s",
+      "quantColContext": "Context",
+      "fitFullVram": "Fits in VRAM",
+      "fitHybrid": "VRAM + RAM offload",
+      "fitTooSmall": "Too small",
+      "yes": "Yes",
+      "no": "No",
+      "unifiedSystem": "Uses the system power supply",
+      "coolingLabels": {
+        "unified-silent": "Quiet unified chassis",
+        "compact-air": "Compact air cooler",
+        "high-airflow-tower": "High-airflow tower",
+        "workstation-blower-or-aio": "Workstation blower or AIO"
+      },
+      "ramUnit": "GB",
+      "wattsUnit": "W",
+      "perYear4h": "USD/year at 4 h/day",
+      "tpsPer100WUnit": "tok/s per 100 W"
+    }
   },
   "guides": {
     "title": "Guides",
@@ -769,6 +815,101 @@
     "loading": "Searching…",
     "popularHeading": "Popular searches",
     "resultCount": "{count} matching result(s)",
-    "browseHeading": "Browse by section"
+    "browseHeading": "Browse by section",
+    "filterBuild": "PC builds"
+  },
+  "builds": {
+    "title": "PC builds",
+    "intro": "Complete local-AI workstations: parts, street price, VRAM, power, noise, and tokens per second. Filter by budget or compare up to three.",
+    "directoryTitle": "All builds",
+    "search": "Search builds",
+    "searchPlaceholder": "GPU, tier, or build name",
+    "tier": "Tier",
+    "vendor": "Vendor",
+    "minVram": "Minimum VRAM",
+    "maxBudget": "Max budget",
+    "sort": "Sort",
+    "all": "All",
+    "tiers": {
+      "budget": "Budget",
+      "sweet-spot": "Sweet spot",
+      "dual-gpu": "Dual GPU",
+      "workstation": "Workstation",
+      "compact-unified": "Compact unified",
+      "flagship": "Flagship"
+    },
+    "vendors": {
+      "nvidia": "NVIDIA",
+      "amd": "AMD",
+      "apple": "Apple"
+    },
+    "anyBudget": "Any budget",
+    "sortCost": "Lowest cost per token",
+    "sortSpeed": "Fastest write",
+    "sortPrice": "Lowest price",
+    "sortVram": "Most VRAM",
+    "sortPower": "Lowest power",
+    "compare": "Compare",
+    "compareHint": "Up to three builds",
+    "compareLimit": "Three builds is the limit. Remove one to add another.",
+    "clearCompare": "Clear",
+    "empty": "No build matches these filters.",
+    "price": "Total price",
+    "vram": "VRAM",
+    "systemRam": "System RAM",
+    "write": "Write tok/s",
+    "read": "Read tok/s",
+    "watts": "Load power",
+    "noise": "Noise",
+    "costPerM": "Cost per million tokens",
+    "breakEven": "Break-even",
+    "quant": "Recommended quant",
+    "view": "Open build",
+    "days": "days",
+    "na": "n/a",
+    "overview": "Overview",
+    "bestForTitle": "Best for",
+    "tradeoffsTitle": "Tradeoffs",
+    "loadIdle": "Load / idle power",
+    "annual4h": "Electricity, 4 h/day",
+    "annual24h": "Electricity, 24 h/day",
+    "recommended": "Quant and context",
+    "runtime": "Runtime",
+    "evidence": "Evidence",
+    "evidenceMeasured": "Measured",
+    "evidenceEstimated": "Estimated",
+    "bomTitle": "Bill of materials",
+    "bomRole": "Role",
+    "bomModel": "Model",
+    "bomSpec": "Specification",
+    "bomPrice": "Est. street price (USD)",
+    "bomTotal": "Total",
+    "roles": {
+      "gpu": "GPU",
+      "cpu": "CPU",
+      "motherboard": "Motherboard",
+      "ram": "Memory",
+      "psu": "Power supply",
+      "cooling": "Cooling",
+      "chassis": "Chassis",
+      "storage": "Storage",
+      "system": "System"
+    },
+    "workloadsTitle": "Multi-model performance",
+    "workloadModel": "Model",
+    "workloadQuant": "Quant",
+    "workloadFit": "Memory fit",
+    "workloadWrite": "Est. write tok/s",
+    "workloadContext": "Max context",
+    "fitFull": "Fits in VRAM",
+    "fitHybrid": "Hybrid offload",
+    "fitUnified": "Unified memory",
+    "assemblyTitle": "Assembly, BIOS, and driver checklist",
+    "faqTitle": "Questions about this build",
+    "relatedBuilds": "Related builds",
+    "seeGpu": "GPU spec sheet",
+    "seeRig": "Measured benchmark",
+    "seeCanIRun": "Check your own PC",
+    "backToBuilds": "All PC builds"
   }
 }

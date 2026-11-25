@@ -3,7 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { EnrichedAudio, EnrichedImage } from "@/components/EnrichedBlock";
 import { FreshSignals } from "@/components/FreshSignals";
 import { getLiveArticles } from "@/lib/articles";
-import { guidePath, releasePath } from "@/lib/routes";
+import { getBuild, buildText, type PcBuild } from "@/lib/builds";
+import { buildPath, guidePath, releasePath } from "@/lib/routes";
 import { getReleases } from "@/lib/releases";
 import { latestPosts, postHeadline } from "@/lib/creator";
 import { comparisonSignals, latestXSignals, upgradeSignals, worthReading } from "@/lib/intelligence";
@@ -83,6 +84,8 @@ export default async function HomePage({
       <div className="hero-links">
         <Link href="/best">{tn("best")}</Link>
         <span aria-hidden>·</span>
+        <Link href="/builds">{tn("builds")}</Link>
+        <span aria-hidden>·</span>
         <Link href="/benchmarks">{t("ctaBenchmarks")}</Link>
         <span aria-hidden>·</span>
         <Link href="/search">{tn("search")}</Link>
@@ -131,6 +134,8 @@ export default async function HomePage({
           <p>{t("featureAgentsBody")}</p>
         </Link>
       </div>
+
+      <FeaturedBuilds locale={locale} title={t("buildsTitle")} intro={t("buildsIntro")} cta={t("buildsCta")} />
 
       {fresh.length ? (
         <section className="section">
@@ -198,6 +203,48 @@ export default async function HomePage({
         </section>
       ) : null}
     </div>
+  );
+}
+
+const FEATURED_BUILDS = [
+  "rtx-4090-workstation",
+  "rx-7900-xtx-rocm-linux-rig",
+  "dual-rtx-3090-48gb-workstation",
+  "rtx-5090-flagship-build",
+] as const;
+
+function FeaturedBuilds({
+  locale,
+  title,
+  intro,
+  cta,
+}: {
+  locale: string;
+  title: string;
+  intro: string;
+  cta: string;
+}) {
+  const builds = FEATURED_BUILDS.map((slug) => getBuild(slug)).filter((build): build is PcBuild => build != null);
+  if (builds.length === 0) return null;
+  return (
+    <section className="section">
+      <h2>{title}</h2>
+      <p className="page-intro">{intro}</p>
+      <ul className="gpu-list">
+        {builds.map((build) => (
+          <li key={build.slug}>
+            <Link href={buildPath(build.slug)}>{buildText(build.title, locale)}</Link>
+            <span className="meta">
+              {" "}
+              ${build.totalPriceUsd.toLocaleString("en-US")} · {build.totalVramGb} GB · {build.writingToks} tok/s
+            </span>
+          </li>
+        ))}
+      </ul>
+      <Link href="/builds" className="btn">
+        {cta}
+      </Link>
+    </section>
   );
 }
 

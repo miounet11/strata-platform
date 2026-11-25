@@ -2,16 +2,17 @@ import { NextResponse } from "next/server";
 import { routing, type Locale } from "@/i18n/routing";
 import { getLiveArticles } from "@/lib/articles";
 import { getRigs } from "@/lib/benchmarks";
+import { allBuilds, buildText } from "@/lib/builds";
 import { allGpus, vramLabel } from "@/lib/gpus";
 import { getReleases } from "@/lib/releases";
 import { SCENARIOS } from "@/lib/scenarios";
 import { getLiveTopics, topicText } from "@/lib/topics";
-import { gpuPath, guidePath, releasePath, rigPath } from "@/lib/routes";
+import { buildPath, gpuPath, guidePath, releasePath, rigPath } from "@/lib/routes";
 
 export const dynamic = "force-dynamic";
 
 export type SearchHit = {
-  type: "guide" | "gpu" | "benchmark" | "topic" | "scenario" | "release";
+  type: "guide" | "gpu" | "build" | "benchmark" | "topic" | "scenario" | "release";
   title: string;
   subtitle: string;
   href: string;
@@ -133,6 +134,30 @@ export async function GET(request: Request) {
           href: `/topics/${topic.slug}`,
           badge: "topic",
           score: s + 7,
+        });
+      }
+    }
+  }
+
+  if (typeFilter === "all" || typeFilter === "build") {
+    for (const build of allBuilds()) {
+      const title = buildText(build.title, locale);
+      const tagline = buildText(build.tagline, locale);
+      const parts = build.bom.map((part) => part.model).join(" ");
+      const s = scoreText(
+        needle,
+        effectiveTokens,
+        title,
+        `${tagline} ${build.gpuModel} ${build.tier} ${build.vendor} ${build.totalVramGb}gb ${parts}`,
+      );
+      if (s > 0) {
+        hits.push({
+          type: "build",
+          title,
+          subtitle: `${build.totalVramGb} GB · ${build.writingToks} tok/s · $${build.totalPriceUsd.toLocaleString("en-US")}`,
+          href: buildPath(build.slug),
+          badge: build.tier,
+          score: s + 11,
         });
       }
     }

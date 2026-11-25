@@ -30,7 +30,8 @@
     "best": "Anwendungen",
     "vps": "VPS-Angebote",
     "canIRun": "VRAM-Rechner",
-    "search": "Suche"
+    "search": "Suche",
+    "builds": "PC-Bauvorschläge"
   },
   "topics": {
     "title": "Einsatz",
@@ -55,7 +56,10 @@
     "featureSpeedBody": "Auf der Benchmark-Seite: Tokens pro Tag, Strom und Amortisation.",
     "featureAgentsBody": "Engine laden und Cursor oder Codex auf 127.0.0.1:8080 legen.",
     "aiPromptTitle": "KI installiert Strata",
-    "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository."
+    "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
+    "buildsTitle": "Ausgewählte PCs für lokale KI",
+    "buildsIntro": "Vier fertige Rechner mit Stückliste, Straßenpreis, VRAM und Schreibgeschwindigkeit.",
+    "buildsCta": "Alle PC-Bauvorschläge ansehen"
   },
   "releases": {
     "title": "Versionshinweise",
@@ -401,6 +405,10 @@
     "search": {
       "title": "Strata durchsuchen — GPUs, Benchmarks, Guides & Releases",
       "description": "Durchsuche über 3.200 GPUs, 29 gemessene Systeme, Bestenlisten, Guides und Releases."
+    },
+    "builds": {
+      "title": "Fertige PCs für lokale KI",
+      "description": "Vierundzwanzig bepreiste Workstations für lokale KI mit Stückliste, VRAM, Leistungsaufnahme, Lautstärke und geschätzten Tokens pro Sekunde."
     }
   },
   "gpus": {
@@ -481,7 +489,45 @@
     "specTransistorsValue": "{count} Millionen",
     "specDieSize": "Die-Fläche",
     "specPixelRate": "Pixelfüllrate",
-    "specTextureRate": "Texturfüllrate"
+    "specTextureRate": "Texturfüllrate",
+    "seeBuilds": "PC-Bauvorschläge",
+    "seeCanIRun": "Läuft es auf meinem PC?",
+    "assembledTitle": "Fertige PCs mit dieser GPU",
+    "buildsCallout": "Fertige Rechner um diese Karten herum ansehen oder prüfen, ob der aktuelle PC schon reicht.",
+    "config": {
+      "configHeading": "Netzteil, Kühlung und Arbeitsspeicher",
+      "configIntro": "Was neben der Karte eingeplant werden muss: Netzteil, Kabel, Gehäuseluft, System-RAM und welche Quantisierung wirklich passt.",
+      "psuLabel": "Empfohlenes Netzteil",
+      "connectorLabel": "Stromanschluss",
+      "hostRamLabel": "Arbeitsspeicher",
+      "pcieLabel": "PCIe / Anbindung",
+      "slotCoolingLabel": "Slots und Kühlung",
+      "multiGpuLabel": "Zweite GPU",
+      "efficiencyLabel": "Effizienz",
+      "annualPowerLabel": "Strom, 4 h/Tag",
+      "quantHeading": "Passende Quantisierung",
+      "quantColModel": "Build",
+      "quantColFit": "Passform",
+      "quantColSplit": "Speicheraufteilung",
+      "quantColSpeed": "Schreiben / Lesen tok/s",
+      "quantColContext": "Kontext",
+      "fitFullVram": "Passt in den VRAM",
+      "fitHybrid": "VRAM plus RAM-Auslagerung",
+      "fitTooSmall": "Zu klein",
+      "yes": "Ja",
+      "no": "Nein",
+      "unifiedSystem": "Nutzt das Netzteil des Systems",
+      "coolingLabels": {
+        "unified-silent": "Leises Unified-Gehäuse",
+        "compact-air": "Kompakte Luftkühlung",
+        "high-airflow-tower": "Tower mit hohem Luftdurchsatz",
+        "workstation-blower-or-aio": "Workstation-Gebläse oder AiO"
+      },
+      "ramUnit": "GB",
+      "wattsUnit": "W",
+      "perYear4h": "USD/Jahr bei 4 h/Tag",
+      "tpsPer100WUnit": "tok/s je 100 W"
+    }
   },
   "guides": {
     "title": "Anleitungen",
@@ -769,6 +815,101 @@
     "loading": "Suche läuft…",
     "popularHeading": "Beliebte Suchanfragen",
     "resultCount": "{count} Treffer",
-    "browseHeading": "Nach Bereich stöbern"
+    "browseHeading": "Nach Bereich stöbern",
+    "filterBuild": "PC-Bau"
+  },
+  "builds": {
+    "title": "PC-Bauvorschläge",
+    "intro": "Fertige Workstations für lokale KI: Teile, Straßenpreis, VRAM, Leistung, Lautstärke und Tokens pro Sekunde. Nach Budget filtern oder bis zu drei vergleichen.",
+    "directoryTitle": "Alle Bauvorschläge",
+    "search": "Bauvorschläge suchen",
+    "searchPlaceholder": "GPU, Stufe oder Name",
+    "tier": "Stufe",
+    "vendor": "Hersteller",
+    "minVram": "Mindest-VRAM",
+    "maxBudget": "Budgetobergrenze",
+    "sort": "Sortierung",
+    "all": "Alle",
+    "tiers": {
+      "budget": "Sparsam",
+      "sweet-spot": "Preis-Leistung",
+      "dual-gpu": "Zwei GPUs",
+      "workstation": "Workstation",
+      "compact-unified": "Kompakt, gemeinsamer Speicher",
+      "flagship": "Spitzenklasse"
+    },
+    "vendors": {
+      "nvidia": "NVIDIA",
+      "amd": "AMD",
+      "apple": "Apple"
+    },
+    "anyBudget": "Jedes Budget",
+    "sortCost": "Niedrigste Kosten pro Token",
+    "sortSpeed": "Schnellstes Schreiben",
+    "sortPrice": "Niedrigster Preis",
+    "sortVram": "Meistes VRAM",
+    "sortPower": "Niedrigste Leistung",
+    "compare": "Vergleichen",
+    "compareHint": "Bis zu drei Rechner",
+    "compareLimit": "Drei Rechner sind das Maximum. Einen entfernen, um einen anderen aufzunehmen.",
+    "clearCompare": "Leeren",
+    "empty": "Kein Bauvorschlag passt zu diesen Filtern.",
+    "price": "Gesamtpreis",
+    "vram": "VRAM",
+    "systemRam": "Arbeitsspeicher",
+    "write": "Schreiben tok/s",
+    "read": "Lesen tok/s",
+    "watts": "Last-Leistung",
+    "noise": "Lautstärke",
+    "costPerM": "Kosten je Million Tokens",
+    "breakEven": "Amortisation",
+    "quant": "Empfohlene Quantisierung",
+    "view": "Bauvorschlag öffnen",
+    "days": "Tage",
+    "na": "k. A.",
+    "overview": "Überblick",
+    "bestForTitle": "Geeignet für",
+    "tradeoffsTitle": "Kompromisse",
+    "loadIdle": "Last / Leerlauf",
+    "annual4h": "Strom, 4 h/Tag",
+    "annual24h": "Strom, 24 h/Tag",
+    "recommended": "Quantisierung und Kontext",
+    "runtime": "Laufzeit",
+    "evidence": "Datenherkunft",
+    "evidenceMeasured": "Gemessen",
+    "evidenceEstimated": "Geschätzt",
+    "bomTitle": "Stückliste",
+    "bomRole": "Rolle",
+    "bomModel": "Modell",
+    "bomSpec": "Spezifikation",
+    "bomPrice": "Geschätzter Straßenpreis (USD)",
+    "bomTotal": "Summe",
+    "roles": {
+      "gpu": "GPU",
+      "cpu": "CPU",
+      "motherboard": "Mainboard",
+      "ram": "Arbeitsspeicher",
+      "psu": "Netzteil",
+      "cooling": "Kühlung",
+      "chassis": "Gehäuse",
+      "storage": "Speicher",
+      "system": "System"
+    },
+    "workloadsTitle": "Leistung mehrerer Modelle",
+    "workloadModel": "Modell",
+    "workloadQuant": "Quantisierung",
+    "workloadFit": "Speicherpassung",
+    "workloadWrite": "Geschätztes Schreiben tok/s",
+    "workloadContext": "Maximaler Kontext",
+    "fitFull": "Passt in den VRAM",
+    "fitHybrid": "Hybride Auslagerung",
+    "fitUnified": "Gemeinsamer Speicher",
+    "assemblyTitle": "Checkliste für Aufbau, BIOS und Treiber",
+    "faqTitle": "Fragen zu diesem Rechner",
+    "relatedBuilds": "Ähnliche Bauvorschläge",
+    "seeGpu": "GPU-Datenblatt",
+    "seeRig": "Gemessener Benchmark",
+    "seeCanIRun": "Eigenen PC prüfen",
+    "backToBuilds": "Alle PC-Bauvorschläge"
   }
 }

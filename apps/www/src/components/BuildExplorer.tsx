@@ -174,7 +174,7 @@ export function BuildExplorer({ builds, labels }: { builds: BuildExplorerRow[]; 
           placeholder={labels.searchPlaceholder}
           aria-label={labels.search}
         />
-        <div className="row" role="group" aria-label={labels.tier}>
+        <div className="row build-filter-row" role="group" aria-label={labels.tier}>
           <button type="button" className="pill" aria-pressed={tier === "all"} onClick={() => setTier("all")}>
             {labels.all}
           </button>
@@ -190,7 +190,7 @@ export function BuildExplorer({ builds, labels }: { builds: BuildExplorerRow[]; 
             </button>
           ))}
         </div>
-        <div className="row" role="group" aria-label={labels.vendor}>
+        <div className="row build-filter-row" role="group" aria-label={labels.vendor}>
           <button type="button" className="pill" aria-pressed={vendor === "all"} onClick={() => setVendor("all")}>
             {labels.all}
           </button>

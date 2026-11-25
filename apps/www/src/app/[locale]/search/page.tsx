@@ -54,6 +54,7 @@ export default async function SearchPage({ params }: { params: Promise<{ locale:
           allTypes: t("allTypes"),
           guides: tn("guides"),
           gpus: tn("gpus"),
+          builds: t("filterBuild"),
           benchmarks: tn("benchmarks"),
           topics: tn("topics"),
           releases: tn("releases"),
