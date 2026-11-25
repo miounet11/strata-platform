@@ -40,6 +40,7 @@ test("sync-and-deploy.sh prints help cleanly and never deletes server runtime tr
   // Catalog allowlist must NOT include live server corpora.
   const allowBlock = src.match(/CATALOG_DATA_FILES=\(([\s\S]*?)\)/)?.[1] ?? "";
   assert.ok(allowBlock.includes("gpus.json"), "gpus.json should be in catalog allowlist");
+  assert.ok(allowBlock.includes("pc-builds.json"), "pc-builds.json should be in catalog allowlist");
   assert.ok(allowBlock.includes("topics.json"), "topics.json should be in catalog allowlist");
   for (const liveCorpus of [
     "releases.json",

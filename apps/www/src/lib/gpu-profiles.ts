@@ -46,10 +46,10 @@ export type GpuHardwareProfile = {
 };
 
 /**
- * Contract detector. `m\b` is a trailing-m token, so it also flags names like Millennium,
- * FireStream, and "600nm". Those stay on the unified/mobile power path on purpose.
+ * Unified/mobile detector. `\d+m\b` matches mobile suffixes like 4090M or 680M without
+ * false-matching desktop legacy cards like Millennium or FireStream.
  */
-const MOBILE_NAME = /mobile|laptop|max-q|m\b|igpu|integrated|iris|uhd|hd graphics|vega \d+ mobile|radeon \d+m|ryzen/i;
+const MOBILE_NAME = /mobile|laptop|max-q|\d+m\b|igpu|integrated|iris|uhd|hd graphics|vega \d+ mobile|radeon \d+m|ryzen/i;
 
 /** Richest → leanest. Coder is a specialist pack, not a quality step above Q2. */
 const QUALITY_ORDER = ["ud-iq4_xs", "iq3_s", "iq3_xxs", "iq2_xs", "q2_0", "coder"] as const;

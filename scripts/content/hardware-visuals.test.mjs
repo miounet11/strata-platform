@@ -242,51 +242,64 @@ test("selectFlagshipGpus dedupes catalog cards and caps the list at 24", () => {
 });
 
 test("collectVisualTargets reads hubs and flagship GPUs when pc-builds.json is absent", () => {
-  assert.equal(existsSync(join(ROOT, "apps/www/src/data/pc-builds.json")), false);
-  assert.deepEqual(collectVisualTargets({ rootDir: ROOT, target: "builds" }), []);
+  const emptyRoot = mkdtempSync(join(tmpdir(), "wp3-no-builds-"));
+  try {
+    mkdirSync(join(emptyRoot, "apps/www/src/data"), { recursive: true });
+    writeFileSync(
+      join(emptyRoot, "apps/www/src/data/gpus.json"),
+      readFileSync(join(ROOT, "apps/www/src/data/gpus.json"), "utf8"),
+    );
+    assert.deepEqual(collectVisualTargets({ rootDir: emptyRoot, target: "builds" }), []);
 
-  const targets = collectVisualTargets({ rootDir: ROOT, target: "all" });
-  const ids = new Set(targets.map((target) => target.id));
-  assert.ok(ids.has("builds-hero"));
-  assert.ok(ids.has("gpus-hero"));
-  for (const slug of [
-    "rtx-5090",
-    "rtx-5080",
-    "rtx-5070",
-    "rtx-4090",
-    "rtx-4070-12-gb",
-    "rtx-3090",
-    "rtx-3090-ti",
-    "rtx-pro-6000-blackwell",
-    "amd-radeon-rx-7900-xtx",
-    "rtx-5070-ti",
-    "rtx-5060-ti-16gb",
-    "rtx-4080-super",
-    "rtx-4070-ti-super-16gb",
-    "rtx-a6000",
-    "rtx-6000-ada",
-    "amd-radeon-rx-7900-xt",
-    "intel-arc-b580",
-  ]) {
-    assert.ok(ids.has(`gpu-${slug}`), slug);
-  }
-  assert.equal(ids.has("gpu-nvidia-geforce-rtx-5070-ti-16-gb-2025"), false);
-  assert.equal(ids.has("gpu-mac-studio-m5-ultra-96-gb"), false);
-  const gpus = targets.filter((target) => target.kind === "gpu");
-  assert.equal(gpus.length, 17);
-  assert.ok(gpus.length <= 24);
-  const hero = targets.find((target) => target.id === "builds-hero");
-  assert.equal(hero.path, "/media/builds-hero.webp");
-  assert.equal(hero.page, "/builds");
-  assert.equal(hero.slot, "hero");
-  const card = targets.find((target) => target.id === "gpu-rtx-4090");
-  assert.equal(card.path, "/media/gpus/rtx-4090.webp");
-  assert.equal(card.page, "/gpus/rtx-4090");
-  assert.equal(card.file.endsWith("/apps/www/public/media/gpus/rtx-4090.webp"), true);
-  for (const target of targets) {
-    assert.equal(target.slot, "hero");
-    assert.equal(isAcceptableHardwarePrompt(target.prompt), true);
-    assert.deepEqual(Object.keys(target.alt).sort(), [...LOCALES].sort());
+    const targets = collectVisualTargets({ rootDir: emptyRoot, target: "all" });
+    const ids = new Set(targets.map((target) => target.id));
+    assert.ok(ids.has("builds-hero"));
+    assert.ok(ids.has("gpus-hero"));
+    for (const slug of [
+      "rtx-5090",
+      "rtx-5080",
+      "rtx-5070",
+      "rtx-4090",
+      "rtx-4070-12-gb",
+      "rtx-3090",
+      "rtx-3090-ti",
+      "rtx-pro-6000-blackwell",
+      "amd-radeon-rx-7900-xtx",
+      "rtx-5070-ti",
+      "rtx-5060-ti-16gb",
+      "rtx-4080-super",
+      "rtx-4070-ti-super-16gb",
+      "rtx-a6000",
+      "rtx-6000-ada",
+      "amd-radeon-rx-7900-xt",
+      "intel-arc-b580",
+    ]) {
+      assert.ok(ids.has(`gpu-${slug}`), slug);
+    }
+    assert.equal(ids.has("gpu-nvidia-geforce-rtx-5070-ti-16-gb-2025"), false);
+    assert.equal(ids.has("gpu-mac-studio-m5-ultra-96-gb"), false);
+    const gpus = targets.filter((target) => target.kind === "gpu");
+    assert.equal(gpus.length, 17);
+    assert.ok(gpus.length <= 24);
+    const hero = targets.find((target) => target.id === "builds-hero");
+    assert.equal(hero.path, "/media/builds-hero.webp");
+    assert.equal(hero.page, "/builds");
+    assert.equal(hero.slot, "hero");
+    const card = targets.find((target) => target.id === "gpu-rtx-4090");
+    assert.equal(card.path, "/media/gpus/rtx-4090.webp");
+    assert.equal(card.page, "/gpus/rtx-4090");
+    assert.equal(card.file.endsWith("/apps/www/public/media/gpus/rtx-4090.webp"), true);
+    for (const target of targets) {
+      assert.equal(target.slot, "hero");
+      assert.equal(isAcceptableHardwarePrompt(target.prompt), true);
+      assert.deepEqual(Object.keys(target.alt).sort(), [...LOCALES].sort());
+    }
+
+    // Real repository root now ships pc-builds.json with all 24 builds.
+    const realBuilds = collectVisualTargets({ rootDir: ROOT, target: "builds" });
+    assert.equal(realBuilds.length, 24);
+  } finally {
+    rmSync(emptyRoot, { recursive: true, force: true });
   }
 });
 

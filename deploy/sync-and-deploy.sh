@@ -206,6 +206,7 @@ CATALOG_DATA_FILES=(
   friendly-links.json
   gpus.json
   models.json
+  pc-builds.json
   topics.json
 )
 CATALOG_SRC=()
