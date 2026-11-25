@@ -22,6 +22,8 @@
     "content:grow": "node scripts/content-grow.mjs",
     "content:mine": "node scripts/content/mine-topics.mjs --merge",
     "content:covers": "node scripts/content/images.mjs --fallback-svg",
+    "content:build-guides": "node scripts/content/generate-build-guides.mjs",
+    "media:hardware": "node scripts/media/generate-hardware-visuals.mjs",
     "content:revalidate": "node scripts/revalidate.mjs --scope all",
     "enrich:assets": "node scripts/enrichment/generate-assets.mjs",
     "enrich:verify": "node scripts/enrichment/validate-images.mjs",
