@@ -1,8 +1,9 @@
 import { routing } from "@/i18n/routing";
 import { getLiveArticles } from "@/lib/articles";
-import { PRIMARY_NAV, SECONDARY_NAV } from "@/lib/routes";
+import { PRIMARY_NAV, SECONDARY_NAV, buildPath } from "@/lib/routes";
 import { getReleases } from "@/lib/releases";
 import { getBenchmarks } from "@/lib/benchmarks";
+import { allBuilds, buildText, getBuild } from "@/lib/builds";
 import { allGpus } from "@/lib/gpus";
 import { localeNames } from "@/lib/locale";
 import { SCENARIOS } from "@/lib/scenarios";
@@ -61,6 +62,28 @@ export function GET() {
   }
   sections.push(`- [Benchmark Methodology & Limitations](${absolute("/method", "en")}): formulas, assumptions, source attribution and known limits`);
   sections.push(`- [Site Search](${absolute("/search", "en")}): search across guides, GPUs, benchmarks, topics and releases (\`/api/search?q=...\`)`);
+
+  const featuredBuildSlugs = [
+    "rtx-4090-workstation",
+    "rtx-5090-flagship-build",
+    "rx-7900-xtx-rocm-linux-rig",
+    "dual-rtx-3090-48gb-workstation",
+    "rtx-5080-balanced-ai-pc",
+    "mac-studio-m5-ultra-96gb",
+    "rtx-3090-used-value-build",
+    "ryzen-ai-max-395-128gb-mini",
+  ];
+  sections.push(`\n## Complete Local-AI PC Builds\n`);
+  sections.push(
+    `- [Complete Local-AI PC Builds](${absolute("/builds", "en")}): ${allBuilds().length} priced workstations with a parts list, VRAM, load power, and write tok/s`,
+  );
+  for (const slug of featuredBuildSlugs) {
+    const build = getBuild(slug);
+    if (!build) continue;
+    sections.push(
+      `- [${buildText(build.title, "en")}](${absolute(buildPath(build.slug), "en")}): ${build.totalVramGb} GB VRAM, $${build.totalPriceUsd.toLocaleString("en-US")}, ${build.writingToks} tok/s write`,
+    );
+  }
 
   sections.push(`\n## Primary pages\n`);
   for (const item of PRIMARY_NAV) {

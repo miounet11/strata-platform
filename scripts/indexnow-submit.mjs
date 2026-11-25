@@ -27,6 +27,7 @@ const locales = ["en", "zh", "ja", "de", "fr", "es", "pt"];
 const hubs = [
   "",
   "/can-i-run",
+  "/builds",
   "/best",
   "/best/best-value-local-llm-gpu",
   "/best/local-llm-under-2000",
@@ -55,6 +56,14 @@ const hubs = [
   "/links",
   "/topics",
 ];
+
+function pcBuildPaths() {
+  const data = loadJson("apps/www/src/data/pc-builds.json");
+  if (!Array.isArray(data)) return [];
+  return data.flatMap((build) =>
+    build && typeof build.slug === "string" ? [`/builds/${encodeURIComponent(build.slug)}`] : [],
+  );
+}
 
 function loadJson(rel) {
   try {
@@ -144,6 +153,7 @@ function collectFull() {
   for (const guide of guides) urls.add(`${SITE}/${guide.locale}/guides/${guide.slug}`);
 
   for (const path of hubs) addLocales(urls, path);
+  for (const path of pcBuildPaths()) addLocales(urls, path);
 
   const releases = loadJson("apps/www/src/data/releases.json");
   for (const release of releases?.releases ?? []) {

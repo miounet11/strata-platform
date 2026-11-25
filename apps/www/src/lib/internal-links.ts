@@ -33,6 +33,10 @@ export function gpuPath(slug: string): string {
   return `/gpus/${encodeURIComponent(slug)}`;
 }
 
+export function buildPath(slug: string): string {
+  return `/builds/${encodeURIComponent(slug)}`;
+}
+
 /** Browsable index of one chip vendor, e.g. `/gpus/vendor/nvidia`. */
 export function gpuVendorPath(vendor: string): string {
   return `/gpus/vendor/${encodeURIComponent(vendor)}`;

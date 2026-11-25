@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { EnrichedImage } from "@/components/EnrichedImage";
 import { GpuExplorer } from "@/components/GpuExplorer";
 import { allGpus, gpuCounts, vendorSlug, vendorSummaries } from "@/lib/gpus";
 import { LISTED } from "@/lib/page-budget";
@@ -55,6 +56,16 @@ export default async function GpuIndexPage({ params }: { params: Promise<{ local
 
       <h1>{t("title")}</h1>
       <p className="page-intro">{t("intro")}</p>
+      <EnrichedImage id="gpus-hero" locale={locale} className="page-visual" />
+      <p className="page-intro">{t("buildsCallout")}</p>
+      <div className="row">
+        <Link href="/builds" className="btn">
+          {t("seeBuilds")}
+        </Link>
+        <Link href="/can-i-run" className="btn">
+          {t("seeCanIRun")}
+        </Link>
+      </div>
       <p className="meta">
         {t("summary", {
           total: gpuCounts.total,

@@ -30,7 +30,8 @@
     "best": "用途別",
     "vps": "VPS 特価",
     "canIRun": "動作判定",
-    "search": "検索"
+    "search": "検索",
+    "builds": "完成PC"
   },
   "topics": {
     "title": "使い方",
@@ -55,7 +56,10 @@
     "featureSpeedBody": "ベンチマークで日次トークン、電力、損益分岐を比べます。",
     "featureAgentsBody": "エンジンを入れて、Cursor や Codex を 127.0.0.1:8080 に向けます。",
     "aiPromptTitle": "AI にインストールさせる",
-    "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository."
+    "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
+    "buildsTitle": "注目のローカルAI向けPC",
+    "buildsIntro": "部品表、実売価格、VRAM、生成速度が分かる完成機を4台。",
+    "buildsCta": "すべてのPC構成を見る"
   },
   "releases": {
     "title": "リリースノート",
@@ -401,6 +405,10 @@
     "search": {
       "title": "サイト内検索 — GPU・ガイド・ベンチマーク・リリース",
       "description": "3,200種以上のGPU、29台の実測ベンチマーク、用途別ランキング、トラブル解決ガイドを検索。"
+    },
+    "builds": {
+      "title": "ローカルAI向け完成PC",
+      "description": "価格付きのローカルAI向けワークステーション24構成。部品表、VRAM、消費電力、騒音、推定トークン/秒を掲載。"
     }
   },
   "gpus": {
@@ -481,7 +489,45 @@
     "specTransistorsValue": "{count} 百万",
     "specDieSize": "ダイ面積",
     "specPixelRate": "ピクセルレート",
-    "specTextureRate": "テクスチャレート"
+    "specTextureRate": "テクスチャレート",
+    "seeBuilds": "完成PC",
+    "seeCanIRun": "このPCで動く？",
+    "assembledTitle": "このGPUを使った完成PC",
+    "buildsCallout": "これらのGPUで組んだ完成PCを見るか、今のマシンで足りるか先に確認できます。",
+    "config": {
+      "configHeading": "電源・冷却・ホストメモリ",
+      "configIntro": "カード以外に見ておくもの：電源、ケーブル、ケースのエアフロー、システムメモリ、そして実際に収まる量子化。",
+      "psuLabel": "推奨電源",
+      "connectorLabel": "補助電源",
+      "hostRamLabel": "ホストメモリ",
+      "pcieLabel": "PCIe / リンク",
+      "slotCoolingLabel": "スロットと冷却",
+      "multiGpuLabel": "2枚目のGPU",
+      "efficiencyLabel": "効率",
+      "annualPowerLabel": "電気代（1日4時間）",
+      "quantHeading": "量子化の収まり",
+      "quantColModel": "ビルド",
+      "quantColFit": "適合",
+      "quantColSplit": "メモリ配分",
+      "quantColSpeed": "書き込み / 読み取り tok/s",
+      "quantColContext": "コンテキスト",
+      "fitFullVram": "VRAMに収まる",
+      "fitHybrid": "VRAM + RAMオフロード",
+      "fitTooSmall": "容量不足",
+      "yes": "はい",
+      "no": "いいえ",
+      "unifiedSystem": "本体の電源を使用",
+      "coolingLabels": {
+        "unified-silent": "静音の一体型筐体",
+        "compact-air": "コンパクト空冷",
+        "high-airflow-tower": "高エアフローのタワー",
+        "workstation-blower-or-aio": "ワークステーション用ブロワーまたは簡易水冷"
+      },
+      "ramUnit": "GB",
+      "wattsUnit": "W",
+      "perYear4h": "米ドル/年（1日4時間）",
+      "tpsPer100WUnit": "tok/s / 100 W"
+    }
   },
   "guides": {
     "title": "ガイド",
@@ -769,6 +815,101 @@
     "loading": "検索中…",
     "popularHeading": "人気の検索",
     "resultCount": "{count} 件の結果",
-    "browseHeading": "カテゴリから探す"
+    "browseHeading": "カテゴリから探す",
+    "filterBuild": "PC構成"
+  },
+  "builds": {
+    "title": "完成PC",
+    "intro": "ローカルAI向けの完成ワークステーション。部品、実売価格、VRAM、消費電力、騒音、トークン/秒。予算で絞るか、最大3台を比較できます。",
+    "directoryTitle": "すべての構成",
+    "search": "構成を検索",
+    "searchPlaceholder": "GPU、区分、構成名",
+    "tier": "区分",
+    "vendor": "ベンダー",
+    "minVram": "最低VRAM",
+    "maxBudget": "予算の上限",
+    "sort": "並び替え",
+    "all": "すべて",
+    "tiers": {
+      "budget": "予算重視",
+      "sweet-spot": "バランス",
+      "dual-gpu": "デュアルGPU",
+      "workstation": "ワークステーション",
+      "compact-unified": "小型・ユニファイドメモリ",
+      "flagship": "フラッグシップ"
+    },
+    "vendors": {
+      "nvidia": "NVIDIA",
+      "amd": "AMD",
+      "apple": "Apple"
+    },
+    "anyBudget": "予算は問わない",
+    "sortCost": "トークン単価が安い順",
+    "sortSpeed": "生成が速い順",
+    "sortPrice": "価格が安い順",
+    "sortVram": "VRAMが多い順",
+    "sortPower": "消費電力が低い順",
+    "compare": "比較",
+    "compareHint": "最大3構成",
+    "compareLimit": "比較は3台までです。追加するには1台外してください。",
+    "clearCompare": "クリア",
+    "empty": "条件に合う構成がありません。",
+    "price": "合計価格",
+    "vram": "VRAM",
+    "systemRam": "システムメモリ",
+    "write": "書き込み tok/s",
+    "read": "読み取り tok/s",
+    "watts": "負荷時電力",
+    "noise": "騒音",
+    "costPerM": "100万トークンあたりの費用",
+    "breakEven": "損益分岐",
+    "quant": "推奨量子化",
+    "view": "構成を開く",
+    "days": "日",
+    "na": "なし",
+    "overview": "概要",
+    "bestForTitle": "向いている用途",
+    "tradeoffsTitle": "トレードオフ",
+    "loadIdle": "負荷時 / 待機時電力",
+    "annual4h": "電気代、1日4時間",
+    "annual24h": "電気代、24時間稼働",
+    "recommended": "量子化とコンテキスト",
+    "runtime": "ランタイム",
+    "evidence": "根拠",
+    "evidenceMeasured": "実測",
+    "evidenceEstimated": "推定",
+    "bomTitle": "部品表",
+    "bomRole": "役割",
+    "bomModel": "型番",
+    "bomSpec": "仕様",
+    "bomPrice": "推定実売価格（米ドル）",
+    "bomTotal": "合計",
+    "roles": {
+      "gpu": "GPU",
+      "cpu": "CPU",
+      "motherboard": "マザーボード",
+      "ram": "メモリ",
+      "psu": "電源",
+      "cooling": "冷却",
+      "chassis": "ケース",
+      "storage": "ストレージ",
+      "system": "システム"
+    },
+    "workloadsTitle": "複数モデルの性能",
+    "workloadModel": "モデル",
+    "workloadQuant": "量子化",
+    "workloadFit": "メモリの収まり",
+    "workloadWrite": "推定書き込み tok/s",
+    "workloadContext": "最大コンテキスト",
+    "fitFull": "VRAMに収まる",
+    "fitHybrid": "ハイブリッドオフロード",
+    "fitUnified": "ユニファイドメモリ",
+    "assemblyTitle": "組み立て、BIOS、ドライバの確認項目",
+    "faqTitle": "この構成についての質問",
+    "relatedBuilds": "関連する構成",
+    "seeGpu": "GPUの仕様",
+    "seeRig": "実測ベンチマーク",
+    "seeCanIRun": "手持ちのPCを確認",
+    "backToBuilds": "すべての完成PC"
   }
 }

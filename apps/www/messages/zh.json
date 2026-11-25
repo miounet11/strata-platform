@@ -30,7 +30,8 @@
     "best": "场景",
     "vps": "VPS 特价",
     "canIRun": "显存计算器",
-    "search": "搜索"
+    "search": "搜索",
+    "builds": "整机方案"
   },
   "topics": {
     "title": "场景",
@@ -55,7 +56,10 @@
     "featureAgentsBody": "装好后填一个地址，Cursor、Claude Code 就能用。",
     "aiPromptTitle": "让 AI 帮你安装",
     "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
-    "ctaBenchmarks": "看跑分"
+    "ctaBenchmarks": "看跑分",
+    "buildsTitle": "精选本地 AI 整机",
+    "buildsIntro": "四套完整机器：配件、街价、显存和生成速度。",
+    "buildsCta": "查看全部整机"
   },
   "releases": {
     "title": "版本更新",
@@ -401,6 +405,10 @@
     "search": {
       "title": "站内搜索 — 显卡、指南、基准测试与版本",
       "description": "快速检索 3,200+ 显卡兼容数据、29 台实测基准、选型榜单、排障指南与最新版本。"
+    },
+    "builds": {
+      "title": "本地 AI 整机配置",
+      "description": "二十四套标价的本地 AI 工作站：完整配件清单、显存、功耗、噪音和预估每秒 token。"
     }
   },
   "gpus": {
@@ -481,7 +489,45 @@
     "specTransistorsValue": "{count} 百万",
     "specDieSize": "芯片面积",
     "specPixelRate": "像素填充率",
-    "specTextureRate": "纹理填充率"
+    "specTextureRate": "纹理填充率",
+    "seeBuilds": "整机方案",
+    "seeCanIRun": "我的电脑跑得动吗？",
+    "assembledTitle": "使用这张显卡的整机方案",
+    "buildsCallout": "看围绕这些显卡装好的整机，或先确认你现在的电脑够不够。",
+    "config": {
+      "configHeading": "供电、散热与主机内存",
+      "configIntro": "显卡之外还要留预算：电源、供电线、机箱风道、系统内存，以及哪一档量化真正装得下。",
+      "psuLabel": "建议电源",
+      "connectorLabel": "供电接口",
+      "hostRamLabel": "主机内存",
+      "pcieLabel": "PCIe / 链路",
+      "slotCoolingLabel": "槽位与散热",
+      "multiGpuLabel": "第二张显卡",
+      "efficiencyLabel": "能效",
+      "annualPowerLabel": "电费（每天 4 小时）",
+      "quantHeading": "量化档位是否装得下",
+      "quantColModel": "版本",
+      "quantColFit": "适配",
+      "quantColSplit": "显存 / 内存分配",
+      "quantColSpeed": "写 / 读 tok/s",
+      "quantColContext": "上下文",
+      "fitFullVram": "显存内放下",
+      "fitHybrid": "显存 + 内存卸载",
+      "fitTooSmall": "装不下",
+      "yes": "可以",
+      "no": "不行",
+      "unifiedSystem": "走整机电源",
+      "coolingLabels": {
+        "unified-silent": "安静的一体机箱",
+        "compact-air": "紧凑风冷",
+        "high-airflow-tower": "高风量塔式机箱",
+        "workstation-blower-or-aio": "工作站涡轮或一体水冷"
+      },
+      "ramUnit": "GB",
+      "wattsUnit": "W",
+      "perYear4h": "美元/年（每天 4 小时）",
+      "tpsPer100WUnit": "tok/s / 100 W"
+    }
   },
   "guides": {
     "title": "指南",
@@ -769,6 +815,101 @@
     "loading": "正在搜索…",
     "popularHeading": "热门搜索",
     "resultCount": "找到 {count} 条相关结果",
-    "browseHeading": "按栏目浏览"
+    "browseHeading": "按栏目浏览",
+    "filterBuild": "整机"
+  },
+  "builds": {
+    "title": "整机方案",
+    "intro": "完整的本地 AI 工作站：配件、街价、显存、功耗、噪音和每秒 token。可按预算筛选，或最多对比三套。",
+    "directoryTitle": "全部整机",
+    "search": "搜索整机",
+    "searchPlaceholder": "显卡、档位或方案名",
+    "tier": "档位",
+    "vendor": "厂商",
+    "minVram": "最低显存",
+    "maxBudget": "预算上限",
+    "sort": "排序",
+    "all": "全部",
+    "tiers": {
+      "budget": "入门",
+      "sweet-spot": "甜点",
+      "dual-gpu": "双卡",
+      "workstation": "工作站",
+      "compact-unified": "小主机统一内存",
+      "flagship": "旗舰"
+    },
+    "vendors": {
+      "nvidia": "NVIDIA",
+      "amd": "AMD",
+      "apple": "Apple"
+    },
+    "anyBudget": "不限预算",
+    "sortCost": "每 token 成本最低",
+    "sortSpeed": "生成最快",
+    "sortPrice": "总价最低",
+    "sortVram": "显存最大",
+    "sortPower": "功耗最低",
+    "compare": "对比",
+    "compareHint": "最多三套",
+    "compareLimit": "最多对比三套。先去掉一套再添加。",
+    "clearCompare": "清空",
+    "empty": "没有符合这些条件的整机。",
+    "price": "总价",
+    "vram": "显存",
+    "systemRam": "系统内存",
+    "write": "写入 tok/s",
+    "read": "读取 tok/s",
+    "watts": "满载功耗",
+    "noise": "噪音",
+    "costPerM": "每百万 token 成本",
+    "breakEven": "回本",
+    "quant": "推荐量化",
+    "view": "打开方案",
+    "days": "天",
+    "na": "不适用",
+    "overview": "概述",
+    "bestForTitle": "适合",
+    "tradeoffsTitle": "取舍",
+    "loadIdle": "满载 / 待机功耗",
+    "annual4h": "电费，每天 4 小时",
+    "annual24h": "电费，每天 24 小时",
+    "recommended": "量化与上下文",
+    "runtime": "运行时",
+    "evidence": "数据来源",
+    "evidenceMeasured": "实测",
+    "evidenceEstimated": "估算",
+    "bomTitle": "完整配件清单",
+    "bomRole": "角色",
+    "bomModel": "型号",
+    "bomSpec": "规格",
+    "bomPrice": "预估街价（美元）",
+    "bomTotal": "合计",
+    "roles": {
+      "gpu": "显卡",
+      "cpu": "处理器",
+      "motherboard": "主板",
+      "ram": "内存",
+      "psu": "电源",
+      "cooling": "散热",
+      "chassis": "机箱",
+      "storage": "存储",
+      "system": "整机"
+    },
+    "workloadsTitle": "多模型性能",
+    "workloadModel": "模型",
+    "workloadQuant": "量化",
+    "workloadFit": "内存适配",
+    "workloadWrite": "预估写入 tok/s",
+    "workloadContext": "最大上下文",
+    "fitFull": "显存内放下",
+    "fitHybrid": "混合卸载",
+    "fitUnified": "统一内存",
+    "assemblyTitle": "装机、BIOS 与驱动核对清单",
+    "faqTitle": "关于这套整机",
+    "relatedBuilds": "相关整机",
+    "seeGpu": "显卡规格",
+    "seeRig": "实测跑分",
+    "seeCanIRun": "看看你的电脑",
+    "backToBuilds": "全部整机方案"
   }
 }

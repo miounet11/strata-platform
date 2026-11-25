@@ -8,6 +8,7 @@ import { newestXAt } from "@/lib/intelligence";
 import { getReleases } from "@/lib/releases";
 import { getLiveTopics, getTopic } from "@/lib/topics";
 import { getLiveArticles, getLiveArticlesByKind, liveGuideKinds, localesForSlug } from "@/lib/articles";
+import { allBuilds } from "@/lib/builds";
 import { allGpus, allSeries, vendorSlug, vendorSummaries } from "@/lib/gpus";
 import { SCENARIOS } from "@/lib/scenarios";
 import { getVpsDeals } from "@/lib/vps";
@@ -16,6 +17,7 @@ import {
   guideCategoryPath,
   guidePath,
   gpuPath,
+  buildPath,
   gpuSeriesPath,
   gpuVendorPath,
   releasePath,
@@ -100,6 +102,7 @@ export function buildEntries(part: SitemapPart): Entry[] {
     ...community.labels.map((label) => `/community/labels/${label.slug}`),
     ...creator.posts.map((post) => `/creator/updates/${post.id}`),
     ...getRigs().map((rig) => rigPath(rig.id)),
+    ...allBuilds().map((build) => buildPath(build.slug)),
     ...SCENARIOS.map((scenario) => `/best/${scenario.slug}`),
     ...releases.releases.map((release) => releasePath(release.tag)),
   ];
@@ -152,7 +155,8 @@ export function buildEntries(part: SitemapPart): Entry[] {
         path === "/changelog" ||
         path === "/vps" ||
         path === "/can-i-run" ||
-        path === "/guides";
+        path === "/guides" ||
+        path === "/builds";
       let modified = releaseAt;
       if (path === "/pulse") modified = pulseAt ?? releaseAt;
       else if (path === "/vps") modified = vpsAt ?? releaseAt;
@@ -171,6 +175,7 @@ export function buildEntries(part: SitemapPart): Entry[] {
       } else if (path.startsWith("/benchmarks")) modified = releaseAt;
 
       const isRelease = Boolean(releaseTag);
+      const isBuildDetail = path.startsWith("/builds/");
       const isHighIntentHub =
         path === "/can-i-run" || path === "/best" || path.startsWith("/best/") || Boolean(guideCategory);
       const isDetail = Boolean(
@@ -191,7 +196,9 @@ export function buildEntries(part: SitemapPart): Entry[] {
             ? 1
             : freshHub
               ? 0.9
-              : isHighIntentHub
+              : isBuildDetail
+                ? 0.8
+                : isHighIntentHub
                 ? 0.85
                 : releaseTag?.[1] === latestReleaseTag
                   ? 0.85

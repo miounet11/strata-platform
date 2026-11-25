@@ -30,7 +30,8 @@
     "best": "Usos",
     "vps": "Ofertas VPS",
     "canIRun": "Calculadora VRAM",
-    "search": "Buscar"
+    "search": "Buscar",
+    "builds": "PCs montados"
   },
   "topics": {
     "title": "Usos",
@@ -55,7 +56,10 @@
     "featureSpeedBody": "Na tabela: tokens por dia, energia e ponto de equilíbrio.",
     "featureAgentsBody": "Baixe o motor e aponte o Cursor ou o Codex para 127.0.0.1:8080.",
     "aiPromptTitle": "Deixe a IA instalar",
-    "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository."
+    "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
+    "buildsTitle": "PCs em destaque para IA local",
+    "buildsIntro": "Quatro máquinas completas com lista de peças, preço de rua, VRAM e velocidade de escrita.",
+    "buildsCta": "Ver todos os PCs"
   },
   "releases": {
     "title": "Notas de versão",
@@ -401,6 +405,10 @@
     "search": {
       "title": "Buscar no Strata — GPUs, Benchmarks, Guias e Versões",
       "description": "Pesquise em 3.200+ GPUs, 29 benchmarks medidos, rankings e guias locais."
+    },
+    "builds": {
+      "title": "PCs completos para IA local",
+      "description": "Vinte e quatro estações com preço para IA local: lista de peças, VRAM, consumo, ruído e tokens por segundo estimados."
     }
   },
   "gpus": {
@@ -481,7 +489,45 @@
     "specTransistorsValue": "{count} milhões",
     "specDieSize": "Área do die",
     "specPixelRate": "Taxa de pixels",
-    "specTextureRate": "Taxa de texturas"
+    "specTextureRate": "Taxa de texturas",
+    "seeBuilds": "PCs montados",
+    "seeCanIRun": "Meu PC consegue rodar?",
+    "assembledTitle": "PCs montados com esta GPU",
+    "buildsCallout": "Veja PCs montados com estas placas, ou confira se o seu computador atual já dá conta.",
+    "config": {
+      "configHeading": "Fonte, refrigeração e memória do sistema",
+      "configIntro": "O que reservar além da placa: fonte, cabos, fluxo de ar, RAM do sistema e qual quantização realmente cabe.",
+      "psuLabel": "Fonte recomendada",
+      "connectorLabel": "Conector de energia",
+      "hostRamLabel": "RAM do sistema",
+      "pcieLabel": "PCIe / ligação",
+      "slotCoolingLabel": "Slots e refrigeração",
+      "multiGpuLabel": "Segunda GPU",
+      "efficiencyLabel": "Eficiência",
+      "annualPowerLabel": "Eletricidade, 4 h/dia",
+      "quantHeading": "Encaixe da quantização",
+      "quantColModel": "Variante",
+      "quantColFit": "Encaixe",
+      "quantColSplit": "Divisão de memória",
+      "quantColSpeed": "Escrita / leitura tok/s",
+      "quantColContext": "Contexto",
+      "fitFullVram": "Cabe na VRAM",
+      "fitHybrid": "VRAM + descarga na RAM",
+      "fitTooSmall": "Não cabe",
+      "yes": "Sim",
+      "no": "Não",
+      "unifiedSystem": "Usa a fonte do sistema",
+      "coolingLabels": {
+        "unified-silent": "Gabinete unificado silencioso",
+        "compact-air": "Air cooler compacto",
+        "high-airflow-tower": "Torre de alto fluxo",
+        "workstation-blower-or-aio": "Blower de workstation ou watercooler AiO"
+      },
+      "ramUnit": "GB",
+      "wattsUnit": "W",
+      "perYear4h": "USD/ano a 4 h/dia",
+      "tpsPer100WUnit": "tok/s por 100 W"
+    }
   },
   "guides": {
     "title": "Guias",
@@ -769,6 +815,101 @@
     "loading": "Buscando…",
     "popularHeading": "Buscas populares",
     "resultCount": "{count} resultado(s)",
-    "browseHeading": "Navegar por seção"
+    "browseHeading": "Navegar por seção",
+    "filterBuild": "PCs montados"
+  },
+  "builds": {
+    "title": "PCs montados",
+    "intro": "Estações completas para IA local: peças, preço de rua, VRAM, consumo, ruído e tokens por segundo. Filtre por orçamento ou compare até três.",
+    "directoryTitle": "Todas as configurações",
+    "search": "Buscar configurações",
+    "searchPlaceholder": "GPU, faixa ou nome",
+    "tier": "Faixa",
+    "vendor": "Fabricante",
+    "minVram": "VRAM mínima",
+    "maxBudget": "Orçamento máximo",
+    "sort": "Ordenar",
+    "all": "Todos",
+    "tiers": {
+      "budget": "Econômico",
+      "sweet-spot": "Equilíbrio",
+      "dual-gpu": "Duas GPUs",
+      "workstation": "Workstation",
+      "compact-unified": "Compacto de memória unificada",
+      "flagship": "Topo de linha"
+    },
+    "vendors": {
+      "nvidia": "NVIDIA",
+      "amd": "AMD",
+      "apple": "Apple"
+    },
+    "anyBudget": "Qualquer orçamento",
+    "sortCost": "Menor custo por token",
+    "sortSpeed": "Escrita mais rápida",
+    "sortPrice": "Menor preço",
+    "sortVram": "Mais VRAM",
+    "sortPower": "Menor consumo",
+    "compare": "Comparar",
+    "compareHint": "Até três configurações",
+    "compareLimit": "O limite é três configurações. Remova uma para adicionar outra.",
+    "clearCompare": "Limpar",
+    "empty": "Nenhuma configuração corresponde a estes filtros.",
+    "price": "Preço total",
+    "vram": "VRAM",
+    "systemRam": "RAM do sistema",
+    "write": "Escrita tok/s",
+    "read": "Leitura tok/s",
+    "watts": "Consumo em carga",
+    "noise": "Ruído",
+    "costPerM": "Custo por milhão de tokens",
+    "breakEven": "Ponto de equilíbrio",
+    "quant": "Quantização recomendada",
+    "view": "Abrir a configuração",
+    "days": "dias",
+    "na": "n/d",
+    "overview": "Visão geral",
+    "bestForTitle": "Serve para",
+    "tradeoffsTitle": "Limitações",
+    "loadIdle": "Carga / ocioso",
+    "annual4h": "Eletricidade, 4 h/dia",
+    "annual24h": "Eletricidade, 24 h/dia",
+    "recommended": "Quantização e contexto",
+    "runtime": "Runtime",
+    "evidence": "Origem dos dados",
+    "evidenceMeasured": "Medido",
+    "evidenceEstimated": "Estimado",
+    "bomTitle": "Lista de materiais",
+    "bomRole": "Função",
+    "bomModel": "Modelo",
+    "bomSpec": "Especificação",
+    "bomPrice": "Preço de rua estimado (USD)",
+    "bomTotal": "Total",
+    "roles": {
+      "gpu": "GPU",
+      "cpu": "CPU",
+      "motherboard": "Placa-mãe",
+      "ram": "Memória",
+      "psu": "Fonte",
+      "cooling": "Refrigeração",
+      "chassis": "Gabinete",
+      "storage": "Armazenamento",
+      "system": "Sistema"
+    },
+    "workloadsTitle": "Desempenho em vários modelos",
+    "workloadModel": "Modelo",
+    "workloadQuant": "Quantização",
+    "workloadFit": "Encaixe na memória",
+    "workloadWrite": "Escrita estimada tok/s",
+    "workloadContext": "Contexto máximo",
+    "fitFull": "Cabe na VRAM",
+    "fitHybrid": "Descarga híbrida",
+    "fitUnified": "Memória unificada",
+    "assemblyTitle": "Lista de montagem, BIOS e drivers",
+    "faqTitle": "Perguntas sobre esta configuração",
+    "relatedBuilds": "Configurações relacionadas",
+    "seeGpu": "Ficha da GPU",
+    "seeRig": "Benchmark medido",
+    "seeCanIRun": "Conferir o seu PC",
+    "backToBuilds": "Todos os PCs montados"
   }
 }

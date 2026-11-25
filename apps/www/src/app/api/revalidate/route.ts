@@ -7,14 +7,15 @@ import { GUIDE_KINDS } from "@/lib/routes";
 
 export const dynamic = "force-dynamic";
 
-type Scope = "releases" | "guides" | "community" | "topics" | "vps" | "all";
+type Scope = "releases" | "guides" | "community" | "topics" | "vps" | "builds" | "all";
 
 const SCOPE_PATHS: Record<Exclude<Scope, "all">, string[]> = {
   releases: ["", "/releases", "/changelog", "/download", "/install"],
   guides: ["", "/guides", ...GUIDE_KINDS.map((k) => `/guides/category/${k}`)],
   community: ["", "/community", "/issues", "/pulls", "/pulse", "/creator"],
-  topics: ["", "/topics", "/best", "/method", "/can-i-run"],
+  topics: ["", "/topics", "/best", "/method", "/can-i-run", "/builds"],
   vps: ["/vps"],
+  builds: ["", "/builds", "/gpus"],
 };
 
 const ROOT_ENDPOINTS = ["/sitemap.xml", "/sitemaps/core.xml", "/llms.txt", "/changelog/rss.xml"];
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
   const targets = new Set<string>(ROOT_ENDPOINTS);
   const rawScopes = Array.isArray(body.scopes) ? (body.scopes as Scope[]) : [];
   const scopes: Exclude<Scope, "all">[] = rawScopes.includes("all")
-    ? ["releases", "guides", "community", "topics", "vps"]
+    ? ["releases", "guides", "community", "topics", "vps", "builds"]
     : rawScopes.filter((s): s is Exclude<Scope, "all"> => s in SCOPE_PATHS);
 
   for (const scope of scopes) {
@@ -75,6 +76,10 @@ export async function POST(request: Request) {
   }
   if (scopes.includes("topics")) {
     revalidatePath("/[locale]/topics/[slug]", "page");
+  }
+  if (scopes.includes("builds")) {
+    revalidatePath("/[locale]/builds/[slug]", "page");
+    revalidatePath("/[locale]/gpus/[slug]", "page");
   }
 
   for (const path of targets) {

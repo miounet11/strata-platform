@@ -16,12 +16,15 @@ import {
 } from "@/lib/gpus";
 import { getRig } from "@/lib/benchmarks";
 import { guidesMentioning } from "@/lib/articles";
-import { guidePath, gpuPath, gpuSeriesPath, gpuVendorPath, rigPath } from "@/lib/routes";
+import { buildPath, guidePath, gpuPath, gpuSeriesPath, gpuVendorPath, rigPath } from "@/lib/routes";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { EnrichedImage } from "@/components/EnrichedImage";
+import { GpuConfigPanel } from "@/components/GpuConfigPanel";
 import { breadcrumbJsonLd } from "@/lib/breadcrumbs";
 import { jsonLdGraph, nodeId } from "@/lib/jsonld";
 import { ORG_ID, siteEntityNodes } from "@/lib/site-entities";
 import { RelatedContent } from "@/components/RelatedContent";
+import { buildText, buildsForGpu } from "@/lib/builds";
 import { siteMetadata } from "@/lib/seo";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.stratat.com";
@@ -61,7 +64,9 @@ export default async function GpuPage({
   if (!gpu) notFound();
 
   const t = await getTranslations("gpus");
+  const tc = await getTranslations("gpus.config");
   const tnav = await getTranslations({ locale, namespace: "nav" });
+  const assembled = buildsForGpu(gpu.slug);
   const variant = recommendedVariant(gpu);
   const level = compatLevel(gpu);
   // Only nine cards have a measured rig; the rest would point at a 404 from this link.
@@ -147,6 +152,7 @@ export default async function GpuPage({
         {capacity ? ` · ${capacity}` : ""}
         {gpu.year ? ` · ${gpu.year}` : ""}
       </p>
+      <EnrichedImage id={`gpu-${gpu.slug}`} locale={locale} className="page-visual" />
 
       <section className={`gpu-verdict gpu-verdict-${level}`}>
         <h2>{t("verdictTitle")}</h2>
@@ -251,21 +257,79 @@ export default async function GpuPage({
         </tbody>
       </table>
 
+      <GpuConfigPanel
+        gpu={gpu}
+        labels={{
+          configHeading: tc("configHeading"),
+          configIntro: tc("configIntro"),
+          psuLabel: tc("psuLabel"),
+          connectorLabel: tc("connectorLabel"),
+          hostRamLabel: tc("hostRamLabel"),
+          pcieLabel: tc("pcieLabel"),
+          slotCoolingLabel: tc("slotCoolingLabel"),
+          multiGpuLabel: tc("multiGpuLabel"),
+          efficiencyLabel: tc("efficiencyLabel"),
+          annualPowerLabel: tc("annualPowerLabel"),
+          quantHeading: tc("quantHeading"),
+          quantColModel: tc("quantColModel"),
+          quantColFit: tc("quantColFit"),
+          quantColSplit: tc("quantColSplit"),
+          quantColSpeed: tc("quantColSpeed"),
+          quantColContext: tc("quantColContext"),
+          fitFullVram: tc("fitFullVram"),
+          fitHybrid: tc("fitHybrid"),
+          fitTooSmall: tc("fitTooSmall"),
+          yes: tc("yes"),
+          no: tc("no"),
+          unifiedSystem: tc("unifiedSystem"),
+          coolingLabels: {
+            "unified-silent": tc("coolingLabels.unified-silent"),
+            "compact-air": tc("coolingLabels.compact-air"),
+            "high-airflow-tower": tc("coolingLabels.high-airflow-tower"),
+            "workstation-blower-or-aio": tc("coolingLabels.workstation-blower-or-aio"),
+          },
+          ramUnit: tc("ramUnit"),
+          wattsUnit: tc("wattsUnit"),
+          perYear4h: tc("perYear4h"),
+          tpsPer100WUnit: tc("tpsPer100WUnit"),
+        }}
+      />
+
       <p className="meta">
         {gpu.evidence === "measured" ? t("noteMeasured") : t("noteEstimated")}
       </p>
 
-      {measured ? (
-        <p>
+      <p>
+        {measured ? (
           <Link href={rigPath(gpu.id)}>{t("seeBenchmark")}</Link>
-        </p>
-      ) : (
-        // Most cards in the catalogue have no measured rig, so linking one would 404 from 92 of
-        // the 101 pages. The table is the honest destination: it shows what was actually measured.
-        <p>
+        ) : (
+          // Most cards in the catalogue have no measured rig, so linking one would 404 from 92 of
+          // the 101 pages. The table is the honest destination: it shows what was actually measured.
           <Link href="/benchmarks">{t("seeBenchmarkAll")}</Link>
-        </p>
-      )}
+        )}
+        {" · "}
+        <Link href="/can-i-run">{t("seeCanIRun")}</Link>
+        {" · "}
+        <Link href="/builds">{t("seeBuilds")}</Link>
+      </p>
+
+      {assembled.length > 0 ? (
+        <section className="section">
+          <h2>{t("assembledTitle")}</h2>
+          <ul className="gpu-list">
+            {assembled.map((build) => (
+              <li key={build.slug}>
+                <Link href={buildPath(build.slug)}>{buildText(build.title, locale)}</Link>
+                <span className="meta">
+                  {" "}
+                  ${build.totalPriceUsd.toLocaleString("en-US")} · {build.totalVramGb} GB · {build.writingToks} tok/s ·{" "}
+                  {build.loadWatts} W
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <RelatedContent title={t("compare")} items={comparisons} />
       <RelatedContent title={t("sameSeries")} items={siblings} />

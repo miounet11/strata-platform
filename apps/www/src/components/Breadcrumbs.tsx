@@ -47,7 +47,16 @@ export function Breadcrumbs({
   }
 
   for (const parent of parents ?? []) {
-    if (parent.text.trim()) trail.push({ href: parent.href, text: parent.text });
+    if (!parent.text.trim()) continue;
+    // A hub already inserted from the pathname (`/builds/<slug>` → `/builds`) must not be
+    // repeated when the page also names that hub as a parent. Keep the page's label.
+    const existing = trail.findIndex((crumb) => crumb.href === parent.href && parent.href !== "/");
+    if (existing >= 0) {
+      trail[existing] = { href: parent.href, text: parent.text };
+      continue;
+    }
+    if (parent.href === "/" || trail.some((crumb) => crumb.href === parent.href)) continue;
+    trail.push({ href: parent.href, text: parent.text });
   }
 
   const leaf = label?.trim();
