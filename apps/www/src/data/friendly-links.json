@@ -137,6 +137,32 @@
         "es": "Limpiar cajas Android TV por adb",
         "pt": "Limpar caixas Android TV via adb"
       }
+    },
+    {
+      "name": "加盟选择专家",
+      "url": "https://www.xntou.cn/",
+      "description": {
+        "en": "Multimodal AI engine for franchise site selection, project vetting and compliance",
+        "zh": "星网数科多模态智能引擎：加盟选址、项目决策与招商视觉合规",
+        "ja": "フランチャイズ立地選定・案件評価・コンプライアンス向けマルチモーダル AI",
+        "de": "Multimodale KI-Engine für Franchise-Standortwahl, Projektprüfung und Compliance",
+        "fr": "Moteur IA multimodal pour le choix de franchise, l’emplacement et la conformité",
+        "es": "Motor de IA multimodal para selección de franquicias, ubicación y cumplimiento",
+        "pt": "Motor de IA multimodal para escolha de franquias, ponto comercial e conformidade"
+      }
+    },
+    {
+      "name": "律肃审",
+      "url": "https://www.lawshen.cn/",
+      "description": {
+        "en": "Chinese statutes, plain-language legal explainers, court and law-firm directory with cited sources",
+        "zh": "法律条文查询、普法解读与法院律所名录，公开内容均标出处",
+        "ja": "中国の法令検索・法律解説・裁判所および法律事務所ディレクトリ（出典明記）",
+        "de": "Chinesische Gesetze, Rechtserklärungen sowie Gerichts- und Kanzleiverzeichnis mit Quellenangaben",
+        "fr": "Textes de loi chinois, vulgarisation juridique et annuaire des tribunaux et cabinets avec sources",
+        "es": "Leyes chinas, divulgación jurídica y directorio de tribunales y despachos con fuentes citadas",
+        "pt": "Leis chinesas, explicações jurídicas e diretório de tribunais e escritórios com fontes citadas"
+      }
     }
   ],
   "linkToUs": {

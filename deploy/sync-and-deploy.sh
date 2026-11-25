@@ -121,17 +121,18 @@ if [[ -z "$HOST" ]]; then
 fi
 
 # Auth: default to standard SSH keys / ~/.ssh/config; support SSH_KEY and SSHPASS if explicitly set.
-SSH_OPTS=(-o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+# Keepalive prevents long remote builds (Next.js static generation) from being dropped by idle NAT/links.
+SSH_OPTS=(-o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ServerAliveInterval=15 -o ServerAliveCountMax=20)
 SSH_CMD=(ssh "${SSH_OPTS[@]}")
-RSYNC_RSH="ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes"
+RSYNC_RSH="ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ServerAliveInterval=15 -o ServerAliveCountMax=20"
 
 if [[ -n "${SSH_KEY:-}" ]]; then
   SSH_CMD=(ssh -i "$SSH_KEY" "${SSH_OPTS[@]}")
-  RSYNC_RSH="ssh -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o BatchMode=yes"
+  RSYNC_RSH="ssh -i ${SSH_KEY} -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ServerAliveInterval=15 -o ServerAliveCountMax=20"
 elif [[ -n "${SSHPASS:-}" ]]; then
   export SSHPASS
-  SSH_CMD=(sshpass -e ssh -o StrictHostKeyChecking=accept-new)
-  RSYNC_RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new"
+  SSH_CMD=(sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=20)
+  RSYNC_RSH="sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=20"
 fi
 
 TARGET="$USER@$HOST"
