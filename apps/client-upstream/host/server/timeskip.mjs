@@ -17,7 +17,8 @@
  * A run is a job, not a request: it outlives the HTTP call that started it. The endpoint returns the
  * run id immediately and the client follows it with `/api/timeskip/status`.
  */
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
+import { endTreeThenKill, ownGroup } from './process-tree.mjs';
 import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { timeSkipDir } from './platform-paths.mjs';
@@ -144,12 +145,22 @@ export function timeskipRevisionMessage(request) {
   ].join('\n');
 }
 
+/**
+ * Forget a trial the host drove: its entry, its model choice, and the chat's pointer to it, but only while that pointer is still this trial.
+ * A chat can start a second trial before the first ends; the first one's end used to remove the chat's pointer to the second, so the chat's
+ * Stop went to the assistant and the running trial went on (#4611).
+ * @param {{trials: Map<string, {chatId?: string|null}>, trialByChat: Map<string, string>, choices?: Map<string, unknown>}} maps
+ */
+export function forgetTrial({ trials, trialByChat, choices }, id) {
+  const trial = trials.get(id);
+  trials.delete(id);
+  choices?.delete(id);
+  if (trial?.chatId && trialByChat.get(trial.chatId) === id) trialByChat.delete(trial.chatId);
+}
+
 /** End a process and everything it started (the job, the Python it runs, the revision command and its Node). */
 function killTree(child) {
-  try {
-    if (process.platform === 'win32' && child.pid) spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' });
-    else child.kill('SIGTERM');
-  } catch { /* already gone */ }
+  endTreeThenKill(child);          // Windows: taskkill /T. Linux and macOS: the job leads its own process group (startDetached), so the group is ended (#4529 #4570)
 }
 
 /** How big a folder is, stopping early once it is clearly too big to copy for a trial. */
@@ -305,7 +316,7 @@ export function createTimeSkip({ repoRoot, python, pythonArgs = [], timeoutMs = 
       const child = spawn(python, [...pythonArgs, cli, ...args, '--output', 'json'], {
         cwd: repoRoot,
         windowsHide: true,
-        env: { ...env, STRATA_TIMESKIP_DIR: root },
+        env: { ...env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8', STRATA_TIMESKIP_DIR: root },
         stdio: ['ignore', 'pipe', 'pipe'],
       });
       let stdout = '';
@@ -452,7 +463,7 @@ export function createTimeSkip({ repoRoot, python, pythonArgs = [], timeoutMs = 
         '--attempts', String(Math.max(0, Math.min(10, Number(attempts) || 0))), '--output', 'json'];
       if (reviseCommand) args.push('--revise-command', reviseCommand);
       const child = spawn(python, [...pythonArgs, cli, ...args], {
-        cwd: repoRoot, windowsHide: true, env: { ...env, ...extraEnv, STRATA_TIMESKIP_DIR: root }, stdio: ['ignore', 'pipe', 'pipe'],
+        cwd: repoRoot, windowsHide: true, detached: ownGroup(), env: { ...env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8', ...extraEnv, STRATA_TIMESKIP_DIR: root }, stdio: ['ignore', 'pipe', 'pipe'],
       });
       let out = '', err = '', closed = null;
       child.stdout.on('data', b => { out += b.toString(); });
@@ -482,7 +493,10 @@ export function createTimeSkip({ repoRoot, python, pythonArgs = [], timeoutMs = 
       }
       live.set(id, child);
       endedOf.set(id, ended);
-      void ended.then(() => live.delete(id));
+      // Both maps are keyed by the run id and nothing waits on them once the job has ended: `stop` took the promise
+      // before it settled (afterwards `?? Promise.resolve()` answers at once), so the ended run leaves both. The
+      // run's own record on disk is what stays, and `list` reads that.
+      void ended.then(() => { live.delete(id); endedOf.delete(id); });
       return { ok: true, run: withLive(summarise(readRun(root, id))) };
     },
 

@@ -3,7 +3,7 @@
  *
  * The host used to assume POSIX in three places: it called /usr/bin/tar and /usr/bin/env, and it kept the tuning
  * and Time-skip state under $HOME/.local/state. On Windows those paths do not exist. State goes to
- * %LOCALAPPDATA%\Strata (the same place the Python side uses: strata_control/paths.py), and the system tools are
+ * %LOCALAPPDATA%\Stratat (the same place the Python side uses: strata_control/paths.py), and the system tools are
  * the ones Windows ships (System32\tar.exe, System32\where.exe). POSIX behavior is unchanged.
  *
  * Every function takes the environment and platform as arguments so tests can exercise both without a second OS.
@@ -19,7 +19,7 @@ export function stateRoot(env = process.env, platform = process.platform, home =
     const local = env.LOCALAPPDATA || winPath(env.USERPROFILE || home, 'AppData', 'Local');
     return winPath(local, 'Stratat');
   }
-  return posix.join(env.XDG_STATE_HOME || posix.join(env.HOME || '.', '.local', 'state'), 'strata');
+  return posix.join(env.XDG_STATE_HOME || posix.join(env.HOME || '.', '.local', 'state'), 'stratat');
 }
 
 const under = (root, platform, name) => (platform === 'win32' ? winPath(root, name) : posix.join(root, name));

@@ -10,6 +10,7 @@
  * The first one that runs `cloudflared --version` and is new enough is used; the answer says which one and from where.
  * Nothing here downloads or installs anything.
  */
+import { utf8Script } from './powershell-utf8.mjs';
 import { execFile } from 'node:child_process';
 import { access, stat } from 'node:fs/promises';
 import { constants } from 'node:fs';
@@ -40,7 +41,7 @@ const SOURCE_LABEL = {
 
 /** Candidate paths in search order, each as { path, source }. Pure: no disk access. */
 export function connectorCandidates({ directory, componentDirectory = null, platform = process.platform, env = process.env, home = homedir(), search = true } = {}) {
-  // STRATA_CLOUDFLARED=<file> uses exactly that connector; STRATA_CLOUDFLARED_SEARCH=own keeps the search to Strata's own folders.
+  // STRATA_CLOUDFLARED=<file> uses exactly that connector; STRATA_CLOUDFLARED_SEARCH=own keeps the search to Stratat's own folders.
   const windows = platform === 'win32', p = windows ? win32 : posix;
   const name = windows ? 'cloudflared.exe' : 'cloudflared';
   if (env.STRATA_CLOUDFLARED) return [{ path: env.STRATA_CLOUDFLARED, source: 'setting' }];
@@ -134,7 +135,7 @@ export async function findRunningConnector({ platform = process.platform, exclud
   const skip = new Set(exclude.filter(Number.isInteger));
   let procs = [];
   if (platform === 'win32') {
-    const out = await run('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', "Get-CimInstance Win32_Process -Filter \"Name='cloudflared.exe'\" | ForEach-Object { \"$($_.ProcessId)`t$($_.CommandLine)\" }"]);
+    const out = await run('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', utf8Script("Get-CimInstance Win32_Process -Filter \"Name='cloudflared.exe'\" | ForEach-Object { \"$($_.ProcessId)`t$($_.CommandLine)\" }")]);
     procs = out.split(/\r?\n/).map(l => /^(\d+)\t(.*)$/.exec(l)).filter(Boolean).map(m => ({ pid: Number(m[1]), command: m[2] }));
     if (!procs.length) {   // no PowerShell answer: at least the pids
       const list = await run('tasklist', ['/FI', 'IMAGENAME eq cloudflared.exe', '/NH', '/FO', 'CSV']);

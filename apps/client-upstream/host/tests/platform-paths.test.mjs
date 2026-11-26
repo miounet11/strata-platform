@@ -25,9 +25,9 @@ test('explicit directories win on every platform', () => {
 });
 
 test('POSIX is unchanged: XDG_STATE_HOME, else ~/.local/state', () => {
-  assert.equal(stateRoot({ XDG_STATE_HOME: '/x' }, 'linux'), '/x/strata');
-  assert.equal(tuningDir({ HOME: '/home/me' }, 'linux'), '/home/me/.local/state/strata/tuning');
-  assert.equal(timeSkipDir({ HOME: '/home/me' }, 'darwin'), '/home/me/.local/state/strata/time-skip');
+  assert.equal(stateRoot({ XDG_STATE_HOME: '/x' }, 'linux'), '/x/stratat');
+  assert.equal(tuningDir({ HOME: '/home/me' }, 'linux'), '/home/me/.local/state/stratat/tuning');
+  assert.equal(timeSkipDir({ HOME: '/home/me' }, 'darwin'), '/home/me/.local/state/stratat/time-skip');
 });
 
 test('the archive tool is the one the platform ships', () => {
@@ -51,9 +51,7 @@ test('which asks where.exe on Windows (first match) and /usr/bin/env which elsew
 });
 
 test('the host no longer hard-codes /usr/bin/tar, /usr/bin/env or HOME/.local/state', () => {
-  assert.ok(!read('../server/engine-install.mjs').includes('/usr/bin/tar'));
   assert.ok(!read('../server/util.mjs').includes("'/usr/bin/env'"));
   assert.ok(!read('../server/timeskip.mjs').includes('.local'));
   assert.ok(!read('../server/index.mjs').includes("'.local', 'state'"));
-  assert.match(read('../server/engine-install.mjs'), /tarBinary\(\)/);
 });

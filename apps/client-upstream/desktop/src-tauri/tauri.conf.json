@@ -3,6 +3,7 @@
   "productName": "Stratat",
   "identifier": "com.ksxw.stratat",
   "build": {
+    "beforeBuildCommand": "node scripts/prepare-harness-bundle.mjs",
     "frontendDist": "../../host/dist"
   },
   "app": {

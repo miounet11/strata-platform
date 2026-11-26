@@ -3,7 +3,7 @@
  * Headless UI flows of the installed app against a packaged host with a FAKE installer and a FAKE engine (nothing is
  * downloaded, no real engine runs; the real Control starts the fake engine through the owner runtime):
  *
- *   node apps/desktop/scripts/ui-flows.mjs [--control <staged control>] [--node <node.exe>] [--shots <dir>] [--only download,models,tune,fail,theme]
+ *   node app/desktop/scripts/ui-flows.mjs [--control <staged control>] [--node <node.exe>] [--shots <dir>] [--only download,models,tune,fail,theme]
  *
  *   download  the onboarding download: ONE combined bar over both files, an ETA in minutes left of Stop, Finish later closes the
  *             pop-up with the download still running, the Models screen shows the same progress, Stop stops it
@@ -616,10 +616,10 @@ await scenario('stop', { installed: true, env: { FAKE_TOKEN_DELAY: '0.1', FAKE_R
 await scenario('latest', {}, async ({ base, browser, shot }) => {
   const page = await newPage(browser, base);
   const now = Date.now();
-  await page.evaluate(now => {
+  await page.evaluate(async now => {
     const messages = [];
     for (let i = 0; i < 40; i++) { messages.push({ id: 'u' + i, role: 'user', content: 'question ' + i, at: now }, { id: 'a' + i, role: 'assistant', content: 'answer number ' + i + ' with some text to fill the line and more of it.', at: now, tokens: 20, inputTokens: 5 }); }
-    localStorage.setItem('strata.sessions.v1', JSON.stringify([{ id: 's_latest', title: 'long', updatedAt: now, createdAt: now, messages }]));
+    await fetch('/api/chats/s_latest', { method: 'PUT', headers: { 'x-strata-client': 'ui' }, body: JSON.stringify({ id: 's_latest', title: 'long', updatedAt: now, createdAt: now, messages }) });
     localStorage.setItem('strata.active-session.v1', 's_latest');
   }, now);
   await page.reload({ waitUntil: 'domcontentloaded' });
@@ -690,12 +690,12 @@ if (only.has('restart')) {
   await run(async (context, { base }) => {
     const page = context.pages()[0] ?? await context.newPage();
     await page.goto(base, { waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => { localStorage.setItem('strata.prefs.v2', JSON.stringify({ theme: 'dark', contentFontSize: 19, language: 'de' })); localStorage.setItem('strata.sessions.v1', JSON.stringify([{ id: 'chat-1', title: 'My chat' }])); });
+    await page.evaluate(() => { localStorage.setItem('strata.prefs.v2', JSON.stringify({ theme: 'dark', contentFontSize: 19, language: 'de' })); return fetch('/api/chats/chat-1', { method: 'PUT', headers: { 'x-strata-client': 'ui' }, body: JSON.stringify({ id: 'chat-1', title: 'My chat', messages: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }) }); });
   });
   await run(async (context, { base }) => {
     const page = context.pages()[0] ?? await context.newPage();
     await page.goto(base, { waitUntil: 'domcontentloaded' });
-    const saved = await page.evaluate(() => ({ prefs: JSON.parse(localStorage.getItem('strata.prefs.v2') || '{}'), chats: localStorage.getItem('strata.sessions.v1'), theme: document.documentElement.dataset.theme }));
+    const saved = await page.evaluate(async () => ({ prefs: JSON.parse(localStorage.getItem('strata.prefs.v2') || '{}'), chats: JSON.stringify(await (await fetch('/api/chats', { headers: { 'x-strata-client': 'ui' } })).json()), theme: document.documentElement.dataset.theme }));
     check(saved.prefs.contentFontSize === 19 && saved.prefs.language === 'de', 'text size and language survive a restart on the same port', JSON.stringify(saved.prefs));
     check(saved.theme === 'dark', 'the theme survives too', saved.theme);
     check(/My chat/.test(saved.chats ?? ''), 'and the chat list', saved.chats);

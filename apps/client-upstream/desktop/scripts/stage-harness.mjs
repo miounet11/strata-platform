@@ -3,7 +3,7 @@
  * Stage the DeepSeek Harness (pinned, MIT) as the installer's `harness/` folder: a pruned PRODUCTION install, built at
  * build time, so nothing is fetched or compiled on the person's PC.
  *
- *   node apps/desktop/scripts/stage-harness.mjs --src <built Harness checkout> [--out apps/desktop/src-tauri/resources/harness]
+ *   node app/desktop/scripts/stage-harness.mjs --src <built Harness checkout> [--out app/desktop/src-tauri/resources/harness]
  *
  * <built Harness checkout> is a clone of the pinned commit after `pnpm install --frozen-lockfile` and `pnpm run build:artifacts`
  * (see phaseA-tests/notes-split-s4a.md, step 1). The script never touches it: it runs `pnpm deploy --legacy --prod` into
@@ -19,6 +19,9 @@ import { join, relative, resolve, sep } from 'node:path';
 import { createHash } from 'node:crypto';
 import { flattenPnpm } from './flatten-pnpm.mjs';
 import { isOtherOsBinaryFolder, missingHarnessImports } from './harness-prune.mjs';
+import { patchStagedHarnessBudget } from './harness-budget.mjs';
+import { patchStagedHarnessSearch } from './harness-search-partial.mjs';
+import { patchStagedHarnessMcpSession } from './harness-mcp-session.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : fallback; };
@@ -144,6 +147,10 @@ function prune(dir) {
 }
 prune(out);
 
+// Strata's provenance-recorded corrections apply only to this copy: the output budget, search results kept when one folder cannot be
+// read (#5964), and a new MCP session when a restarted server no longer knows the old one (#6014).
+const patches = [patchStagedHarnessBudget(out), patchStagedHarnessSearch(out), patchStagedHarnessMcpSession(out)];
+
 // --- licence: the MIT text and the third-party notices travel with the files ---------------------------------------------
 for (const name of ['LICENSE', 'THIRD_PARTY_NOTICES.md']) {
   if (existsSync(join(src, name))) cpSync(join(src, name), join(out, name));
@@ -156,6 +163,7 @@ const total = size(out);
 writeFileSync(join(out, 'BUNDLE.json'), JSON.stringify({
   component: 'deepseek-harness', version: cli.version, commit, license: 'MIT', platform, node: process.version,
   bytes: total.bytes, files: total.files, entry: 'apps/cli/lib/bin.js', builtAt: new Date().toISOString(),
+  patches,
   note: 'Pruned production install (pnpm deploy --prod). No package manager runs on the user\'s PC.',
 }, null, 2));
 

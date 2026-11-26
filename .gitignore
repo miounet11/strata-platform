@@ -12,6 +12,7 @@ apps/api/data/*.db-*
 apps/desktop/src-tauri/target
 .DS_Store
 .cache/intake
+.cache/desktop-stage
 .logs/
 grok/logs/
 .clavue/

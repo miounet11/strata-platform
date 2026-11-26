@@ -13,6 +13,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { externalEnvironment } from '../external-env.mjs';
+import { utf8Script } from '../powershell-utf8.mjs';
 
 const URL_PATTERN = /http:\/\/127\.0\.0\.1:(\d+)\/\?token=([A-Za-z0-9_-]+)/;
 
@@ -32,7 +33,7 @@ export function agentEnvironment(base = process.env, extra = {}) {
   }
   // DSH_PERMISSION_MODE is the composition default for a session no chat mode has touched (a child agent, a
   // seeded session): the strictest sandbox, which matches the Manual preset, never the Harness's wider default.
-  return { ...out, DSH_TELEMETRY_DISABLED: '1', DSH_PERMISSION_MODE: 'read-only', ...extra };
+  return { ...out, DSH_TELEMETRY_DISABLED: '1', DSH_PERMISSION_MODE: 'read-only', NODE_USE_SYSTEM_CA: '1', ...extra };
 }
 
 /**
@@ -92,12 +93,22 @@ export class HarnessProcess {
     child.stderr.on('data', keep);
     const info = await new Promise((resolveInfo, reject) => {
       const timer = setTimeout(() => reject(new Error(`the agent did not print its address within ${Math.round(timeoutMs / 1000)}s`)), timeoutMs);
-      child.stdout.on('data', chunk => {
+      const onData = chunk => {
         keep(chunk);
         text += chunk.toString();
         const m = URL_PATTERN.exec(text);
-        if (m) { clearTimeout(timer); resolveInfo({ port: Number(m[1]), token: m[2], baseUrl: `http://127.0.0.1:${m[1]}` }); }
-      });
+        if (m) {
+          clearTimeout(timer);
+          // The address is out: the rest of the agent's life streams its log to stdout, and nothing here reads it. Without
+          // this the string and the regex grew with the whole uptime of one long session (the app's memory climbed until WebView2 OOMed).
+          child.stdout.removeListener('data', onData);
+          text = '';
+          resolveInfo({ port: Number(m[1]), token: m[2], baseUrl: `http://127.0.0.1:${m[1]}` });
+        } else if (text.length > 64 * 1024) {
+          text = text.slice(-8 * 1024);   // a stray address can only be near the end of what came so far
+        }
+      };
+      child.stdout.on('data', onData);
       child.on('exit', code => { clearTimeout(timer); reject(new Error(`the agent exited during start (code ${code}): ${redact(log.join('').slice(-600), Object.values(this.extraEnv))}`)); });
       child.on('error', e => { clearTimeout(timer); reject(e); });
     }).catch(async error => { await this.stop(); throw error; });
@@ -113,7 +124,7 @@ export class HarnessProcess {
     const done = new Promise(r => child.once('exit', r));
     if (process.platform === 'win32') {
       // /T takes the shells and PTYs the agent started; /PID is this child only.
-      spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true });
+      taskkillTree(child.pid);
     } else {
       child.kill('SIGTERM');
       setTimeout(() => { if (!this.exited) child.kill('SIGKILL'); }, graceMs).unref();
@@ -127,7 +138,7 @@ export class HarnessProcess {
 function commandLineOf(pid) {
   if (!Number.isInteger(pid) || pid <= 0) return null;
   if (process.platform === 'win32') {
-    const r = spawnSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', `(Get-CimInstance Win32_Process -Filter "ProcessId=${pid}").CommandLine`], { encoding: 'utf8', windowsHide: true, timeout: 15000 });
+    const r = spawnSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', utf8Script(`(Get-CimInstance Win32_Process -Filter "ProcessId=${pid}").CommandLine`)], { encoding: 'utf8', windowsHide: true, timeout: 15000 });
     return r.status === 0 && r.stdout.trim() ? r.stdout.trim() : null;
   }
   const r = spawnSync('ps', ['-p', String(pid), '-o', 'args='], { encoding: 'utf8' });
@@ -146,9 +157,20 @@ export function stopStaleAgent(pidFile) {
   rmSync(pidFile, { force: true });
   const cmd = commandLineOf(pid);
   if (!cmd || !/lib[\\/]bin\.js/.test(cmd) || !/--profile web/.test(cmd)) return null;
-  if (process.platform === 'win32') spawnSync('taskkill', ['/PID', String(pid), '/T', '/F'], { windowsHide: true });
+  if (process.platform === 'win32') taskkillTree(pid);
   else { try { process.kill(pid, 'SIGTERM'); } catch { /* already gone */ } }
   return pid;
+}
+
+/** How long a taskkill may take. spawnSync blocks the host's whole event loop (every timer and every HTTP call) until the program returns, so it must have an end. */
+export const TASKKILL_TIMEOUT_MS = 10_000;
+
+/**
+ * Windows: end a process and its children (`taskkill /PID <pid> /T /F`, that PID's tree only). Bounded by TASKKILL_TIMEOUT_MS: a taskkill that stalls (a process the
+ * system cannot end, a machine out of memory) used to freeze the host for as long as it stalled. `run` is injectable for tests.
+ */
+export function taskkillTree(pid, run = spawnSync) {
+  return run('taskkill', ['/PID', String(pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore', timeout: TASKKILL_TIMEOUT_MS });
 }
 
 /** Remove any occurrence of a secret value from text bound for a log. */

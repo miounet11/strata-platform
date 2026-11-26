@@ -107,7 +107,7 @@ try {
   // 2. web search with no key
   if (!SKIP.has('search')) {
     await newChat();
-    await send('Use the web_search tool to find the GitHub page of the Stratat local LLM engine by Niko1221. Tell me its address.');
+    await send('Use the web_search tool to find the GitHub page of the Strata local LLM engine by Niko1221. Tell me its address.');
     await started().catch(() => {});
     const r = await approveUntilIdle('05');
     await idle();
@@ -115,7 +115,7 @@ try {
     const body = await chatText();
     check(/Searched the web/.test(body), 'a "Searched the web" card appeared');
     check(r.asked === 0, 'searching asked nothing (it only reads)');
-    check(/github\.com\/Niko1221\/Stratat/i.test(body), 'the answer names the real GitHub address from the results');
+    check(/github\.com\/Niko1221\/Strata/i.test(body), 'the answer names the real GitHub address from the results');
   }
 
   // 3. my own tools
@@ -148,7 +148,7 @@ try {
     await shot('08-search-off');
     check((await page.getByRole('switch', { name: 'Search the web' }).getAttribute('aria-checked')) === 'false', 'the switch is off');
     await newChat();
-    await send('Use the web_search tool to search for the word Stratat. If you have no such tool, say exactly: NO SEARCH TOOL.');
+    await send('Use the web_search tool to search for the word Strata. If you have no such tool, say exactly: NO SEARCH TOOL.');
     await started().catch(() => {});
     await approveUntilIdle('08');
     await idle();

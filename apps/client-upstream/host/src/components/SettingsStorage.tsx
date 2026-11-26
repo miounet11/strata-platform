@@ -6,6 +6,7 @@ import { pickerGroups, pickerVersionState } from '../lib/model-picker';
 import { sizeGb } from '../lib/format';
 import { useNative } from '../lib/native';
 import { NativeDeleteDialog } from './NativeDelete';
+import { ModelsFolderCard } from './ModelsFolderDialog';
 import { nativeShortName } from '../lib/native-names';
 export function SettingsStorage() {
     const state = useStore(s => s);
@@ -18,11 +19,14 @@ export function SettingsStorage() {
     const library = state.library;
     const versions = library ? pickerGroups(library).flatMap(group => group.versions) : [];
     // ONE list and ONE total: the optimized models (sizes from their real files, shared files counted once) and the other local models together.
-    const nativeModels = native?.installed?.models ?? [];
+    const nativeModels = (native?.installed?.models ?? []).filter(m => !m.retired && (m.ready || (m.diskGb ?? 0) > 0));      // a model whose files are all gone (an old config) is not a 0.0 GB download
+    // DeepSeek models of an earlier Stratat (strata_control/retired.py): this Stratat does not run them, but their files are still here, often
+    // over 100 GB. They are listed with Control's own line (name, size and folder when known) so they can be seen and deleted (#6048).
+    const retiredModels = (native?.installed?.models ?? []).filter(m => m.retired);
     const sharedGb = (native?.installed?.usage?.shared_bytes ?? 0) / 1e9;
     const nativeGb = native?.installed?.usage ? native.installed.usage.total_gb : nativeModels.reduce((n, m) => n + (m.diskGb ?? 0), 0);
     const totalGb = nativeGb + versions.reduce((n, v) => n + (v.diskGb ?? 0), 0);
-    const rows = nativeModels.length + versions.length;
+    const rows = nativeModels.length + retiredModels.length + versions.length;
     const version = versions.find(v => v.id === selected);
     const running = !!version && (state.runtime?.instances.some(i => i.variantId === version.id) || library?.loaded === version.id);
     const lifecycle = lifecycleStatus(state);
@@ -77,7 +81,9 @@ export function SettingsStorage() {
             setPending(false);
         }
     }
+    const downloading = !!native?.jobs.some(j => j.state === 'running' && j.kind !== 'models-move') || !!library?.downloads.active || !!state.imageModels?.variants.some(v => v.state === 'downloading');
     return <>
+    {native?.available && native.downloadDirectory ? <ModelsFolderCard blocked={downloading}/> : null}
     <section className="storage-directory" aria-labelledby="storage-directory-title">
       <div className="storage-directory__heading"><span><Icon name="folder" size={18}/><strong id="storage-directory-title">{tr("Model directory")}</strong></span><Btn size="sm" disabled={!currentDirectory || directoryPending || pending} onClick={() => { setDirectory(currentDirectory); setEditing(!editing); setDirectoryError(''); setNotice(''); }}>{tr(editing ? 'Cancel' : 'Change directory')}</Btn></div>
       <p className="small muted">{tr("Your models are saved here. Use an existing folder to reuse supported downloads.")}</p>
@@ -95,12 +101,14 @@ export function SettingsStorage() {
         <div className="row"><Btn variant="primary" type="submit" disabled={directoryPending || directoryBlocked || !directory.trim()}>{tr(directoryPending ? 'Checking files…' : changing && loadedCount > 0 ? 'Unload and change directory' : changing ? 'Use this directory' : 'Check folder')}</Btn></div>
       </form> : <Btn size="sm" icon="refresh" disabled={directoryPending || directoryBlocked || !currentDirectory} onClick={() => void saveDirectory(currentDirectory)}>{tr(directoryPending ? 'Checking files…' : 'Check folder')}</Btn>)}
       {tr(directoryBlocked && !directoryPending ? <p className="small muted">{tr(!lifecycle.allowed ? lifecycle.reason : 'Finish or cancel downloads and loading to change the directory.')}</p> : null)}
+      {tr(state.setup?.app.modelsDirNotice && !notice ? <p className="small storage-directory__notice" role="status"><Icon name="info" size={15}/>{tr(state.setup.app.modelsDirNotice)}</p> : null)}
       {tr(notice ? <p className="small storage-directory__notice" role="status"><Icon name="check" size={15}/>{tr(notice)}</p> : null)}
       {tr(directoryError ? <ErrorNotice message={directoryError}/> : null)}
     </section>
     <Field wide label={tr("Downloaded models")} hint={tr("{0} on this computer. Choose a version to delete its files.", [sizeGb(totalGb)])}>
       {tr(rows ? <ul className="storage-models" aria-label={tr("Downloaded models")}>
         {tr(nativeModels.map(m => <li className="storage-model" key={m.model}><span className="storage-model__name" title={m.model_name || m.model}><strong>{nativeShortName(m.model)}</strong>{tr(native?.instances.some(i => i.model === m.model) ? <small className="muted">{tr('Loaded')}</small> : null)}</span><span className="storage-model__size muted">{tr(sizeGb(m.diskGb ?? 0))}</span><Btn size="sm" variant="danger" disabled={!!native?.jobs.some(j => j.state === 'running')} onClick={() => setNativeDeleting(m.model)}>{tr("Delete")}</Btn></li>))}
+        {tr(retiredModels.map(m => <li className="storage-model storage-model--retired" key={m.model}><span className="storage-model__name" title={m.model_name || m.model}><strong>{m.model_name || nativeShortName(m.model)}</strong><small className="muted">{m.retired?.line}</small></span><span className="storage-model__size muted">{tr((m.diskGb ?? 0) > 0 ? sizeGb(m.diskGb ?? 0) : '')}</span><Btn size="sm" variant="danger" disabled={!!native?.jobs.some(j => j.state === 'running')} onClick={() => setNativeDeleting(m.model)}>{tr("Delete")}</Btn></li>))}
         {tr(versions.map(v => <li className="storage-model" key={v.id}><span className="storage-model__name" title={`${v.family} · ${v.quant}`}><strong>{`${v.local ? v.name : v.family} · ${v.quant}`}</strong>{tr(v.local ? <small className="muted">{tr('Local')}</small> : null)}{tr(v.id === library?.loaded ? <small className="muted">{tr('Loaded')}</small> : null)}</span><span className="storage-model__size muted">{tr(sizeGb(v.diskGb))}</span><Btn size="sm" variant="danger" disabled={pickerVersionState(v, library?.loaded ?? null).busy || pending || directoryPending} onClick={() => { setError(''); setSelected(v.id); }}>{tr("Delete")}</Btn></li>))}
         {tr(sharedGb > 0 ? <li className="storage-model storage-model--shared"><span className="storage-model__name"><strong>{tr("Shared files")}</strong><small className="muted">{tr("Used by more than one model")}</small></span><span className="storage-model__size muted">{tr(sizeGb(sharedGb))}</span><span/></li> : null)}
       </ul> : <p className="small muted">{tr("No downloaded models")}</p>)}

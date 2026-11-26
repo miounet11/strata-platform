@@ -8,6 +8,10 @@ export interface SoftwareUpdate {
   releaseUrl?: string;
   canInstall: boolean;
   message: string;
+  /** The technical reason behind `message`, shown only behind the Details disclosure. */
+  details?: string;
+  /** Windows desktop update path / custom-launcher profile warning surfaced before updating (#6573). */
+  installPathWarning?: string;
 }
 export interface UpdateCheckResult { checkedAt: string; strata: SoftwareUpdate; engine: SoftwareUpdate }
 
@@ -21,7 +25,7 @@ export interface HardwareCheck {
 
 export interface ProcessorInfo { id:string; socket:string; model:string; cores:number; threads:number; arch:string; ghz:number; logicalIds?:number[] }
 export interface CpuReading { id:string; utilizationPct:number|null }
-export interface GpuReading { id:string; temperatureC:number|null; utilizationPct:number|null; memoryUsedGb:number|null; source:string; sampledAt:string; powerW?:number|null; powerLimitW?:number|null; pcieGen?:number|null; pcieGenMax?:number|null; pcieWidth?:number|null; pcieRxMbs?:number|null }
+export interface GpuReading { id:string; temperatureC:number|null; utilizationPct:number|null; memoryUsedGb:number|null; /** The engine's own total for this device (hardware.gpus[].mem_total), when it reports one. */ memoryTotalGb?:number|null; source:string; sampledAt:string; powerW?:number|null; powerLimitW?:number|null; pcieGen?:number|null; pcieGenMax?:number|null; pcieWidth?:number|null; pcieRxMbs?:number|null; fanPct?:number|null; clockMhz?:number|null }
 
 export interface GpuInfo {
   id?: string;
@@ -125,17 +129,18 @@ export interface ImageModelLibrary {
 }
 
 export type ModelProtocol = 'openai-chat' | 'openai-responses' | 'anthropic';
+export type ModelReasoningFormat = 'auto' | 'default' | 'strata' | 'deepseek' | 'effort';
 export interface ApiModel { id: string; name: string; contextMax?: number | null; /** What the person ticked ("This model reads pictures"): true, false, or null for not set. */ vision?: boolean | null; /** The answer in use: the tick, else what the server said; null when nobody knows. */ reads?: boolean | null; /** The provider says the model can think (OpenRouter's supported_parameters): the Reasoning menu then works. */ reasoning?: boolean | null; thinks?: boolean | null }
 export interface ModelProviderPreset { id: string; name: string; baseUrl: string; protocol: ModelProtocol; baseUrlHint?: string }
 export interface ModelConnection {
   id: string; kind: 'provider' | 'custom'; provider: string | null; name: string;
-  baseUrl: string; protocol: ModelProtocol; apiKeySet: boolean; models: ApiModel[];
+  baseUrl: string; protocol: ModelProtocol; reasoningFormat?: ModelReasoningFormat; apiKeySet: boolean; models: ApiModel[];
 }
 export interface ModelProviders { catalog: ModelProviderPreset[]; connections: ModelConnection[] }
 export interface RemoteModelSelection { connectionId: string; modelId: string }
 export interface ModelConnectionDraft {
   id?: string; kind: 'provider' | 'custom'; provider: string | null; name: string;
-  baseUrl: string; protocol: ModelProtocol; apiKey: string; clearKey?: boolean; models: ApiModel[];
+  baseUrl: string; protocol: ModelProtocol; reasoningFormat?: ModelReasoningFormat; apiKey: string; clearKey?: boolean; models: ApiModel[];
 }
 
 export type Effort = 'fastest' | 'balanced' | 'quality' | 'max';
@@ -223,20 +228,26 @@ export interface ServeRequest {
   finishReason?: string | null;
 }
 
-export interface TunnelState { status: 'idle' | 'starting' | 'connected' | 'stopping' | 'error'; mode: 'quick' | 'domain' | null; url: string | null; error: string | null; installed: boolean; originUrl: string; connector?: { path: string; version: string | null; source: string; label: string; summary: string } | null; external?: { kind: 'service' | 'process'; others: number[]; own: number[]; message: string } | null; }
+export interface TunnelState { status: 'idle' | 'starting' | 'connected' | 'stopping' | 'error'; mode: 'quick' | 'domain' | null; url: string | null; error: string | null; warning?: string | null; installed: boolean; originUrl: string; connector?: { path: string; version: string | null; source: string; label: string; summary: string } | null; external?: { kind: 'service' | 'process'; others: number[]; own: number[]; message: string } | null; }
 
 export interface ServingState {
   tunnel?: TunnelState;
-  sharing?: { active: boolean; url: string | null };
+  sharing?: { active: boolean; url: string | null; warning?: string | null };
   revision?: number;
   running: boolean;
   baseUrl: string;
+  /** The address on this computer (the app's own port); baseUrl is the network address while sharing is on. */
+  localUrl?: string;
   port: number;
   endpoints: { openai: string; anthropic: string; models: string };
   access: { otherDevices: boolean; apiKeySet: boolean; apiKeyHint: string | null; allowOrigin: string };
   stats: { running: number; waiting: number; completed: number; failed: number; tokensOut: number };
   requests: ServeRequest[];
   pauseServing: boolean;
+  /** #5661: models whose MCP tools an API client of this computer may use (opt-in, default none). */
+  mcpTools?: string[];
+  /** Origins of pages that may use /v1 without an API key besides the app's own (no UI; PATCH /api/serving). */
+  trustedOrigins?: string[];
 }
 
 export interface MonitorSample {
@@ -283,6 +294,10 @@ export interface MonitorState {
     powerW?: number | null;
     powerLimitW?: number | null;
     pcieRxMbs?: number | null;
+    /** CPU and SSD temperatures (only where this PC can give one) and the GPU energy used since the host started, in Wh (#3628). */
+    cpuTempC?: number | null;
+    ssdTempC?: number | null;
+    energyWh?: number | null;
     diskReadGbs?: number | null;
     diskWriteMbs?: number | null;
     gpuLoad: number | null;
@@ -314,9 +329,15 @@ export interface MonitorState {
 }
 
 export interface ChatMessage {
+  /** Durable, human-readable activity records. Unlike the live status line these remain after the turn ends. */
+  activity?: { text: string; at: number }[];
+  /** Tool calls the model is writing right now (a file, a command): live data for the writing card; see ToolDraft. */
+  drafts?: ToolDraft[];
   /** The person's message is written with Markdown (a task handover: bold headings and lists), so the bubble draws it as such. */
   markdown?: boolean;
   photos?:import('./chat-photos').ChatPhoto[];
+  /** #5993: where each numbered quote of this message came from ([1], [2] ...), so the transcript can label it and jump to it. */
+  quotes?: import('./quotes').QuoteSource[];
   /** Reply came from a saved API connection, rather than the local engine. */
   remoteModel?: boolean;
   timeSkipId?: string;
@@ -355,12 +376,39 @@ export interface ChatMessage {
   reasoningOpen?: boolean;
   tokens?: number;
   tps?: number;
+  promptTps?: number;
   durationMs?: number;
   error?: string;
+  /** What went wrong, as a code the page acts on (a context error offers its own recovery buttons). */
+  errorCode?: string;
+  /** The engine's own text of the error, kept behind Details. */
+  errorDetail?: string;
   tools?: ToolCall[];
 }
 
 export type ToolState = 'proposed' | 'approved' | 'running' | 'done' | 'denied' | 'error';
+
+/**
+ * A tool call the model is still writing (a whole file in one call, say), as the host streams it: the name, the file it is for, a growing size
+ * and the tail of the text. It lives on the assistant message while the call is written and is removed when the call is complete (the
+ * ordinary tool card takes over) or the reply was cut and the call was lost (`lost`).
+ */
+export interface ToolDraft {
+  id: string;
+  name: string;
+  /** The file (or address) the call is for; empty until the model has written it. */
+  target: string;
+  /** Characters of the call's arguments so far (a file's size, a little more because of escapes). */
+  bytes: number;
+  /** Lines of text written so far. */
+  lines: number;
+  /** The last part of the text being written, read back from its JSON form (at most 1,600 characters). */
+  preview: string;
+  /** What the call is: 'write', 'edit', 'shell', ... (same as ToolCall.scope). */
+  scope?: 'read' | 'write' | 'shell' | 'connected';
+  /** The plain verb for the card while it is written ("Writing"). */
+  verb?: string;
+}
 
 export interface ToolCall {
   id: string;
@@ -393,6 +441,12 @@ export interface Workspace {
   aliases?: string[];
 }
 
+export interface SessionAgentReply {
+  id: string;
+  text: string;
+  at: string;
+}
+
 export interface SessionAgent {
   id: string;
   name: string;
@@ -402,14 +456,43 @@ export interface SessionAgent {
   tokens: number;
   /** Time the latest duration measurement was received. */
   updatedAt?: number;
+  /** What the helper did, newest last (at most 20, short): a tool it used ({ verb, target }) or words it wrote ({ said }). Shown by View log (#5254). */
+  steps?: { verb?: string; target?: string; said?: string }[];
+  /** Structured assistant replies from this helper, in order (#6516). */
+  replies?: SessionAgentReply[];
 }
 
 export type ChatMode = 'auto' | 'manual' | 'accept-edits' | 'plan' | 'bypass';
 
+/**
+ * What the board needs to know about a /loop after the window closes: loops live in memory, so the chat keeps a small record of the
+ * last one (running, or how it ended). A record that says `running` with no loop behind it is a loop the window closed on.
+ */
+export interface LoopRecord {
+  prompt: string;
+  everyMs: number;
+  startedAt: number;
+  state: 'running' | 'ended';
+  answers: number;
+  maxRuns?: number;
+  /** When the next answer is due (ms), while running. */
+  nextAt?: number;
+  endedAt?: number;
+  /** count, said-done, time, failures, cap; `stopped` when the person typed /loop stop; `closed` when the window closed on it. */
+  endedWhy?: 'count' | 'said-done' | 'time' | 'failures' | 'cap' | 'stopped' | 'closed';
+  /** The last answer's first words, for the card. */
+  lastText?: string;
+}
+
 export interface Session {
+  /** The person dismissed this chat's (or its loop's) card on the board at this time. A later problem brings it back. */
+  ackedAt?: string;
+  loop?: LoopRecord;
   timeSkips?: import('./time-skip').TimeSkipRun[];
   showcase?: boolean;
   agents?: SessionAgent[];
+  /** Finished helper rows the person removed from this chat. */
+  dismissedAgentIds?: string[];
   previewOpen?: string;
   closedPreviews?: string[];
   showcaseAgentStates?: boolean;
@@ -471,7 +554,7 @@ export interface SetupState {
   step: number;
   completedAt?: string;
   history: { step: number; at: string }[];
-  app: { version: string; modelsDir: string; dataDir: string };
+  app: { version: string; modelsDir: string; dataDir: string; modelsDirNotice?: string };
 }
 
 export interface EngineEvent {

@@ -43,12 +43,14 @@ export function createConnectorInstaller({ directory, componentDirectory = null,
   async function locate() { return (await look()).found?.path ?? null; }
   /** What is in use ({ path, version, source, label }), or null; set by the last look. */
   const connector = () => last.found;
-  async function install() {
+  async function install({ explicit = false } = {}) {
     const existing = await locate();
     if (existing) return existing;
     const unusable = skippedMessage(last.skipped);
     if (unusable) throw new Error(unusable);
-    requireAcquisition('The Cloudflare connector (cloudflared)', 'the optional connector component');
+    // Automatic / background startup paths never acquire software in packaged builds.
+    // An explicit user click ("Install Cloudflare connector") downloads & SHA-256 verifies the official binary.
+    if (!explicit) requireAcquisition('The Cloudflare connector (cloudflared)', 'the optional connector component', { ...process.env, ...env });
     const name = connectorAsset(platform, arch);
     await mkdir(directory, { recursive: true });
     const stage = await mkdtemp(join(directory, '.install-'));
@@ -87,8 +89,8 @@ export function createConnectorInstaller({ directory, componentDirectory = null,
       return binary;
     } finally { await rm(stage, { recursive: true, force: true }); }
   }
-  return { locate, connector, async inspect() { await look(); return last; }, ensure() {
-    if (!installing) installing = install().finally(() => { installing = null; });
+  return { locate, connector, async inspect() { await look(); return last; }, ensure(options = {}) {
+    if (!installing) installing = install(options).finally(() => { installing = null; });
     return installing;
   } };
 }

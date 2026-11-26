@@ -1,26 +1,33 @@
 import { tr } from '../lib/i18n';
 /** App shell: routes, setup takeover, palette, toasts. */
 import { useNative } from '../lib/native';
-import { Component, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Component, Suspense, useDeferredValue, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useSurfaceFocus } from '../lib/focus';
 import { closeSettings, useLocation } from '../lib/router';
-import { bootOnce, bootstrap, setNavOpen, setFocus, useStore, } from '../lib/store';
+import { bootOnce, bootstrap, getState, setNavOpen, setFocus, useStore, } from '../lib/store';
+import { failedRetriesAfter, hostSeemsStopped } from '../lib/connection-retry';
 import { Sidebar } from './Sidebar';
 import { CommandPalette } from './CommandPalette';
 import { ShortcutsDialog } from './Shortcuts';
 import { FolderPathDialog } from '../components/FolderPathDialog';
-import { handleAppShortcut, runCommand } from '../lib/commands';
+import { MOD, handleAppShortcut, runCommand } from '../lib/commands';
 import { useMedia } from '../lib/responsive';
 import { Btn, Dialog, IconBtn, Toasts } from '../components/ui';
 import { Brand } from '../components/Brand';
-import { SetupScreen } from '../screens/Setup';
 import { ChatScreen } from '../screens/Chat';
-import { ModelRunScreen } from '../screens/ModelRun';
-import { ServingScreen } from '../screens/Serving';
-import { MonitorScreen } from '../screens/Monitor';
-import { TasksScreen } from '../screens/Tasks';
-import { SkillsScreen } from '../screens/Skills';
-import { SettingsScreen } from '../screens/Settings';
+import { SubagentRow } from '../components/SubagentRow';
+import { api } from '../lib/client';
+import { recordOf, useHelperRecords } from '../lib/helper-records';
+import type { SessionAgent } from '../lib/types';
+import { lazyScreen, useLoadedModule } from '../lib/lazy-screen';
+// The start screen is Chat. Every other screen loads the first time it is opened (7.1), so the first start reads and runs less code.
+const loadSetup = () => import('../screens/Setup');
+const loadSettings = () => import('../screens/Settings');
+const ModelRunScreen = lazyScreen(() => import('../screens/ModelRun'), (m) => m.ModelRunScreen);
+const ServingScreen = lazyScreen(() => import('../screens/Serving'), (m) => m.ServingScreen);
+const MonitorScreen = lazyScreen(() => import('../screens/Monitor'), (m) => m.MonitorScreen);
+const TasksScreen = lazyScreen(() => import('../screens/Tasks'), (m) => m.TasksScreen);
+const SkillsScreen = lazyScreen(() => import('../screens/Skills'), (m) => m.SkillsScreen);
 function AppShell() {
     useStore(s => s.language);
     const location = useLocation();
@@ -49,7 +56,13 @@ function AppShell() {
     // demanding five steps before anything appears.
     const setupOpen = location.route === 'setup' || (!!setup && !setup.complete && !setup.dismissed) || firstRunOpen;
     // Hook runs here, after setupOpen exists — see src/lib/focus.ts.
-    useSurfaceFocus(setupOpen, setupRef);
+    // The dialogs open once their code has loaded, so they appear and take focus exactly as before.
+    const setupCode = useLoadedModule(loadSetup, setupOpen);
+    const setupShown = setupOpen && !!setupCode;
+    useSurfaceFocus(setupShown, setupRef);
+    const settingsWanted = location.query.get('settings') === '1';
+    const settingsCode = useLoadedModule(loadSettings, settingsWanted);
+    const routeShown = useDeferredValue(location.route);
     return (<div className="app" data-rail={compact ? !navOpen : rail} data-layout={mobile ? 'mobile' : compact ? 'compact' : 'desktop'} data-nav-open={navOpen || undefined} data-focus={focus && location.route === 'chat' || undefined}>
       <Sidebar containerRef={navRef}/>
       {tr(navOpen && compact ? <button className="nav-scrim" tabIndex={-1} aria-hidden="true" aria-label={tr("Close navigation")} onClick={() => setNavOpen(false)}/> : null)}
@@ -62,16 +75,16 @@ function AppShell() {
         </div>
         <ConnectionBar />
         {tr(focus && location.route === 'chat' ? <FocusBar /> : null)}
-        {tr(!ready ? <BootSkeleton /> : <RouteView route={location.route}/>)}
+        {tr(!ready ? <BootSkeleton /> : <Suspense fallback={<BootSkeleton />}><RouteView route={routeShown}/></Suspense>)}
       </main>
       <CommandPalette open={paletteOpen}/>
-      <Dialog open={location.query.get('settings') === '1'} title={tr("Settings")} className="settings-dialog" onClose={closeSettings}><SettingsScreen /></Dialog>
+      <Dialog open={settingsWanted && !!settingsCode} title={tr("Settings")} className="settings-dialog" onClose={closeSettings}>{settingsCode ? <settingsCode.SettingsScreen /> : null}</Dialog>
       <ShortcutsDialog />
       <FolderPathDialog />
-      {tr(setupOpen ? (<div className="setupmodal" role="dialog" aria-modal="true" aria-label={tr("Set up Stratat")}>
+      {tr(setupShown ? (<div className="setupmodal" role="dialog" aria-modal="true" aria-label={tr("Set up Stratat")}>
           <div className="scrim" data-open="true" aria-hidden="true"/>
           <div className="setupmodal__surface" ref={setupRef}>
-            <SetupScreen />
+            {setupCode ? <setupCode.SetupScreen /> : null}
           </div>
         </div>) : null)}
       <Toasts />
@@ -88,6 +101,8 @@ function AppShell() {
 function ConnectionBar() {
     const connection = useStore((s) => s.connection);
     const [retrying, setRetrying] = useState(false);
+    const [failedRetries, setFailedRetries] = useState(0);
+    useEffect(() => { if (connection === 'live') setFailedRetries(0); }, [connection]);
     if (connection === 'live')
         return null;
     const offline = connection === 'offline';
@@ -99,10 +114,11 @@ function ConnectionBar() {
       </span>
       {tr(offline ? (<Btn variant="secondary" size="sm" icon="refresh" disabled={retrying} onClick={() => {
                 setRetrying(true);
-                void bootstrap().finally(() => setRetrying(false));
+                void bootstrap().finally(() => { setRetrying(false); setFailedRetries(n => failedRetriesAfter(n, getState().connection)); });
             }}>
           {tr(retrying ? 'Retrying…' : 'Retry')}
         </Btn>) : null)}
+      {tr(offline && hostSeemsStopped(failedRetries) ? <p className="connbar__stopped" role="alert">{tr("Stratat’s background part has stopped. Close Stratat and open it again.")}</p> : null)}
       {tr(offline ? <details className="connection-details"><summary>{tr("Connection details")}</summary><p className="xs">{tr("App host: ")}{tr(window.location.origin)}{tr(". Retained readings may be stale. Start the configured engine host, then retry.")}</p></details> : null)}
     </div>);
 }
@@ -111,6 +127,9 @@ function ConnectionBar() {
  * way out. Everything else on this screen is the conversation.
  */
 function FocusBar() {
+    // The hints are chords, not decorations: on Windows the modifier is Ctrl and
+    // Alt is spelled out, because ⌘ and ⌥ are not on that keyboard.
+    const mac = MOD === '⌘';
     const native = useNative(), nativeCurrent = native?.instances.find(i => i.id === native.defaultId);
     const library = useStore((s) => s.library);
     const monitor = useStore((s) => s.monitor);
@@ -139,11 +158,11 @@ function FocusBar() {
           {/* A chord reads as one key: the two caps sit tight together, with
             the space before the label doing the separating. */}
           <span className="focusbar__chord">
-            <kbd>⌥↑</kbd>
-            <kbd>⌥↓</kbd>
+            <kbd>{mac ? '⌥↑' : 'Alt+↑'}</kbd>
+            <kbd>{mac ? '⌥↓' : 'Alt+↓'}</kbd>
           </span>{tr("turns")}</span>
         <span>
-          <kbd>⌘↓</kbd>{tr(" latest")}</span>
+          <kbd>{mac ? '⌘↓' : 'Ctrl+↓'}</kbd>{tr(" latest")}</span>
         <span>
           <kbd>{tr("Esc")}</kbd>{tr(" leave")}</span>
       </span>
@@ -201,4 +220,47 @@ class AppBoundary extends Component<{
         return <div className="app-recovery"><h1 className="h2">{tr("Stratat couldn\u2019t show this screen")}</h1><p>{tr("Your saved conversations and settings are still available.")}</p><Btn variant="primary" onClick={() => { void bootstrap().then(() => this.setState({ failed: false })); }}>{tr("Retry")}</Btn></div>;
     }
 }
-export function App() { return <AppBoundary><AppShell /></AppBoundary>; }
+
+/** A native helper window is the same trusted app, but without navigation or the
+ * parent chat. Its query is written only by the desktop shell. */
+function HelperWindow() {
+    const query = new URLSearchParams(window.location.search);
+    const sessionId = query.get('sessionId') ?? '';
+    const helperId = query.get('helperId') ?? '';
+    const record = recordOf(useHelperRecords(sessionId), helperId);
+    const messageCount = record?.messages?.length ?? 0;
+    const [agent, setAgent] = useState<SessionAgent | null>();
+    const [disconnected, setDisconnected] = useState(false);
+    useEffect(() => {
+      const controller = new AbortController();
+      const search = new URLSearchParams({ sessionId, helperId });
+      let timer: ReturnType<typeof setTimeout>;
+      async function read() {
+        try {
+          const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(5000)]);
+          const result = await api.get<{ agent: SessionAgent | null; active: boolean }>(`/api/chat/helper/state?${search}`, signal);
+          if (controller.signal.aborted) return;
+          setAgent(result.agent);
+          setDisconnected(false);
+          if (!result.active) return;
+        } catch {
+          if (controller.signal.aborted) return;
+          setDisconnected(true);
+        }
+        timer = setTimeout(() => void read(), 1000);
+      }
+      void read();
+      return () => { controller.abort(); clearTimeout(timer); };
+    }, [sessionId, helperId, messageCount]);
+    return <main className="main helper-window"><div className="main__body"><div className="wrap stack">
+      <header className="main__head"><h1>{tr(agent?.name ?? 'Subagent')}</h1></header>
+      {disconnected && <p className="muted" role="status">{tr('Reconnecting…')}</p>}
+      {agent === null
+        ? <p className="muted">{tr('This helper is no longer available in this chat.')}</p>
+        : agent ? <SubagentRow agent={agent} sessionId={sessionId} record={record} panel /> : <BootSkeleton />}
+    </div></div></main>;
+}
+export function App() {
+    const helper = new URLSearchParams(window.location.search).get('helperWindow') === '1';
+    return <AppBoundary>{helper ? <HelperWindow /> : <AppShell />}</AppBoundary>;
+}

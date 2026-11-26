@@ -1,3 +1,4 @@
+import { terminalRoot } from './helpers/terminal-root.mjs';
 /**
  * Time-skip in the app, for real: the host starts the job without waiting for it, follows its record, lists the changed files and
  * applies a revision the person chose. The revision step here is a small script (the assistant's turn is covered by the box runs).
@@ -11,22 +12,19 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createTimeSkip, diffRun, measureFolder, timeskipRevisionMessage } from '../server/timeskip.mjs';
 
-const HOST_DIR = resolve(fileURLToPath(new URL('..', import.meta.url)));
-// Upstream keeps the host at apps/host; this fork keeps it at apps/client-upstream/host, so walk up
-// to the checkout that actually holds the engine instead of counting levels.
-function findRepoRoot(from) {
-  for (let dir = resolve(from); ; dir = resolve(dir, '..')) {
-    if (existsSync(join(dir, 'strata.py'))) return dir;
-    if (resolve(dir, '..') === dir) return resolve(from, '..', '..', '..');
-  }
-}
-const REPO = findRepoRoot(HOST_DIR);
+const REPO = terminalRoot();
 const PYTHON = process.env.STRATA_TEST_PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3');
 const hasPython = spawnSync(PYTHON, ['--version'], { windowsHide: true }).status === 0;
-// A client-only fork ships without the engine; these runs drive strata.py.
-const noEngine = !existsSync(join(REPO, 'strata.py')) && 'the engine checkout (strata.py) is not part of this client-only fork';
+const hasTerminalRepo = existsSync(join(REPO, 'strata.py'));
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/** Removes a test's scratch folder. On Windows a process the test started (python, a revise script) can still hold a file for a moment, and rmSync then fails with EPERM or EBUSY:
+ *  retry briefly, and never fail the test on its cleanup alone (the scratch folder is in the temp folder, which the OS clears). */
+function cleanup(dir) {
+  try { rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 }); }
+  catch (error) { console.warn(`timeskip-real: could not remove ${dir} (${error.code ?? error.message}); left in the temp folder`); }
+}
 
 test('the revision request tells the assistant to stay in the copy and to say what it did', () => {
   const text = timeskipRevisionMessage('make a launch plan');
@@ -44,7 +42,7 @@ test('measureFolder stops early on a folder that is too big to copy', () => {
     mkdirSync(join(dir, 'node_modules'));
     writeFileSync(join(dir, 'node_modules', 'big.txt'), 'y'.repeat(1000));
     assert.equal(measureFolder(dir, { maxBytes: 100 }).tooBig, false, 'node_modules is not copied for a trial, so it does not count');
-  } finally { rmSync(dir, { recursive: true, force: true }); }
+  } finally { cleanup(dir); }
 });
 
 test('diffRun lists added, changed and removed files and says which revision to apply', () => {
@@ -60,25 +58,27 @@ test('diffRun lists added, changed and removed files and says which revision to 
     assert.deepEqual(found.files.map(f => [f.path, f.status]), [['edit.txt', 'changed'], ['gone.txt', 'removed'], ['new.md', 'added']]);
     assert.equal(found.files[0].original, 'one'); assert.equal(found.files[0].updated, 'one two');
     assert.equal(found.applyAttempt, 1, 'nothing was kept by the checks, so the person applies the last revision');
-  } finally { rmSync(dir, { recursive: true, force: true }); }
+  } finally { cleanup(dir); }
 });
 
-test('a run starts without the caller waiting, shows its changed files, and applies the chosen revision with a rollback copy', { skip: noEngine || (!hasPython && 'no python on this machine'), timeout: 120000 }, async () => {
+test('a run starts without the caller waiting, shows its changed files, and applies the chosen revision with a rollback copy', { skip: (!hasPython && 'no python on this machine') || (!hasTerminalRepo && 'terminal source checkout is absent in client-only fork'), timeout: 240000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ts-run-'));
   try {
     const workspace = join(dir, 'work'); mkdirSync(workspace);
     writeFileSync(join(workspace, 'plan.md'), 'first draft\n');
-    const script = join(dir, 'revise.mjs');
-    writeFileSync(script, "import { writeFileSync, appendFileSync } from 'node:fs'; await new Promise(r => setTimeout(r, 1500)); appendFileSync('plan.md', 'second line\\n'); writeFileSync('extra.md', process.env.STRATA_TIMESKIP_PROMPT);");
+    // The revision step waits for a file the test writes once the call has returned (no fixed time: on a loaded PC a Python start can take longer than any timer
+    // a test could set, and "the call returned while the revision was still running" is then decided by the order of events, not by the clock).
+    const script = join(dir, 'revise.mjs'), go = join(dir, 'go');
+    writeFileSync(script, `import { writeFileSync, appendFileSync, existsSync } from 'node:fs'; for (let i = 0; i < 2400 && !existsSync(${JSON.stringify(go)}); i++) await new Promise(r => setTimeout(r, 50)); appendFileSync('plan.md', 'second line\\n'); writeFileSync('extra.md', process.env.STRATA_TIMESKIP_PROMPT);`);
     const state = join(dir, 'state');
     const ts = createTimeSkip({ repoRoot: REPO, python: PYTHON, env: { ...process.env, STRATA_TIMESKIP_DIR: state } });
-    const started = Date.now();
     const result = await ts.startDetached({ workspace, prompt: 'extend the plan', attempts: 1, reviseCommand: `"${process.execPath}" "${script}"` });
     assert.ok(result.ok, JSON.stringify(result));
-    assert.ok(Date.now() - started < 1400, 'the call returned while the revision was still running');
     const id = result.run.id;
+    assert.notEqual(ts.status(id).phase, 'completed', 'the call returned while the revision was still running (its step cannot finish before the file below exists)');
+    writeFileSync(go, 'go');
     let run;
-    for (let i = 0; i < 100; i++) { run = ts.status(id); if (['completed', 'failed'].includes(run.phase)) break; await sleep(300); }
+    for (let i = 0; i < 400; i++) { run = ts.status(id); if (['completed', 'failed'].includes(run.phase)) break; await sleep(300); }
     assert.equal(run.phase, 'completed', JSON.stringify(run));
     assert.equal(run.needsUserReview, true, 'no checks were declared, so the person decides');
     const files = ts.files(id);
@@ -92,10 +92,10 @@ test('a run starts without the caller waiting, shows its changed files, and appl
     const restored = await ts.apply({ id, restore: true });
     assert.ok(restored.ok, JSON.stringify(restored));
     assert.equal(readFileSync(join(workspace, 'plan.md'), 'utf8'), 'first draft\n');
-  } finally { rmSync(dir, { recursive: true, force: true }); }
+  } finally { cleanup(dir); }
 });
 
-test('a run whose host is gone reads as interrupted, not as still working', { skip: !hasPython && 'no python on this machine', timeout: 60000 }, async () => {
+test('a run whose host is gone reads as interrupted, not as still working', { skip: (!hasPython && 'no python on this machine') || (!hasTerminalRepo && 'terminal source checkout is absent in client-only fork'), timeout: 60000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ts-gone-'));
   try {
     const state = join(dir, 'state'), id = 'a'.repeat(32);
@@ -103,10 +103,10 @@ test('a run whose host is gone reads as interrupted, not as still working', { sk
     writeFileSync(join(state, id, 'run.json'), JSON.stringify({ id, state: 'generating', workspace: dir, prompt: 'x', checkpoints: [], attempts: [] }));
     const ts = createTimeSkip({ repoRoot: REPO, python: PYTHON, env: { ...process.env, STRATA_TIMESKIP_DIR: state } });
     assert.equal(ts.status(id).phase, 'interrupted');
-  } finally { rmSync(dir, { recursive: true, force: true }); }
+  } finally { cleanup(dir); }
 });
 
-test('Stop ends the job and everything it started, deletes the copies, leaves the person\'s files alone, and the run then reads as cancelled', { skip: noEngine || (!hasPython && 'no python on this machine'), timeout: 120000 }, async () => {
+test('Stop ends the job and everything it started, deletes the copies, leaves the person\'s files alone, and the run then reads as cancelled', { skip: (!hasPython && 'no python on this machine') || (!hasTerminalRepo && 'terminal source checkout is absent in client-only fork'), timeout: 240000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ts-stop-'));
   try {
     const workspace = join(dir, 'work'); mkdirSync(workspace);
@@ -119,25 +119,25 @@ test('Stop ends the job and everything it started, deletes the copies, leaves th
     const started = await ts.startDetached({ workspace, prompt: 'slow one', attempts: 1, reviseCommand: `"${process.execPath}" "${script}"` });
     assert.ok(started.ok, JSON.stringify(started));
     const id = started.run.id;
-    for (let i = 0; i < 100 && !existsSync(pidFile); i++) await sleep(200);
+    for (let i = 0; i < 300 && !existsSync(pidFile); i++) await sleep(200);
     assert.ok(existsSync(pidFile), 'the revision step is running');
     const pid = Number(readFileSync(pidFile, 'utf8'));
     assert.equal(ts.status(id).phase, 'generating');
     assert.equal(await ts.stop(id), true);
     assert.equal(existsSync(join(state, id)), false, 'the copies are deleted');
     assert.equal(ts.status(id).phase, 'cancelled');
-    let alive = true; for (let i = 0; i < 40 && alive; i++) { try { process.kill(pid, 0); await sleep(150); } catch { alive = false; } }
+    let alive = true; for (let i = 0; i < 200 && alive; i++) { try { process.kill(pid, 0); await sleep(150); } catch { alive = false; } }
     assert.equal(alive, false, 'the revision command (a grandchild of the job) was ended too');
     assert.equal(readFileSync(join(workspace, 'plan.md'), 'utf8'), 'first draft\n');
     assert.equal(existsSync(join(workspace, 'half-done.md')), false, 'nothing reached the person\'s folder');
     assert.equal(await ts.stop('b'.repeat(32)), false, 'an id that is not a run is not "stopped"');
-  } finally { rmSync(dir, { recursive: true, force: true }); }
+  } finally { cleanup(dir); }
 });
 
 test('the revision step reads the host\'s stream: a long silent turn is fine, a failure is told in the host\'s words, a vanished host is "could not be reached"', { timeout: 60000 }, async () => {
   const http = await import('node:http');
   const { spawn } = await import('node:child_process');
-  const script = join(HOST_DIR, 'server', 'timeskip-revise.mjs');
+  const script = resolve(fileURLToPath(new URL('.', import.meta.url)), '..', 'server', 'timeskip-revise.mjs');
   const mode = { current: 'ok' };
   const server = http.createServer((req, res) => {
     if (req.headers['x-strata-internal'] !== 's3cret') { res.writeHead(403, { 'content-type': 'application/json' }); res.end('{"error":"Not allowed."}'); return; }

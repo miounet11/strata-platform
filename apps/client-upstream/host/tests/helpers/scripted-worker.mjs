@@ -15,6 +15,7 @@
  *                                   wider access, so the approval gate is exercised
  *   SCRIPT:plain <file> <text>      the same call without the escalation (no approval needed)
  *   SCRIPT:echo <text>              replies with <text>
+ *   SCRIPT:fill <n>                 one long text chunk with n repetitions
  *   SCRIPT:ask                      one ask_user_question call (the agent asking the person something)
  *   SCRIPT:envdump <file>           one shell call that writes the shell's environment to <file>
  *   SCRIPT:retrywrite <file> <text> the `write` tool, like a careful model: when the sandbox denies it and offers
@@ -28,7 +29,9 @@
  *   SCRIPT:call <tool> <json>       one call to any tool with the given JSON arguments
  *   SCRIPT:multi <json>             {"calls":[[tool,args],...],"say":"final text"}: all the calls in one reply, then the text once their results are in
  *   SCRIPT:searchloop               a model that never stops: every reply rewrites a numbered plan and calls web_search again with a new query
- *   SCRIPT:bloat <prompt tokens>    a reply that is only thinking (no answer text), with usage reporting that many prompt tokens (a context at 100%)
+ *   SCRIPT:bloat <prompt tokens> [answer]   report the specified prompt usage and emit an answer or thinking only
+ *   SCRIPT:badseq <steps> <file>    tool calls the Stratat server could not run, as it marks them (strata_rejected_tool_calls /
+ *                                   strata_unread_tool_markup), then a proper call: steps rej:NAME[>HINT], cut, junk, read, say (see below)
  *
  * A request whose last message is a tool result is answered with a text that quotes the result.
  */
@@ -37,11 +40,14 @@ import { createHash } from 'node:crypto';
 
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
-export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model = 'scripted-model', serial = false } = {}) {
+export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model = 'scripted-model', serial = false, window = 0, charsPerToken = 0, noCount = false } = {}) {
+  // `window` + `charsPerToken` make it behave like the engine: every request's prompt is counted (its size over charsPerToken), the usage it
+  // reports is that count, and a prompt that leaves no room to answer is refused with the engine's own 400 ("requests are never truncated").
   // `serial` stands in for an engine with one request slot: the next request waits until the one before it has finished.
   let tail = Promise.resolve();
   const turn = () => { let release; const mine = new Promise(r => { release = r; }); const wait = tail; tail = tail.then(() => mine); return wait.then(() => release); };
   const requests = [];
+  const counts = [];
   let aborted = 0;
   const server = createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
@@ -49,6 +55,16 @@ export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model =
     if (req.method === 'GET' && url.pathname === '/health') return json(200, { ok: true });
     if (req.method === 'GET' && url.pathname === '/v1/models') return json(200, { object: 'list', data: [{ id: model, object: 'model' }] });
     if (req.method === 'GET' && url.pathname === '/__requests') return json(200, { requests, aborted });
+    // The engine's own token count of a message (Anthropic style): characters over the density, plus the template's few tokens.
+    if (req.method === 'POST' && url.pathname.endsWith('/messages/count_tokens')) {
+      if (noCount) return json(404, { error: 'no count here' });   // an older engine: the message cannot be counted before it is sent
+      let text = '';
+      for await (const c of req) text += c;
+      const sent = JSON.parse(text);
+      const chars = (sent.messages ?? []).reduce((n, m) => n + (typeof m.content === 'string' ? m.content.length : JSON.stringify(m.content).length), 0);
+      counts.push(chars);
+      return json(200, { input_tokens: Math.ceil(chars / (charsPerToken || 4)) + 12 });
+    }
     if (req.method !== 'POST' || !url.pathname.endsWith('/chat/completions')) return json(404, { error: 'no route' });
     const release = serial ? await turn() : () => {};
     res.on('close', release);
@@ -72,6 +88,11 @@ export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model =
       authSha: req.headers.authorization ? createHash('sha256').update(req.headers.authorization).digest('hex') : null,
       promptChars: raw.length, raw,
     });
+    const counted = charsPerToken > 0 ? Math.ceil(raw.length / charsPerToken) : 0;
+    if (window > 0 && counted > 0 && counted > window - 64) {
+      requests.at(-1).refused = counted;
+      return json(400, { error: { type: 'invalid_request_error', message: `request exceeds the context window: prompt (${counted} tokens) leaves no room to answer in the context (${window}); requests are never truncated` } });
+    }
     const shellName = () => (body.tools ?? []).find(t => ['bash', 'pwsh'].includes(t.function?.name))?.function?.name ?? 'bash';
     const shellCommand = (file, value) => (shellName() === 'pwsh' ? `Add-Content -Path '${file}' -Value '${value}'` : `echo ${value} >> ${file}`);
     let closed = false;
@@ -80,9 +101,9 @@ export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model =
     res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' });
     const id = `chatcmpl-${requests.length}`;
     const send = (delta, finish = null, extra = {}) => res.write(`data: ${JSON.stringify({ id, object: 'chat.completion.chunk', created: 0, model: body.model, choices: [{ index: 0, delta, finish_reason: finish }], ...extra })}\n\n`);
-    let promptTokens = 100 + messages.length;
-    const finish = (reason, tokens = 10) => {
-      send({}, reason);
+    let promptTokens = counted || 100 + messages.length;
+    const finish = (reason, tokens = 10, extra = {}) => {
+      send({}, reason, extra);
       res.write(`data: ${JSON.stringify({ id, object: 'chat.completion.chunk', created: 0, model: body.model, choices: [], usage: { prompt_tokens: promptTokens, completion_tokens: tokens, total_tokens: promptTokens + tokens } })}\n\n`);
       res.write('data: [DONE]\n\n'); res.end();
     };
@@ -119,6 +140,26 @@ export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model =
       if (/biggest lever/.test(t) && !answered && last.role !== 'tool') return say(['{"step": 2, "why": "The layout decided in step 1 shapes everything after it."}']);
       if (/IMPROVEMENT PLAN/.test(t) && !answered && last.role !== 'tool') return say(['## Better path\n\n', '1. Improve the first attempt SCRIPT:goalstep\n', '2. Polish and check SCRIPT:goalstep\n']);
     }
+    const guardCase = directive?.[1] === 'mixedguard'
+      ? (directive[2].includes('#1') ? 'repeatread' : 'distinctreads')
+      : directive?.[1];
+    if (['repeatread', 'distinctreads', 'emptyafterread'].includes(guardCase)) {
+      if (!(body.tools ?? []).length) return say(['Scripted title']);
+      const n = toolMessages.length;
+      if (guardCase === 'emptyafterread' && n) return finish('stop', 1);
+      if (n >= 14) return say(['Checked all fixtures.']);
+      return toolCall('read', { file_path: `fixture-${guardCase === 'distinctreads' ? n : 0}.txt` });
+    }
+    if (guardCase === 'repeatthinking') {
+      if (!(body.tools ?? []).length) return say(['Scripted title']);
+      const thought = 'I will look again at the same option and retrace the same checks before deciding what to do. ';
+      for (let i = 0; i < 80 && !closed; i++) {
+        send({ role: 'assistant', reasoning_content: thought });
+        await delay(chunkDelayMs);
+      }
+      if (!closed) return finish('stop', 1800);
+      return;
+    }
     if (directive?.[1] === 'searchloop') {
       const n = requests.filter(r => r.directive === 'searchloop').length;
       send({ role: 'assistant', content: `Plan, version ${n}:
@@ -134,8 +175,56 @@ export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model =
       send({ tool_calls: [{ index: 0, id: `call_${requests.length}`, type: 'function', function: { name: 'web_search', arguments: argsJson } }] });
       return finish('tool_calls', 60);
     }
+    if (directive?.[1] === 'badseq') {
+      // TOOLCALL-B: a model whose tool calls the Stratat server could not run. The steps are taken in order, one per reply after the prompt:
+      //   rej:NAME / rej:NAME>HINT   a call to an undeclared tool, as text, with strata_rejected_tool_calls on the finish chunk (HINT = closest_declared)
+      //   cut                        a call cut off inside its markup, with strata_unread_tool_markup {reason: "cut_off"}
+      //   junk                       a closed block that reads as no call, with strata_unread_tool_markup {reason: "unreadable"}
+      //   read                       a proper call of the declared `read` tool on <file>
+      //   say                        a plain answer (also what comes after the last step)
+      // a request without tools (the session title) is never marked by the server
+      if (!(body.tools ?? []).length) return say(['Scripted title']);
+      const [pattern = '', file = 'x.txt'] = (directive[2] ?? '').trim().split(/\s+/);
+      const steps = pattern.split(',').filter(Boolean);
+      const step = steps[messages.slice(promptAt + 1).filter(m => m.role === 'assistant').length] ?? 'say';
+      const markup = (text, extra) => { send({ role: 'assistant', content: '' }); send({ content: text }); return finish('stop', 25, extra); };
+      if (step.startsWith('rej:')) {
+        const [name, hint] = step.slice(4).split('>');
+        return markup(`I will run it.\n<tool_call>\n<function=${name}>\n<parameter=command>\nls\n</parameter>\n</function>\n</tool_call>`,
+          { strata_rejected_tool_calls: [{ name, reason: 'undeclared', ...(hint ? { closest_declared: hint } : {}) }] });
+      }
+      if (step === 'cut') { const tail = '<tool_call>\n<function=read>\n<parameter=file_path>\n'; return markup(`Reading it.\n${tail}`, { strata_unread_tool_markup: { reason: 'cut_off', chars: tail.length } }); }
+      if (step === 'junk') { const tail = '<tool_call>\n<=true>\n</tool_call>'; return markup(`Reading it.\n${tail}`, { strata_unread_tool_markup: { reason: 'unreadable', chars: tail.length } }); }
+      if (step === 'length') { send({ role: 'assistant', content: 'A partial answer.' }); return finish('length', 100); }
+      if (step === 'read') return toolCall('read', { file_path: file });
+      return say(['All done after the tool step.']);
+    }
+    if (directive?.[1] === 'thinkcut') {
+      if (!(body.tools ?? []).length) return say(['Scripted title']);
+      send({ role: 'assistant', reasoning_content: 'I should consider the question before answering.' });
+      return finish('length', 100);
+    }
+    if (directive?.[1] === 'cutwrite' || directive?.[1] === 'cutalways') {
+      // A reply the length limit cuts inside a tool call (AGENT-LOST): some words, then `write` arguments that never close, finish "length".
+      // `cutwrite` is cut once and then, asked to carry on, writes the file in a small call; `cutalways` is cut every time.
+      const nudged = messages.some(m => m.role === 'user' && /cut off by the output limit/.test(text(m)));
+      if (directive[1] === 'cutwrite' && nudged) {
+        if (last.role === 'tool') return say(['Written in parts. The file is complete.']);
+        return toolCall('write', { file_path: (directive[2] ?? '').trim() || 'big.txt', content: 'entry 0001\nentry 0002\n' });
+      }
+      send({ role: 'assistant', content: 'Writing the whole file in one call now. ' });
+      await delay(chunkDelayMs);
+      const file = (directive[2] ?? '').trim() || 'big.txt';
+      send({ tool_calls: [{ index: 0, id: `call_${requests.length}`, type: 'function', function: { name: 'write', arguments: '' } }] });
+      const head = `{"file_path":"${file}","content":"`;
+      for (let i = 0; i < head.length; i += 11) { send({ tool_calls: [{ index: 0, function: { arguments: head.slice(i, i + 11) } }] }); await delay(2); }
+      for (let n = 1; n <= 60; n++) { send({ tool_calls: [{ index: 0, function: { arguments: `entry ${String(n).padStart(4, '0')}: alpha beta gamma delta\\n` } }] }); await delay(2); }
+      return finish('length', 19660);
+    }
     if (directive?.[1] === 'bloat') {
-      promptTokens = parseInt((directive[2] ?? '').trim(), 10) || 100;
+      const [, count, answer] = /^(\d+)(?:\s+(.+))?$/.exec((directive[2] ?? '').trim()) ?? [];
+      promptTokens = Number(count) || 100;
+      if (answer) return say([answer]);
       send({ role: 'assistant', content: '', reasoning_content: 'Thinking about it for a long time and never getting to the answer.' });
       return finish('stop', 20);
     }
@@ -170,6 +259,7 @@ export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model =
     }
     if (name === 'hang') { send({ role: 'assistant', content: '' }); return; }   // headers sent, then silence: a model server that went quiet
     if (name === 'echo') return say([args]);
+    if (name === 'fill') return say(['routine output '.repeat(Math.min(1000, Number.parseInt(args, 10) || 1))]);
     if (name === 'retrywrite' || name === 'retryshell') {
       const [file, ...rest] = args.split(/\s+/);
       const value = rest.join(' ') || 'run';
@@ -248,7 +338,7 @@ export async function startScriptedWorker({ port = 0, chunkDelayMs = 40, model =
   return {
     port: server.address().port,
     url: `http://127.0.0.1:${server.address().port}/v1`,
-    requests, get aborted() { return aborted; },
+    requests, counts, get aborted() { return aborted; },
     close: () => new Promise(r => { server.closeAllConnections?.(); server.close(r); }),
   };
 }

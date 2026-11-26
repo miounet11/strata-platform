@@ -14,6 +14,7 @@ export function browserCandidates(platform = process.platform, env = process.env
     return [
       ...at('Google\\Chrome\\Application\\chrome.exe').map(path => ({ name: 'Google Chrome', path })),
       ...at('Microsoft\\Edge\\Application\\msedge.exe').map(path => ({ name: 'Microsoft Edge', path })),
+      ...at('BraveSoftware\\Brave-Browser\\Application\\brave.exe').map(path => ({ name: 'Brave', path })),
       ...at('Chromium\\Application\\chrome.exe').map(path => ({ name: 'Chromium', path })),
     ];
   }
@@ -21,12 +22,15 @@ export function browserCandidates(platform = process.platform, env = process.env
     return [
       { name: 'Google Chrome', path: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' },
       { name: 'Microsoft Edge', path: '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge' },
+      { name: 'Brave', path: '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser' },
+      { name: 'Arc', path: '/Applications/Arc.app/Contents/MacOS/Arc' },
       { name: 'Chromium', path: '/Applications/Chromium.app/Contents/MacOS/Chromium' },
     ];
   }
   return [
     ...['/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/opt/google/chrome/chrome'].map(path => ({ name: 'Google Chrome', path })),
     ...['/usr/bin/microsoft-edge', '/usr/bin/microsoft-edge-stable', '/opt/microsoft/msedge/msedge'].map(path => ({ name: 'Microsoft Edge', path })),
+    ...['/usr/bin/brave-browser', '/usr/bin/brave-browser-stable', '/snap/bin/brave'].map(path => ({ name: 'Brave', path })),
     ...['/usr/bin/chromium', '/usr/bin/chromium-browser', '/snap/bin/chromium'].map(path => ({ name: 'Chromium', path })),
   ];
 }

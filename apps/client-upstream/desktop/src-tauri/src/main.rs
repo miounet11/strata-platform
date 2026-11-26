@@ -38,10 +38,49 @@ use std::time::{Duration, Instant};
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 mod updater;
-#[cfg(target_os = "linux")]
 mod desktoplog;
+mod identity;
+mod recovery;
+mod shell;
+// Plain std, built on every platform so its decisions are tested everywhere; only the Linux window process uses it.
+#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
+mod fontguard;
+// The same for the DMA-BUF renderer choice (#5417).
+mod renderer_choice;
 #[cfg(target_os = "linux")]
 mod supervisor;
+
+/// Opens a separate, ordinary operating-system window for one helper. The page
+/// owns the data; the shell only gives it a movable native surface on the same
+/// trusted loopback origin as the main window.
+fn open_helper_window(app: &tauri::AppHandle, port: u16, session_id: &str, helper_id: &str, name: &str) -> Result<(), String> {
+    let valid_id = |id: &str| !id.is_empty() && id.len() <= 160 &&
+        id.bytes().all(|c| c.is_ascii_alphanumeric() || b"_-.:@".contains(&c));
+    if !valid_id(session_id) || !valid_id(helper_id) {
+        return Err("The helper window identifier is not valid.".to_string());
+    }
+    use std::hash::{DefaultHasher, Hash, Hasher};
+    let mut hasher = DefaultHasher::new();
+    (session_id, helper_id).hash(&mut hasher);
+    let label = format!("helper-{:016x}", hasher.finish());
+    if let Some(window) = app.get_webview_window(&label) {
+        let _ = window.unminimize(); let _ = window.show(); let _ = window.set_focus();
+        return Ok(());
+    }
+    let title = if name.trim().is_empty() { "Stratat helper" } else { name.trim() };
+    let mut url: tauri::Url = format!("http://127.0.0.1:{port}/").parse().map_err(|_| "The helper window address is invalid.")?;
+    url.query_pairs_mut()
+        .append_pair("helperWindow", "1")
+        .append_pair("sessionId", session_id)
+        .append_pair("helperId", helper_id);
+    WebviewWindowBuilder::new(app, label, WebviewUrl::External(url))
+        .title(title)
+        .inner_size(680.0, 760.0)
+        .min_inner_size(420.0, 360.0)
+        .build()
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
 
 /// The kill-on-close Job Object that holds everything this app starts (Windows). Its only handle is this process's,
 /// which the system closes however the process ends; closing the last handle ends every process in the job.
@@ -180,7 +219,7 @@ fn contain_app() -> bool {
                 return true;
             }
         }
-        eprintln!("[strata] could not put the app in a job object; engines are stopped by the host and their owners instead");
+        eprintln!("[stratat] could not put the app in a job object; engines are stopped by the host and their owners instead");
         false
     }
     #[cfg(not(windows))]
@@ -253,13 +292,26 @@ fn pick_port() -> Result<u16, String> {
 /// launch starts with empty storage, as before).
 const PREFERRED_PORT: u16 = 47831;
 
+/// Set when the port the person (or the app) wanted was busy: "busy:<wanted>:<used>". The host gets it as STRATA_PORT_NOTICE and tells the
+/// person (the chats and settings saved on the page belong to the port, so a different port starts empty) (#3402).
+static PORT_NOTICE: std::sync::Mutex<Option<String>> = std::sync::Mutex::new(None);
+
 fn pick_stable_port() -> Result<u16, String> {
-    match TcpListener::bind(("127.0.0.1", PREFERRED_PORT)) {
+    // The person may have chosen a port in Settings (shell-prefs.json); otherwise the app's usual one.
+    let wanted = shell::wanted_port(&shell::read_prefs(), PREFERRED_PORT);
+    *PORT_NOTICE.lock().unwrap() = None;
+    match TcpListener::bind(("127.0.0.1", wanted)) {
         Ok(listener) => {
             drop(listener);
-            Ok(PREFERRED_PORT)
+            Ok(wanted)
         }
-        Err(_) => pick_port(),
+        Err(_) => {
+            let used = pick_port()?;
+            // A model started from the Terminal (`strata launch`, port 8080 unless told otherwise) is the usual holder: say so (#6278).
+            let by_terminal = health_answer(wanted) == identity::Answer::ModelServer;
+            *PORT_NOTICE.lock().unwrap() = Some(if by_terminal { identity::terminal_notice(wanted, used) } else { shell::busy_notice(wanted, used) });
+            Ok(used)
+        }
     }
 }
 
@@ -275,7 +327,7 @@ fn resource_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
             return Ok(plain_path(dir));
         }
     }
-    // development: apps/desktop/src-tauri -> ../../host  and  ./resources
+    // development: app/desktop/src-tauri -> ../../host  and  ./resources
     let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     Ok(manifest)
 }
@@ -352,9 +404,13 @@ fn wait_for_health(
         if let Some(why) = exited() {
             return Err(format!("the Stratat App Host stopped before it became healthy: {why}"));
         }
-        match ureq_get_ok(&url) {
-            Ok(true) => return Ok(()),
-            Ok(false) => last = "the host answered with a non-2xx status".into(),
+        // The App Host's own answer only (#6278): the Terminal's model server also answers 200 on /api/health.
+        match ureq_get(&url) {
+            Ok((status, body)) => match identity::classify_health(&status, &body) {
+                identity::Answer::AppHost => return Ok(()),
+                identity::Answer::ModelServer => last = "a Stratat model server (started from the Terminal) answers on this port, not the App Host".into(),
+                identity::Answer::Other => last = "the host answered with a non-2xx status".into(),
+            },
             Err(e) => last = e,
         }
         std::thread::sleep(Duration::from_millis(250));
@@ -401,8 +457,21 @@ fn http_request_body(method: &str, url: &str, headers: &[(&str, &str)], body: Op
     Ok((status, response))
 }
 
+/// Who answers `/api/health` on this loopback port: the App Host, a Stratat model server from the Terminal, or something else / nothing.
+pub(crate) fn health_answer(port: u16) -> identity::Answer {
+    match ureq_get(&format!("http://127.0.0.1:{port}/api/health")) {
+        Ok((status, body)) => identity::classify_health(&status, &body),
+        Err(_) => identity::Answer::Other,
+    }
+}
+
 /// A minimal blocking HTTP GET, so the shell needs no async runtime for one health probe.
 fn ureq_get_ok(url: &str) -> Result<bool, String> {
+    ureq_get(url).map(|(status, _)| status.contains(" 200") || status.contains(" 204"))
+}
+
+/// The same GET with a short read timeout, returning the status line and the body.
+fn ureq_get(url: &str) -> Result<(String, String), String> {
     use std::io::{Read, Write};
     let rest = url.strip_prefix("http://").ok_or("only http:// is supported")?;
     let (authority, path) = match rest.find('/') {
@@ -424,8 +493,9 @@ fn ureq_get_ok(url: &str) -> Result<bool, String> {
         .map_err(|e| e.to_string())?;
     let mut buf = String::new();
     stream.read_to_string(&mut buf).map_err(|e| e.to_string())?;
-    let status = buf.lines().next().unwrap_or_default();
-    Ok(status.contains(" 200") || status.contains(" 204"))
+    let status = buf.lines().next().unwrap_or_default().to_string();
+    let body = buf.split_once("\r\n\r\n").map(|(_, b)| b.to_string()).unwrap_or_default();
+    Ok((status, body))
 }
 
 /// The App Host's command, ready to start: the bundled Node runs the host on `port`, serving the built UI, on 127.0.0.1 only.
@@ -470,6 +540,9 @@ fn host_command(res: &Path, port: u16, shutdown_token: &str) -> Result<Command, 
         .stderr(Stdio::inherit());
     apply_runtime_policy(&mut cmd, res);
     hide_console(&mut cmd);
+    if let Some(notice) = PORT_NOTICE.lock().unwrap().clone() {
+        cmd.env("STRATA_PORT_NOTICE", notice);
+    }
     // A user with the Stratat API worker on a different port sets this; unset means the worker's
     // documented loopback default.
     if let Ok(url) = std::env::var("STRATA_SERVER_URL") {
@@ -485,15 +558,33 @@ fn start_host(app: &tauri::AppHandle) -> Result<u16, String> {
     let port = pick_stable_port()?;
     let token = random_token();
     let mut cmd = host_command(&res, port, &token)?;
+    // This process shows the page in its own window: the host says so at /api/app/mode, and the page then hands a link in an answer to
+    // the host, which opens it in the default browser (#5072, #4721). Without it the mode was null and the click called window.open,
+    // which the app window ignores. The Linux shell sets the same variable in supervisor.rs.
+    cmd.env("STRATA_UI_MODE", "window");
     // The signed app updater (Tauri) is reached by the host through a token-protected loopback bridge.
-    let bridge = updater::start(app, random_token());
+    let bridge = updater::start(app, random_token(), port);
     updater::apply_env(&mut cmd, app, bridge.as_ref());
     *app.state::<ShutdownToken>().0.lock().unwrap() = Some(token);
 
     let node = node_binary(&res)?;
-    let child = cmd
+    // The host's lines go to the run log (a packaged Windows app has no console, so they were lost before).
+    let log = desktoplog::run_log();
+    if log.is_some() {
+        cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+    }
+    let mut child = cmd
         .spawn()
         .map_err(|e| format!("could not start the App Host on {}: {e}", node.display()))?;
+    if let Some(log) = log {
+        let ring = desktoplog::Ring::default();
+        if let Some(out) = child.stdout.take() {
+            desktoplog::tee(out, "host", false, ring.clone(), log.clone());
+        }
+        if let Some(err) = child.stderr.take() {
+            desktoplog::tee(err, "host", true, ring, log);
+        }
+    }
     *app.state::<HostProcess>().0.lock().unwrap() = Some(child);
     *app.state::<HostPort>().0.lock().unwrap() = Some(port);
 
@@ -525,6 +616,19 @@ fn stop_host(app: &tauri::AppHandle) {
     if let Some(state) = app.try_state::<HostProcess>() {
         if let Some(mut child) = state.0.lock().unwrap().take() {
             stop_host_child(&mut child, port, token.as_deref());
+        }
+    }
+}
+
+/// End the host at once, without the clean stop (a start that failed: there is nothing to drain).
+#[cfg(not(target_os = "linux"))]
+fn kill_host(app: &tauri::AppHandle) {
+    if let Some(state) = app.try_state::<HostProcess>() {
+        if let Ok(mut guard) = state.0.lock() {
+            if let Some(mut child) = guard.take() {
+                let _ = child.kill();
+                let _ = child.wait();
+            }
         }
     }
 }
@@ -754,6 +858,38 @@ fn run_self_test(report_path: &str) -> i32 {
     };
     record("host-sees-control-and-forbids-acquiring", status_ok, status_detail);
 
+    // The bundled Agent Harness + Install Center / System Doctor API must report healthy runtimes.
+    let harness_dir = res.join("harness");
+    let harness_ok = harness_dir.join("BUNDLE.json").exists()
+        && (harness_dir.join("apps").join("cli").join("lib").join("bin.js").exists()
+            || harness_dir.join("lib").join("bin.js").exists());
+    record(
+        "harness-component-present",
+        harness_ok,
+        if harness_ok {
+            harness_dir.display().to_string()
+        } else {
+            format!("no harness bundle under {}", res.display())
+        },
+    );
+
+    let ic = http_get_body(&format!("http://127.0.0.1:{port}/api/install-center"));
+    let (ic_ok, ic_detail) = match &ic {
+        Ok((line, body)) => {
+            let parsed: serde_json::Value = serde_json::from_str(body).unwrap_or(serde_json::Value::Null);
+            let ctrl_ok = parsed["control"]["healthy"] == serde_json::Value::Bool(true);
+            let harn_ok = parsed["harness"]["installed"] == serde_json::Value::Bool(true);
+            let has_mirror = parsed["network"]["effectiveHfEndpoint"].is_string();
+            let has_tools = parsed["integrations"].as_array().map(|a| !a.is_empty()).unwrap_or(false);
+            (
+                line.contains(" 200") && ctrl_ok && harn_ok && has_mirror && has_tools,
+                format!("{line}; control={ctrl_ok}; harness={harn_ok}; mirror={has_mirror}; integrations={has_tools}"),
+            )
+        }
+        Err(e) => (false, e.clone()),
+    };
+    record("install-center-api-healthy", ic_ok, ic_detail);
+
     let _ = child.kill();
     let _ = child.wait();
 
@@ -784,7 +920,7 @@ fn write_self_test_report(path: &str, steps: Vec<(String, bool, String)>, error:
     });
     let text = serde_json::to_string_pretty(&report).unwrap_or_else(|_| "{}".into());
     if let Err(e) = std::fs::write(path, &text) {
-        eprintln!("[strata] could not write the self-test report to {path}: {e}");
+        eprintln!("[stratat] could not write the self-test report to {path}: {e}");
     }
     println!("{text}");
     if ok {
@@ -803,12 +939,17 @@ fn main() {
     // at the screen — the lesson from the Electron attempt, where a packaged app that never started
     // its host hung with no output at all.
     let args: Vec<String> = std::env::args().collect();
+    // Windows and macOS: the run log and the panic hook come first, before anything that can fail. A start that goes wrong then leaves a
+    // log, a crash file and a message box instead of a process that is gone with 0xc0000409 and nothing else (Linux: supervisor.rs).
+    #[cfg(not(target_os = "linux"))]
+    desktoplog::init_startup(self_test_path(&args).is_none());
     contain_app();
     #[cfg(target_os = "linux")]
     {
         // WebKitGTK's DMA-BUF renderer shows a blank window on several NVIDIA + Wayland desktops (and some virtual GPUs); the plain
-        // renderer is slower to start by a hair and always works. Anyone who set the variable themselves keeps their choice.
-        if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {
+        // renderer always works but paints on the CPU, which made typing and scrolling crawl on a 4K Radeon desktop (#5417). It
+        // is chosen only where it is needed (renderer_choice.rs). Anyone who set the variable themselves keeps their choice.
+        if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() && renderer_choice::disable_dmabuf_here(std::path::Path::new("/sys")) {
             std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
         }
     }
@@ -825,6 +966,10 @@ fn main() {
         if !options.window_child {
             std::process::exit(supervisor::run(&options));
         }
+        // A window process its shell did not start is the app updater's restart (the shell that owned the window is stopping): start Stratat again normally.
+        if !supervisor::started_by_shell(std::env::var(supervisor::SHELL_PID_ENV).ok().as_deref(), std::os::unix::process::parent_id()) {
+            std::process::exit(supervisor::restart_after_update());
+        }
         run_window_process();
     }
     #[cfg(not(target_os = "linux"))]
@@ -834,7 +979,19 @@ fn main() {
 /// Windows and macOS: one process owns the host and the window.
 #[cfg(not(target_os = "linux"))]
 fn run_embedded() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    // macOS: WKWebView ends the page's web content process under memory pressure and leaves a blank window; the page is loaded again (#5079).
+    #[cfg(target_os = "macos")]
+    let builder = builder.on_web_content_process_terminate(|webview| {
+        let port = webview.app_handle().state::<HostPort>().0.lock().ok().and_then(|p| *p);
+        let Some(port) = port else { return };
+        let failed = webview.url().ok().map(|u| u.to_string());
+        let target = webview.clone();
+        on_renderer_failure(format!("http://127.0.0.1:{port}"), recovery::Failure::RendererExited, "web content process terminated".to_string(), failed, move |url| {
+            if let Ok(url) = url.parse::<tauri::Url>() { let _ = target.navigate(url); }
+        });
+    });
+    builder
         // First, as the plugin requires: a second launch ends here after telling the running app to show itself.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             if let Some(window) = app.get_webview_window("main") {
@@ -845,27 +1002,56 @@ fn run_embedded() {
         }))
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_notification::init())
         .manage(HostProcess(Mutex::new(None)))
         .manage(HostPort(Mutex::new(None)))
         .manage(ShutdownToken(Mutex::new(None)))
         .setup(|app| {
+            // A way to prove the safety net on a computer where the app starts fine (tests only): a panic at the place a setup error ends in.
+            if std::env::var_os("STRATA_DESKTOP_TEST_PANIC").is_some() {
+                panic!("STRATA_DESKTOP_TEST_PANIC is set: the app panics on purpose");
+            }
             let handle = app.handle().clone();
-            let port = start_host(&handle).map_err(|e| {
-                // A startup failure must be visible, not a blank window.
-                eprintln!("[strata] {e}");
-                Box::<dyn std::error::Error>::from(e)
-            })?;
-            let shell_token = handle.state::<ShutdownToken>().0.lock().unwrap().clone().unwrap_or_default();
-            open_window(app, port, &shell_token)?;
+            // A setup error would become a panic inside Tauri ("Failed to setup app"), and with panic = "abort" a crash with no message.
+            // A failed start is reported (log, crash file, message box) and ends the app here instead.
+            let port = match start_host(&handle) {
+                Ok(port) => port,
+                Err(e) => {
+                    kill_host(&handle);
+                    desktoplog::startup_failed(&e)
+                }
+            };
+            let shell_token = handle.state::<ShutdownToken>().0.lock().map(|t| t.clone().unwrap_or_default()).unwrap_or_default();
+            if let Err(e) = open_window(app, port, &shell_token) {
+                kill_host(&handle);
+                desktoplog::startup_failed(&format!("the Stratat window could not be opened: {e}"))
+            }
             Ok(())
         })
         .on_window_event(|window, event| {
-            if let tauri::WindowEvent::Destroyed = event {
+            // "Minimise to tray" (Settings, off by default): closing the main window hides it and keeps Stratat running in the tray; Quit in the
+            // tray menu ends it (#3477). If no tray could be made the window closes as before.
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() == "main" {
+                    let prefs = shell::read_prefs();
+                    if prefs.tray {
+                        api.prevent_close();
+                        shell::hide_to_tray(&window.app_handle().clone(), &prefs.language);
+                        if !shell::tray_exists(&window.app_handle().clone()) {
+                            let _ = window.destroy();
+                        }
+                    }
+                }
+            }
+            // Helper windows are independent reading surfaces. Closing one must
+            // never end the app host or the conversation it is showing.
+            if window.label() == "main" && matches!(event, tauri::WindowEvent::Destroyed) {
                 stop_host(&window.app_handle().clone());
+                window.app_handle().exit(0);
             }
         })
         .build(tauri::generate_context!())
-        .expect("error while building the Stratat application")
+        .unwrap_or_else(|e| desktoplog::startup_failed(&format!("the Stratat application could not be built: {e}")))
         .run(|app, event| {
             if let tauri::RunEvent::ExitRequested { .. } | tauri::RunEvent::Exit = event {
                 stop_host(app);
@@ -873,21 +1059,28 @@ fn run_embedded() {
         });
 }
 
+/// Whether the window opens with the browser developer tools available (#5408): only when STRATA_DEVTOOLS is 1. A debug build has them anyway;
+/// a release build has them compiled in (Cargo.toml) but off, so the packaged window behaves as it always did unless someone asks.
+fn devtools_wanted(value: Option<&str>) -> bool {
+    value.map(str::trim) == Some("1")
+}
+
 /// The one window, on the host's own origin so the page and its API share an origin exactly as the browser build does.
 #[cfg_attr(windows, allow(unused_variables))]
 fn open_window(app: &tauri::App, port: u16, shell_token: &str) -> Result<(), Box<dyn std::error::Error>> {
     let origin = format!("http://127.0.0.1:{port}");
     let url = origin.parse().expect("a valid loopback URL");
-    let builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url)).title("Stratat").inner_size(1440.0, 920.0).min_inner_size(900.0, 600.0);
+    let builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url)).title("Stratat").inner_size(1440.0, 920.0).min_inner_size(900.0, 600.0)
+        .devtools(devtools_wanted(std::env::var("STRATA_DEVTOOLS").ok().as_deref()));
     // Dropping pictures on the chat (QA report 1, item 4). Windows: the shell's own file-drop handler is off, because with it on the system hands
-    // the dropped file to the shell and the page never sees it; with it off the page gets ordinary drag and drop events (apps/host DropZone), as
+    // the dropped file to the shell and the page never sees it; with it off the page gets ordinary drag and drop events (app/host DropZone), as
     // in a browser. Linux and macOS: the page gets the drag events but WebKit gives it no files, so the handler stays on and the shell passes the
     // drop on (see drop_script and hand_over_drop below).
     #[cfg(windows)]
     let builder = builder.disable_drag_drop_handler();
     // WebKitGTK (2.50 to 2.52 at least) dereferences a null pointer in AcceleratedBackingStore::update in its UI process when a page calls
     // document.startViewTransition (the web process asks the UI process to enter accelerated compositing, and the backing store is not
-    // there). The page itself does not call it on that engine (apps/host/src/lib/router.ts), and this line keeps any other script from doing
+    // there). The page itself does not call it on that engine (app/host/src/lib/router.ts), and this line keeps any other script from doing
     // it either: the API is simply absent, as in older WebKit versions.
     #[cfg(target_os = "linux")]
     let builder = builder.initialization_script(
@@ -916,7 +1109,78 @@ fn open_window(app: &tauri::App, port: u16, shell_token: &str) -> Result<(), Box
     }
     #[cfg(target_os = "linux")]
     hook_linux_drops(&window, port, shell_token);
+    #[cfg(windows)]
+    hook_renderer_failures(&window, port);
     Ok(())
+}
+
+/// Milliseconds since the first failure report or window (a clock that only goes forward, for the recovery limit).
+#[cfg(not(target_os = "linux"))]
+fn uptime_ms() -> u64 {
+    static START: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
+    START.get_or_init(Instant::now).elapsed().as_millis() as u64
+}
+
+/// The page's renderer is gone (#5079). Writes it to the run log, and, when the window needs the page again, loads it again through
+/// `navigate` after a short wait: the same screen with `?recovery=1` the first time (the page then starts with the sidebar previews
+/// closed once), the home screen the second time, and nothing after two in two minutes. The chats are the host's and are not touched.
+#[cfg(not(target_os = "linux"))]
+fn on_renderer_failure(origin: String, failure: recovery::Failure, detail: String, failed: Option<String>, navigate: impl FnOnce(String) + Send + 'static) {
+    static GUARD: Mutex<recovery::Guard> = Mutex::new(recovery::Guard::new());
+    let say = |text: &str| { if let Some(log) = desktoplog::run_log() { log.line("shell", text); } };
+    say(&format!("the page's {} ({detail}); it was showing {}", failure.name(), failed.as_deref().unwrap_or("an unknown address")));
+    let plan = match GUARD.lock() {
+        Ok(mut guard) => recovery::plan(&mut guard, uptime_ms(), &origin, failure, failed.as_deref()),
+        Err(_) => recovery::Plan::Stop,
+    };
+    match plan {
+        recovery::Plan::Ignore => {}
+        recovery::Plan::Stop => say("the page's renderer failed again within two minutes of two recoveries; the window is left as it is (Reload in the page loads it again)"),
+        recovery::Plan::Reload { attempt, url } => {
+            say(&format!("loading the page again (recovery {attempt}): {url}"));
+            std::thread::spawn(move || {
+                std::thread::sleep(Duration::from_millis(recovery::RELOAD_DELAY_MS));
+                navigate(url);
+            });
+        }
+    }
+}
+
+/// Windows: WebView2 tells the shell when a process of the page fails; the page's renderer dying is recovered by on_renderer_failure.
+#[cfg(windows)]
+fn hook_renderer_failures(window: &tauri::WebviewWindow, port: u16) {
+    use webview2_com::Microsoft::Web::WebView2::Win32::{ICoreWebView2ProcessFailedEventArgs2, COREWEBVIEW2_PROCESS_FAILED_KIND};
+    use webview2_com::{take_pwstr, ProcessFailedEventHandler};
+    use windows_core::{Interface, PWSTR};
+    let target = window.clone();
+    let origin = format!("http://127.0.0.1:{port}");
+    let _ = window.with_webview(move |platform| unsafe {
+        let Ok(core) = platform.controller().CoreWebView2() else { return };
+        let handler = ProcessFailedEventHandler::create(Box::new(move |sender, args| {
+            let Some(args) = args else { return Ok(()) };
+            let mut kind = COREWEBVIEW2_PROCESS_FAILED_KIND::default();
+            args.ProcessFailedKind(&mut kind)?;
+            let mut detail = format!("kind {}", kind.0);
+            if let Ok(more) = args.cast::<ICoreWebView2ProcessFailedEventArgs2>() {
+                let mut reason = Default::default();
+                let mut exit_code = 0i32;
+                if more.Reason(&mut reason).is_ok() { detail = format!("{detail}, reason {}", recovery::reason_name(reason.0)); }
+                if more.ExitCode(&mut exit_code).is_ok() { detail = format!("{detail}, exit code {exit_code:#x}"); }
+            }
+            let failed = sender.and_then(|view| {
+                let mut source = PWSTR::null();
+                view.Source(&mut source).ok()?;
+                Some(take_pwstr(source))
+            });
+            let window = target.clone();
+            on_renderer_failure(origin.clone(), recovery::Failure::from_webview2(kind.0), detail, failed, move |url| {
+                if let Ok(url) = url.parse::<tauri::Url>() { let _ = window.navigate(url); }
+            });
+            Ok(())
+        }));
+        let mut token = 0i64;
+        let _ = core.add_ProcessFailed(&handler, &mut token);
+    });
 }
 
 /// A file:// address from a drag, as a path (percent-escapes decoded); anything else (http, mailto, text) is not a dropped file.
@@ -1026,7 +1290,7 @@ fn pointer_buttons_up(widget: &webkit2gtk::WebView) -> bool {
     !mask.intersects(gtk::gdk::ModifierType::BUTTON1_MASK | gtk::gdk::ModifierType::BUTTON2_MASK | gtk::gdk::ModifierType::BUTTON3_MASK)
 }
 
-/// The script that tells the page a file drag is over the window (`state` is "enter" or "leave"); the page shows its drop box (apps/host DropZone).
+/// The script that tells the page a file drag is over the window (`state` is "enter" or "leave"); the page shows its drop box (app/host DropZone).
 #[cfg_attr(windows, allow(dead_code))]
 fn drag_script(state: &str) -> String {
     format!("window.dispatchEvent(new CustomEvent('strata:native-drag', {{ detail: '{state}' }}));")
@@ -1052,8 +1316,8 @@ fn hand_over_drop(window: tauri::WebviewWindow, port: u16, token: String, paths:
         );
         let files = match answer {
             Ok((status, text)) if status.contains(" 200") => serde_json::from_str::<serde_json::Value>(&text).ok().and_then(|v| v.get("files").cloned()),
-            Ok((status, _)) => { eprintln!("[strata] the host did not take the dropped files: {status}"); None }
-            Err(e) => { eprintln!("[strata] the dropped files could not be handed to the host: {e}"); None }
+            Ok((status, _)) => { eprintln!("[stratat] the host did not take the dropped files: {status}"); None }
+            Err(e) => { eprintln!("[stratat] the dropped files could not be handed to the host: {e}"); None }
         };
         let json = files.map(|f| f.to_string()).unwrap_or_else(|| "[]".to_string());
         let _ = window.eval(&drop_script(&json));
@@ -1069,8 +1333,17 @@ fn run_window_process() -> ! {
     let token = std::env::var("STRATA_SHUTDOWN_TOKEN").unwrap_or_default();
     // A way to prove the safety net on a computer where the window works (tests only): this process dies the way a WebKit crash does.
     if std::env::var_os("STRATA_WINDOW_TEST_CRASH").is_some() {
-        eprintln!("[strata] STRATA_WINDOW_TEST_CRASH is set: the window process aborts on purpose.");
+        eprintln!("[stratat] STRATA_WINDOW_TEST_CRASH is set: the window process aborts on purpose.");
         std::process::abort();
+    }
+    // WebKitGTK aborts while it draws a COLRv1 colour emoji font (fontguard.rs, #4533): this process is told to leave that font out. Only this
+    // process, and before WebKit starts its own: the host, the engine and the agent keep the fonts the person chose.
+    {
+        let env = |k: &str| std::env::var(k).ok();
+        let dirs = fontguard::font_dirs(&env);
+        if let Some(conf) = fontguard::config_for(&env, &desktoplog::data_dir().join("fonts"), &dirs, Path::new(fontguard::SYSTEM_CONFIG)) {
+            std::env::set_var("FONTCONFIG_FILE", conf);
+        }
     }
     // The shell is this process's parent: when it is gone (killed, crashed, logged off) the window goes too.
     let parent = std::os::unix::process::parent_id();
@@ -1094,7 +1367,7 @@ fn run_window_process() -> ! {
         .setup(move |app| {
             // The signed app updater (Tauri) is reached by the host through a token-protected loopback bridge; tell the host where it is.
             let bridge_token = random_token();
-            if let Some(bridge) = updater::start(app.handle(), bridge_token) {
+            if let Some(bridge) = updater::start(app.handle(), bridge_token, port) {
                 let body = serde_json::json!({ "bridge": { "url": bridge.url, "token": bridge.token } }).to_string();
                 if let Err(e) = http_request_body(
                     "POST",
@@ -1102,13 +1375,13 @@ fn run_window_process() -> ! {
                     &[("x-strata-shutdown", token.as_str()), ("content-type", "application/json")],
                     Some(&body),
                 ) {
-                    eprintln!("[strata] the app updater could not be registered with the host: {e}");
+                    eprintln!("[stratat] the app updater could not be registered with the host: {e}");
                 }
             }
             open_window(app, port, &token)
         })
         .on_window_event(|window, event| {
-            if let tauri::WindowEvent::Destroyed = event {
+            if window.label() == "main" && matches!(event, tauri::WindowEvent::Destroyed) {
                 window.app_handle().exit(0);
             }
         })
@@ -1121,6 +1394,14 @@ fn run_window_process() -> ! {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn developer_tools_are_off_unless_asked_for() {
+        assert!(!devtools_wanted(None));
+        for off in ["", "0", "true", "yes", "on", "11"] { assert!(!devtools_wanted(Some(off)), "{off}"); }
+        assert!(devtools_wanted(Some("1")));
+        assert!(devtools_wanted(Some(" 1 ")));
+    }
 
     #[test]
     fn dropped_file_addresses_become_paths_and_nothing_else_does() {
@@ -1138,6 +1419,33 @@ mod tests {
         let script = drop_script(files);
         assert!(script.starts_with("window.dispatchEvent(new CustomEvent('strata:native-drop', { detail: [{"));
         assert!(script.contains("x.png") && script.ends_with("}));"));
+    }
+
+    /// A loopback server that answers every request with `body` as a 200 (what a Stratat model server or the App Host does on /api/health).
+    fn answer_with(body: &'static str) -> u16 {
+        use std::io::{Read, Write};
+        let listener = TcpListener::bind(("127.0.0.1", 0)).unwrap();
+        let port = listener.local_addr().unwrap().port();
+        std::thread::spawn(move || {
+            for stream in listener.incoming() {
+                let Ok(mut stream) = stream else { break };
+                let mut buf = [0u8; 1024];
+                let _ = stream.read(&mut buf);
+                let _ = stream.write_all(format!("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", body.len(), body).as_bytes());
+            }
+        });
+        port
+    }
+
+    #[test]
+    fn a_terminal_model_server_on_the_port_is_not_taken_for_the_host() {
+        // #6278: `strata launch`'s server answers 200 on /api/health too; only the App Host's own answer counts.
+        let server = answer_with(r#"{"status": "ok", "model": "swift-1.5-iq3_xxs", "api_key": true, "service": "strata"}"#);
+        assert_eq!(health_answer(server), identity::Answer::ModelServer);
+        assert!(wait_for_health(server, Duration::from_millis(600), || None).is_err());
+        let host = answer_with(r#"{"ok":true,"uptimeSec":2,"backend":"none","engine":null,"clients":0}"#);
+        assert_eq!(health_answer(host), identity::Answer::AppHost);
+        assert!(wait_for_health(host, Duration::from_secs(5), || None).is_ok());
     }
 
     #[test]

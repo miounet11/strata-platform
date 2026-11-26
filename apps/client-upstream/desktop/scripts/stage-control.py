@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Stage the Control component the installer ships: src-tauri/resources/control.
 
-    python apps/desktop/scripts/stage-control.py                       # build the terminal bundle, stage it
-    python apps/desktop/scripts/stage-control.py --archive X.zip       # stage an archive you already built
-    python apps/desktop/scripts/stage-control.py --wheelhouse DIR      # build with no network (wheels from DIR)
-    python apps/desktop/scripts/stage-control.py --check               # verify what is staged
+    python app/desktop/scripts/stage-control.py                       # build the terminal bundle, stage it
+    python app/desktop/scripts/stage-control.py --archive X.zip       # stage an archive you already built
+    python app/desktop/scripts/stage-control.py --wheelhouse DIR      # build with no network (wheels from DIR)
+    python app/desktop/scripts/stage-control.py --check               # verify what is staged
 
 What lands in `control/`: the pinned CPython 3.12.15 (python-build-standalone, digest-checked), the hash-locked wheels
 (`packaging/locks/runtime-<target>-cp312.txt`, installed with --require-hashes at build time), strata_control,
@@ -31,7 +31,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 OUT = HERE.parent / "src-tauri" / "resources" / "control"
-sys.path.insert(0, str(ROOT / "packaging"))
+sys.path.insert(0, str(ROOT / "tools" / "packaging"))
 import package_terminal as pt  # noqa: E402
 
 
@@ -44,7 +44,7 @@ def sha256(path: Path) -> str:
 
 
 def build_archive(work: Path, wheelhouse: str | None) -> Path:
-    command = [sys.executable, str(ROOT / "packaging" / "package_terminal.py"), "--out", str(work)]
+    command = [sys.executable, str(ROOT / "tools" / "packaging" / "package_terminal.py"), "--out", str(work)]
     if wheelhouse:
         command += ["--wheelhouse", wheelhouse]
     subprocess.run(command, check=True, cwd=str(ROOT))
@@ -81,7 +81,7 @@ local_imports = pt.local_imports
 
 def add_installer(folder: Path) -> dict:
     """Copy the installer's files from the source tree into the staged Control (after the Terminal bundle is in place)."""
-    return pt.add_installer(folder, ROOT)
+    return pt.add_installer(folder, pt.ROOT)
 
 
 #: What the other names of the interpreter become: Tauri copies a symlink as a full copy of its target, so `python`, `python3` and

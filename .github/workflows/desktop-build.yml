@@ -45,31 +45,21 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
-      # Build inputs the bundle ships but does not commit: the private Node runtime and the
-      # harness/control folders. Without them `tauri build` fails on missing resource paths.
-      - name: Stage bundled runtime
-        working-directory: ${{ env.DESKTOP_DIR }}
+      # Stage verified bundled runtimes (private Node, Control 0.1.69, DeepSeek Harness + Playwright MCP,
+      # and native Apple Metal engines on arm64) so every feature works out of the box.
+      - name: Stage bundled runtimes
         shell: bash
         run: |
-          case "${{ matrix.target }}" in
-            x86_64-pc-windows-msvc) node_target=win-x64 ;;
-            aarch64-apple-darwin)   node_target=darwin-arm64 ;;
-            x86_64-apple-darwin)    node_target=darwin-x64 ;;
-            x86_64-unknown-linux-gnu) node_target=linux-x64 ;;
-          esac
-          bash scripts/fetch-node.sh --target "$node_target"
-          for d in harness control engine-bundle; do
-            mkdir -p "src-tauri/resources/$d"
-            [ -f "src-tauri/resources/$d/.gitignore" ] || printf '*\n!.gitignore\n' > "src-tauri/resources/$d/.gitignore"
-          done
+          node scripts/stage-desktop-resources.mjs --target "${{ matrix.target }}"
 
       # The host UI is built first: tauri.conf.json points frontendDist at ../../host/dist.
-      - name: Install and build the host UI
+      - name: Install, typecheck, and build the host UI
         working-directory: ${{ env.CLIENT_DIR }}/host
         run: |
           npm ci
+          npm run typecheck
           npm run build
 
       - uses: dtolnay/rust-toolchain@stable

@@ -19,18 +19,13 @@ import { externalEnvironment } from './external-env.mjs';
  * macOS keeps per-user temp files under /var/folders (realpath: /private/var/folders).
  * That is a place people write to, so the blanket `/var` rule must not catch it.
  */
+function realpathSafe(p) {
+  try { return realpathSync(p); } catch { return resolve(p); }
+}
 function isTempDir(p) {
   const t = realpathSafe(tmpdir());
   const q = realpathSafe(p);
   return q === t || q.startsWith(t + sep);
-}
-
-function realpathSafe(p) {
-  try {
-    return realpathSync(p);
-  } catch {
-    return resolve(p);
-  }
 }
 
 /** A folder no chat may use as its project: the top of a drive, or the system's own folders. */
@@ -41,7 +36,7 @@ export function refusedFolder(dir) {
     const win = (process.env.SystemRoot ?? 'C:\\Windows').toLowerCase();
     const q = p.toLowerCase();
     if (q === win || q.startsWith(win + sep) || /^[a-z]:\\(program files( \(x86\))?|programdata)(\\|$)/.test(q)) return 'That is a system folder. Choose one of your own folders.';
-  } else if (!isTempDir(p) && /^\/(bin|boot|dev|etc|lib|lib64|proc|root|run|sbin|sys|usr|var)(\/|$)/.test(p)) return 'That is a system folder. Choose one of your own folders.';
+  } else if (!isTempDir(p) && /^\/(bin|boot|dev|etc|lib|lib64|proc|root|run|sbin|sys|usr|var)(\/|$)/.test(p) && !/^\/run\/media\/[^/]+\/./.test(p)) return 'That is a system folder. Choose one of your own folders.';
   return null;
 }
 
@@ -80,7 +75,7 @@ export function createChatFolders({ file }) {
  * The folder a chat's files live in, one rule for the agent's writes, Open, Show in folder, preview and attach:
  *   1. the folder the person chose for this chat; else
  *   2. the folder the agent actually worked in for it (its session's working folder, so it is the one it wrote to); else
- *   3. the default workspace (Documents/Strata/Workspace, or STRATA_WORKSPACE), where a chat with no folder is run.
+ *   3. the default workspace (Documents/Stratat/Workspace, or STRATA_WORKSPACE), where a chat with no folder is run.
  * A folder that no longer exists is skipped. Never null while the default exists, so a chat with no chosen folder can still open its files.
  */
 export function chatRootOf({ chosen = null, used = null, fallback = null } = {}) {
@@ -172,7 +167,7 @@ export function parseCsv(text, delimiter = ',', maxRows = 500) {
 export function previewFile(root, rawPath, sessionId) {
   const file = resolveChatFile(root, rawPath);
   const st = statSync(file); const kind = fileType(file);
-  const base = { kind, name: basename(file), path: file, size: st.size, url: pathToFileURL(file).href };
+  const base = { kind, name: basename(file), path: file, size: st.size, mtime: Math.round(st.mtimeMs), url: pathToFileURL(file).href };
   const raw = `/api/files/raw?sessionId=${encodeURIComponent(sessionId)}&path=${encodeURIComponent(file)}`;
   if (kind === 'image' || kind === 'pdf') return { ...base, rawUrl: raw, mime: mimeOf(file) };
   if (kind === 'other') return { ...base, note: 'This kind of file has no preview. Open it in its own app.' };
@@ -182,6 +177,20 @@ export function previewFile(root, rawPath, sessionId) {
   const text = buf.toString('utf8');
   if (kind === 'csv') return { ...base, rows: parseCsv(text, file.toLowerCase().endsWith('.tsv') ? '\t' : ','), truncated: text.split('\n').length > 500 };
   return { ...base, text };
+}
+
+/** Types a browser can run script from when it is opened as a page (a picture that is really a document, or an HTML/XML page). */
+const ACTIVE_TYPES = /^(image\/svg\+xml|text\/html|application\/xhtml\+xml|text\/xml|application\/xml)\b/i;
+
+/**
+ * The response headers for a person's file served from the app's own address (a chat folder's picture, a dropped file). Such a file is not ours: an SVG or
+ * HTML file opened as a page there would run its script as the app itself. `sandbox` gives that page an opaque origin and no script, while a picture still
+ * draws in an <img>; `nosniff` keeps the browser from deciding on another type.
+ */
+export function fileResponseHeaders(mime, length) {
+  const headers = { 'content-type': mime, 'content-length': length, 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
+  if (ACTIVE_TYPES.test(String(mime))) headers['content-security-policy'] = "sandbox; default-src 'none'; style-src 'unsafe-inline'; img-src data:";
+  return headers;
 }
 
 /** The bytes of a picture or PDF inside the chat's folder. */

@@ -1,7 +1,7 @@
 {
   "name": "stratat-desktop",
   "productName": "Stratat",
-  "version": "0.2.0-beta",
+  "version": "0.2.22",
   "private": true,
   "description": "Stratat Desktop - local AI, tuned to one model.",
   "scripts": {

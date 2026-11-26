@@ -15,6 +15,7 @@
 import * as supervisor from './supervisor.mjs';
 import { get as getStore } from './store.mjs';
 import { which } from './util.mjs';
+import { cancelOnAbort } from './stream-abort.mjs';
 
 /** Where Stratat's own API worker listens by default (`serve/server.py`, `--port 8095`). */
 const STRATA_DEFAULT_URL = 'http://127.0.0.1:8095/v1';
@@ -24,6 +25,14 @@ const CANDIDATES = [
   { name: 'Ollama', url: 'http://127.0.0.1:11434/v1' },
   { name: 'LM Studio', url: 'http://127.0.0.1:1234/v1' },
 ];
+
+/** Model ids an OpenAI-style server lists that are not chat models (embeddings, rerankers, speech): never picked for a chat. */
+const NOT_CHAT = /embed|rerank|(^|[\/:_-])bge-|(^|[\/:_-])e5-|whisper|(^|[\/:_-])tts/i;
+/** The model a chat on an adopted server asks for (#5574): the first listed chat model, else the first listed model; null when it lists none. */
+export function chatModelId(ids) {
+  const list = (Array.isArray(ids) ? ids : []).filter((id) => typeof id === 'string' && id);
+  return list.find((id) => !NOT_CHAT.test(id)) ?? list[0] ?? null;
+}
 
 let backend = null;
 let checkedAt = 0;
@@ -42,8 +51,7 @@ export function requiresRealEngine() {
 }
 
 /**
- * True when the caller explicitly asked for simulated output. A packaged build can never opt in,
- * the same rule `requiresRealEngine` enforces in the other direction.
+ * True when the caller explicitly asked for simulated output. A packaged build can never opt in.
  */
 function simulationRequested() {
   if (process.env.STRATA_PACKAGED === '1') return false;
@@ -65,7 +73,7 @@ function strataUrl() {
  * server because it happens to hold the port is exactly the silent substitution the architecture
  * forbids, so the identity check is required.
  */
-async function probeStratat(baseUrl) {
+async function probeStrata(baseUrl) {
   try {
     const res = await fetch(`${baseUrl.replace(/\/v1$/, '')}/v1/status`, { signal: AbortSignal.timeout(900) });
     if (!res.ok) return null;
@@ -92,7 +100,7 @@ async function probeStratat(baseUrl) {
 
 export async function detectBackend({ force = false } = {}) {
   // 1. Stratat's own engine, always first: it is the product's inference path.
-  const strata = await probeStratat(strataUrl());
+  const strata = await probeStrata(strataUrl());
   if (strata) {
     backend = strata;
     checkedAt = Date.now();
@@ -118,19 +126,18 @@ export async function detectBackend({ force = false } = {}) {
 
   if (!force && backend && backend.kind !== 'engine' && Date.now() - checkedAt < 20_000) return backend;
 
-  // `STRATA_REAL_ENGINE=0` asks for simulation. Adopting whatever OpenAI-compatible server happens
-  // to be listening (Ollama, LM Studio) would make a demo run answer from a foreign model, so the
-  // candidate scan only runs when simulation is not explicitly requested.
   if (!simulationRequested()) for (const c of CANDIDATES) {
     try {
       const res = await fetch(`${c.url}/models`, { signal: AbortSignal.timeout(700) });
       if (res.ok) {
         const data = await res.json().catch(() => ({}));
+        const models = (data?.data ?? []).map((m) => m?.id).filter((id) => typeof id === 'string' && id);
+        if (!chatModelId(models)) continue;   // a server that lists no model has nothing to answer with: not adopted (#5574)
         backend = {
           kind: 'openai-compatible',
           name: c.name,
           baseUrl: c.url,
-          models: (data?.data ?? []).map((m) => m.id),
+          models,
         };
         checkedAt = Date.now();
         return backend;
@@ -154,13 +161,12 @@ export async function detectBackend({ force = false } = {}) {
     return backend;
   }
 
-  const binary = supervisor.findBinary() ?? (await which('llama-server'));
   backend = {
     kind: 'demo',
-    name: binary ? 'llama.cpp (engine not running)' : 'Stratat demo engine',
+    name: 'Stratat demo engine',
     baseUrl: null,
     models: [],
-    binary: binary?.path ?? null,
+    binary: null,
     // Every demo frame is labelled for the UI; nothing here may be recorded as a real result.
     simulated: true,
   };
@@ -235,6 +241,8 @@ export async function streamChat({ message, history = [], systemPrompt = '', mod
       signal,
       supervised: be.kind === 'engine',
       engine,
+      // an adopted server (Ollama, LM Studio, llama.cpp) is asked for a model it listed, not the placeholder "local" (#5574)
+      ...(be.kind === 'openai-compatible' ? { modelId: chatModelId(be.models) } : {}),
     });
   }
 
@@ -281,6 +289,7 @@ export async function proxyCompletion({ baseUrl, message, history = [], systemPr
   onFrame({ type: 'start', demo: false });
 
   const reader = res.body.getReader();
+  const stopListening = cancelOnAbort(reader, signal);   // the engine's request ends when the person leaves, even if fetch's own abort is not heard (stream-abort.mjs)
   const decoder = new TextDecoder();
   let buffer = '';
   let out = null;
@@ -360,6 +369,7 @@ export async function proxyCompletion({ baseUrl, message, history = [], systemPr
   } finally {
     streaming = false;
     if (metricsTicker) clearInterval(metricsTicker);
+    stopListening();
     reader.releaseLock();
   }
 
@@ -534,4 +544,16 @@ async function demoCompletion({ message, modelLabel, onFrame, signal, engine, ca
   if (wantsPreviewExamples(message)) onFrame({ type: 'artifacts', artifacts: previewExamples });
   onFrame({ type: 'done', tokensIn: promptTokens, tokensOut: emitted, tps, durationMs, demo: true, usageSource: 'demo' });
   return { tokensIn: promptTokens, tokensOut: emitted, durationMs, tps, usageSource: 'demo' };
+}
+
+/**
+ * The start-up line "inference · ...". The worker that serves a model is only running once a model is loaded, so on a restart nothing answers
+ * at the worker's address even though the engine is installed and usable; the line says that instead of "No Stratat engine".
+ * `engine` is Control's answer (null when there is no Control, as in a source checkout).
+ */
+export function inferenceLine({ backend, engine = null, settled = true }) {
+  if (!settled) return 'unpacking the bundled engine… (about a minute the first time)';
+  if (backend?.kind !== 'unavailable' || !engine) return backend?.name ?? 'No Stratat engine';
+  if (engine.usable) return `Stratat engine${engine.engine?.version ? ' ' + engine.engine.version : ''} is installed; no model is loaded yet`;
+  return engine.notice ? `No Stratat engine for this PC. ${engine.notice}` : backend.name;
 }

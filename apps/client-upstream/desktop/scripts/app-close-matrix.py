@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The installed Windows app, closed every way, with a stub engine: nothing may be left running.
 
-    python apps/desktop/scripts/app-close-matrix.py --install <folder the installer wrote> [--scenarios all] [--report out.json]
+    python app/desktop/scripts/app-close-matrix.py --install <folder the installer wrote> [--scenarios all] [--report out.json]
 
 For each case it starts the REAL installed `strata-desktop.exe` (its window opens), loads a stub engine through the host's API
 (profile + `runtime start` under Control's owner runtime, exactly the app's path), records every process of the tree (the app,
@@ -27,7 +27,7 @@ import urllib.request
 from ctypes import wintypes
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[3] / "terminal"
 sys.path.insert(0, str(ROOT))
 
 import psutil  # noqa: E402

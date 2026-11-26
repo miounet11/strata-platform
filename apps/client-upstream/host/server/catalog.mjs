@@ -18,7 +18,8 @@ const DESIGN_VERSIONS = [
 const DESIGN_FAMILIES = [
  {id:'qwen38',family:'Qwen3.8-Flash-Next',params:30.5,contextMax:1048576,layerCount:48,experts:128,kvKbPerToken:24},
  // Architecture metadata follows Qwen's config; file sizes and speeds remain illustrative.
- {id:'qwen36',family:'Qwen3.6-35B-A3B',params:35,contextMax:262144,layerCount:40,experts:256,kvKbPerToken:20},
+ // kvKbPerToken: 47,104 B per token (strata_control/own_path_fit.py BYTES_PER_TOKEN: fp32 K / V of 11 layers + the fp16 copy, #5715)
+ {id:'qwen36',family:'Qwen3.6-35B-A3B',params:35,contextMax:262144,layerCount:40,experts:256,kvKbPerToken:46},
 ];
 const BUILT_IN_VARIANTS = process.env.STRATA_REAL_ENGINE === '1' ? REAL_VARIANTS : DESIGN_FAMILIES.flatMap(f=>DESIGN_VERSIONS.map(([quant,name,bits])=>{
  const diskGb=Math.round(f.params*bits/8*10)/10;
@@ -103,7 +104,7 @@ export function expertParams(cores = null) {
     { id: 'server.parallel', group: 'Server', label: 'Engine request slots', effect: 'This UI host dispatches one request at a time', type: 'number', value: 1, recommended: 1 },
     { id: 'server.queue', group: 'Server', label: 'Queue depth', effect: 'Requests allowed to wait', type: 'number', value: 8, recommended: 8 },
     { id: 'server.timeout', group: 'Server', label: 'Request timeout', effect: 'Seconds before a call is dropped', type: 'number', value: 600, recommended: 600 },
-    { id: 'server.cors', group: 'Server', label: 'Allow browser origins', effect: 'CORS for local web apps', type: 'toggle', value: false, recommended: false },
+    { id: 'server.cors', group: 'Server', label: 'Allow browser origins', effect: 'This switch does nothing in the app. Web pages from any site can already call the API shown under Serving. To allow only some sites, or to use the engine’s own server (port 8080), add "cors_origins": ["https://your.site"] to the model’s config file.', type: 'toggle', value: false, recommended: false },
 
     // Advanced
     { id: 'adv.rope', group: 'Advanced', label: 'RoPE scaling', effect: 'Extends context beyond training', type: 'number', value: 1, recommended: 1, advanced: true },
@@ -115,4 +116,4 @@ export function expertParams(cores = null) {
   ];
 }
 
-export const CONTEXT_TOKENS = { recommended: 131072, ...Object.fromEntries(Array.from({length:1021}, (_, i) => [`${i+4}k`, (i+4)*1024])) };
+export const CONTEXT_TOKENS = { recommended: 131072, ...Object.fromEntries(Array.from({length:1024}, (_, i) => [`${i+1}k`, (i+1)*1024])) };

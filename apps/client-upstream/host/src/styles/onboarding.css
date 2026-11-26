@@ -88,6 +88,9 @@
 .onboard-download-info{padding:18px}
 .onboard-download-counter{position:absolute;left:50%;bottom:25px;transform:translateX(-50%);display:grid;grid-template-columns:20px auto;align-items:center;gap:3px 10px;min-width:180px;padding:15px 22px;background:var(--st-surface);border:1px solid var(--st-line);border-radius:18px;box-shadow:0 12px 28px #10b98115;animation:onboard-counter-bounce 3s ease-in-out infinite}
 .onboard-download-counter>.st-icon{color:var(--st-accent-text)}.onboard-download-counter>strong{font-size:36px;line-height:1;letter-spacing:-1px;font-variant-numeric:tabular-nums}.onboard-download-counter>span{grid-column:2;font-size:11px;color:var(--st-ink-muted);white-space:nowrap}
+/* the files are already here (no number): a check mark and the words; a note under the label (part of the model is here) */
+.onboard-download-counter[data-plain]>span{grid-row:1;font-size:14px;font-weight:600;color:var(--st-ink)}
+.onboard-download-counter>small{grid-column:2;font-size:11px;color:var(--st-ink-muted);white-space:nowrap}
 .onboard-download-location{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--st-ink-muted);padding-top:15px;margin-top:15px;border-top:1px solid var(--st-line-soft)}.onboard-download-location>span{flex:1;min-width:0;display:grid;gap:5px}.onboard-download-location strong{font-size:11px;font-weight:500;color:var(--st-ink-soft);overflow-wrap:anywhere}.onboard-download-location>button{padding:5px 0;border:0;background:none;color:var(--st-accent-text);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .onboard-download-info>.onboard-download-location:first-child{padding-top:0;margin-top:0;border:0}
 .onboard-download-status{display:block;font-size:12px;line-height:1.6;margin:0 0 12px}
@@ -129,10 +132,12 @@
 .onboard-resource-honesty{font-size:11px;line-height:1.6;color:var(--st-ink-muted);margin:14px 0 16px}
 .onboard-calibration{display:flex;align-items:flex-start;gap:10px;padding:15px 17px;border:1px solid var(--st-line-soft);border-radius:12px;background:var(--st-surface-2);cursor:pointer}
 .onboard-calibration strong{font-size:11px}.onboard-calibration small{display:block;font-size:10px;line-height:1.5;color:var(--st-ink-muted);margin-top:5px}.onboard-calibration input{margin-top:2px;flex-shrink:0}.onboard-calibration-note{font-size:11px;color:var(--st-ink-muted)}
-.onboard-tune-stage:has(.onboard-tuning-status){display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+.onboard-tune-stage:has(.onboard-tuning-status){display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;gap:0 20px}
 .onboard-tune-stage:has(.onboard-tuning-status)>.onboard-art{grid-column:1;height:180px;margin:0;border-radius:20px 20px 0 0;border-bottom:0}
 .onboard-tuning-status{grid-column:1;padding:20px;border:1px solid var(--st-line);border-top:0;border-radius:0 0 20px 20px;background:var(--st-surface)}
 .onboard-tuning-status>strong{font-size:12px;line-height:1.6;display:block;margin:8px 0;overflow-wrap:anywhere}.onboard-tuning-status>small{font-size:10px;color:var(--st-ink-muted)}.onboard-tuning-status>.onboard-pulse-dot{display:none}
+.onboard-tuning-status>small.onboard-tuning-details{display:block;margin:0 0 6px}
+.onboard-version-size[data-here]{font-size:14px;white-space:normal;line-height:1.3}
 .onboard-tune-stage:has(.onboard-tuning-status)>.onboard-tour{grid-column:2;grid-row:1/3}
 .onboard-continue-anyway{display:block;text-align:center;margin:0 auto 20px;font-size:12px}
 .onboard-pulse-dot,.onboard-local-badge>span{width:6px;height:6px;background:var(--st-accent);border-radius:50%;display:inline-block;box-shadow:0 0 0 4px #10b98118;animation:onboard-glow 2.5s ease-in-out infinite}
@@ -184,9 +189,8 @@
 /* The first conversation puts the welcome and the real composer in one place. */
 .first-chat-start{width:100%;max-width:640px;margin:0 auto 30px;padding:0 16px;text-align:center}
 .first-chat-mark{position:relative;display:grid;place-items:center;width:80px;height:80px;border:1px solid var(--st-line);border-radius:24px;background:var(--st-accent-tint);box-shadow:var(--st-sh-card);margin:0 auto 28px;isolation:isolate}
-.first-chat-mark:before{content:'';position:absolute;inset:-22px;background:radial-gradient(circle,color-mix(in srgb,var(--st-accent) 12%,transparent),transparent 70%);z-index:-1;pointer-events:none;animation:first-chat-glow 4s ease-in-out infinite}
-.first-chat-status{position:absolute;right:-4px;bottom:-4px;display:grid;place-items:center;width:21px;height:21px;background:var(--st-accent);color:#171717;border:3px solid var(--st-bg);border-radius:50%}
-.first-chat-start h2{font-size:46px;font-weight:900;line-height:1.1;letter-spacing:-1.1px;margin:0 0 14px}
+.first-chat-status{position:absolute;right:-4px;bottom:-4px;display:grid;place-items:center;width:21px;height:21px;background:var(--st-accent);color:var(--st-ink);border:3px solid var(--st-bg);border-radius:50%}
+.first-chat-start h2{font-size:var(--st-fs-display);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin:0 0 14px}
 .first-chat-start>p{font-size:16px;line-height:1.6;color:var(--st-ink-muted);margin:0}
 .chatcol:has(.first-chat-start){justify-content:center;overflow:auto;padding:32px 0 clamp(40px,8vh,80px)}
 .chatcol:has(.first-chat-start)>.main__body.chat{flex:0 0 auto;overflow:visible;padding:0}
@@ -196,13 +200,12 @@
 .chatcol:has(.first-chat-start) .st-composer{background:var(--st-surface);border-color:var(--st-line);border-radius:20px}
 .chatcol:has(.first-chat-start) .st-composer:focus-within{border-color:var(--st-accent)}
 .chatcol:has(.first-chat-start) .st-composer textarea{min-height:70px;font-size:16px}
-@keyframes first-chat-glow{50%{opacity:.6;transform:scale(.95)}}
-@media(max-width:650px){.first-chat-mark{width:68px;height:68px;margin-bottom:22px}.first-chat-start{margin-bottom:26px}.first-chat-start h2{font-size:35px;letter-spacing:-.7px}.first-chat-start>p{font-size:14px}.chatcol:has(.first-chat-start){padding:24px 0 48px}.chatcol:has(.first-chat-start) .chat__inner,.chatcol:has(.first-chat-start) .composer{padding-inline:16px}}
-@media(max-height:650px){.chatcol:has(.first-chat-start){justify-content:flex-start;padding:28px 0}.first-chat-mark{width:56px;height:56px;margin-bottom:18px}.first-chat-start h2{font-size:34px}.first-chat-start{margin-bottom:20px}}
-@media(prefers-reduced-motion:reduce){.first-chat-mark:before{animation:none}}
+@media(max-width:650px){.first-chat-mark{width:68px;height:68px;margin-bottom:22px}.first-chat-start{margin-bottom:26px}.first-chat-start h2{font-size:var(--st-fs-stat);letter-spacing:-.015em}.first-chat-start>p{font-size:14px}.chatcol:has(.first-chat-start){padding:24px 0 48px}.chatcol:has(.first-chat-start) .chat__inner,.chatcol:has(.first-chat-start) .composer{padding-inline:16px}}
+@media(max-height:650px){.chatcol:has(.first-chat-start){justify-content:flex-start;padding:28px 0}.first-chat-mark{width:56px;height:56px;margin-bottom:18px}.first-chat-start h2{font-size:var(--st-fs-stat)}.first-chat-start{margin-bottom:20px}}
 
 .onboard-load-vision{margin:12px 0;padding:14px;border:1px solid var(--st-line);border-radius:12px;background:var(--st-surface-2)}
 .onboard-engine-connect{display:grid;justify-items:start;gap:14px}
+.onboard-engine-connect[data-loading] .onboard-progress{width:min(360px,100%);margin:2px 0}
 @media(max-width:700px){.onboard-load-vision>span>small{line-height:1.5}}
 
 @media(max-width:700px){.onboard-model-top{grid-template-columns:minmax(0,1fr) 145px;gap:12px}.onboard-control-label{font-size:11px}.onboard-model-picker .select{font-size:13px}.onboard-hardware{gap:15px;padding:15px}.onboard-memory-equation{gap:10px;grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr) 14px minmax(0,1fr)}.onboard-memory-value{gap:6px}.onboard-memory-value>strong{font-size:18px}.onboard-memory-value>.st-icon{width:18px!important;height:18px!important}.onboard-versions>button{padding:16px;min-height:112px;gap:15px}.onboard-version-copy strong{font-size:14px}.onboard-version-bottom{align-items:flex-start;flex-direction:column;gap:8px}.onboard-version-size{font-size:19px}.onboard-version-heading>span{font-size:10px}.onboard-download-identity{gap:7px}.onboard-download-identity>strong{font-size:12px}.onboard-download .onboard-art{height:248px}.onboard-tour-preview{min-height:225px}.onboard-tour-content>p{font-size:12px}.onboard-footer>.st-btn--primary{max-width:100%}.onboard-folder small{white-space:normal;line-height:1.5}.onboard-folder .st-btn{margin-left:32px}.onboard-tour-top>div{justify-content:space-between}}
@@ -255,3 +258,13 @@
 .engine-warning p { margin: 0; }
 .engine-warning svg { flex: none; margin-top: 1px; }
 .engine-warning small { display: block; margin-top: 4px; }
+.onboard-language{margin-left:auto;min-width:132px}
+.guided-onboarding[data-step="1"] .onboard-language{position:relative;z-index:1}
+@media(max-width:700px){.guided-onboarding[data-step="1"] .onboard-header{justify-content:space-between}.guided-onboarding[data-step="1"] .onboard-header>.brand{position:static;transform:none}.onboard-language{min-width:120px}}
+.engine-update { align-items: center; }
+.engine-update > div { flex: 1; }
+
+/* The progress bar under the words in the engine update dialog. */
+.engine-update-progress { margin-top: 12px; }
+/* the bar and its figures belong together, above the part rows (the figures used to sit under the last row, the Engine) */
+.onboard-progress-meta+.native-parts{margin-top:12px}

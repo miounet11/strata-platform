@@ -8,9 +8,8 @@
  *   searches-failed   this many web searches in a row failed (web search was limited, or could not be reached)
  *   searches          this many searches in one turn (a plan or an ordinary answer needs a handful, not dozens)
  *   rewrites          a plan turn wrote its numbered plan from "1." again this many times
- *   context           the context is nearly full: the Harness compaction did not keep up
  *
- * What the person is told is `guardNote`: fixed English sentences that are also in the interface catalog in all eight languages (the page
+ * What the person is told is `guardNote`: fixed English sentences that are also in the interface catalog in all nine languages (the page
  * translates a `delta` frame that carries `key`). Each says what happened and gives one next step.
  */
 
@@ -19,9 +18,9 @@ export const GUARD_LIMITS = Object.freeze({
   searchesPlan: 10,
   searchesTurn: 25,
   planRewrites: 4,
-  contextFraction: 0.93,
-  /** A turn that ends with no words at all and a context this full is "out of room", not "nothing to say". */
-  contextEmptyFraction: 0.85,
+  /** A goal (#4981): this many tool calls in a row failed, or one call (the same tool with the same arguments) failed this many times. */
+  goalFailedInARow: 12,
+  goalSameFailure: 4,
 });
 
 const SEARCH_TOOLS = new Set(['web_search']);
@@ -32,8 +31,13 @@ const NOTES = {
   'searches-failed': 'Web search is limited right now, so I stopped searching and went on with what I have. Try again in a minute, or add a search key in Settings → Tools → Web search.',
   searches: 'I searched a lot and stopped so this chat does not fill up. This is what I have so far. Tell me what to look into next.',
   rewrites: 'I kept rewriting the plan, so I stopped here with the latest version. Tell me what to change, or approve it.',
-  context: 'I ran out of room in this chat, so I stopped. Stratat is summarising the older messages to make space. Say “continue” to go on, or start a new chat.',
   empty: 'I stopped without writing an answer. Send your message again, or say “continue”.',
+  'work-only': 'The assistant stopped without a final answer. Its tool results are in the work log. Say “continue” to pick up from there.',
+  'repeated-work': 'The assistant kept getting the same tool result, so Stratat stopped this run. The work is kept. Say “continue” with the next step.',
+  'no-progress': 'The assistant went several steps without a new result, so Stratat stopped this run. The work is kept. Say “continue” with the next step.',
+  'repeated-thinking': 'The assistant kept repeating the same reasoning, so Stratat stopped this run. Say “continue” with the next step.',
+  'recovery-limit': 'Stratat stopped after two attempts to recover the reply. Any work already finished is kept. Say “continue” to go on.',
+  'goal-failures': 'This goal kept running into the same errors, so I paused it. Look at the last steps, fix what is in the way, then resume the goal.',
 };
 export const GUARD_NOTES = Object.freeze({ ...NOTES });
 
@@ -45,10 +49,10 @@ export function guardNote(reason) {
 
 export class TurnGuard {
   /**
-   * @param {{plan?: boolean, contextMax?: number, limits?: Partial<typeof GUARD_LIMITS>}} [options]
+   * @param {{plan?: boolean, limits?: Partial<typeof GUARD_LIMITS>}} [options]
    */
-  constructor({ plan = false, contextMax = 0, limits = {} } = {}) {
-    this.plan = plan; this.contextMax = Number(contextMax) || 0;
+  constructor({ plan = false, limits = {} } = {}) {
+    this.plan = plan;
     this.limits = { ...GUARD_LIMITS, ...limits };
     this.seen = new Set();
     this.searches = 0; this.failedInARow = 0; this.failedTotal = 0;
@@ -83,23 +87,55 @@ export class TurnGuard {
     return this.reason;
   }
 
-  /** What the context holds now (tokens of the last request). */
-  context(tokens) {
-    if (this.reason || !this.contextMax || !Number.isFinite(tokens)) return this.reason;
-    if (tokens / this.contextMax >= this.limits.contextFraction) return this.#fire('context');
-    return this.reason;
-  }
-
   /**
    * The turn is over. If the person has seen no words from it, which sentence do they get? `ended` is the Harness's turn end reason,
-   * `wrote` whether any answer text was shown, `acted` whether tool cards were shown, `contextTokens` the last request's size. Returns a reason or null.
+   * `wrote` whether any answer text was shown and `acted` whether tool cards were shown. Returns a reason or null.
    */
-  silent({ ended, wrote, contextTokens, acted = false, stoppedByPerson = false }) {
+  silent({ ended, wrote, acted = false, stoppedByPerson = false }) {
     if (this.reason) return this.reason;
     if (stoppedByPerson || wrote) return null;
     const kind = ended?.kind;
     if (kind !== 'completed' && kind !== 'max-tokens') return null;       // an error says why by itself; Stop is the person's own
-    if (this.contextMax && Number(contextTokens) / this.contextMax >= this.limits.contextEmptyFraction) return 'context';
-    return acted ? null : 'empty';                                         // cards of work done are an answer of a kind; no cards and no words is not
+    return acted ? 'work-only' : 'empty';
   }
+}
+
+/**
+ * #4981: the guard of a goal run. A goal runs for hours across many rounds, so the per-turn limits (searches, plan rewrites) do not apply to it;
+ * what stops it is failing: a goal whose tool calls kept failing ran 5 h 23 min (26 failed calls) before anyone saw it. The goal is paused
+ * (stop() pauses it, Resume picks it up) with one sentence when this many calls in a row failed, or the same call failed this many times.
+ * A call the person denied is their decision, not a failure.
+ */
+export class GoalGuard {
+  /** @param {{limits?: Partial<typeof GUARD_LIMITS>}} [options] */
+  constructor({ limits = {} } = {}) {
+    this.limits = { ...GUARD_LIMITS, ...limits };
+    this.seen = new Set();
+    this.failedInARow = 0; this.failedTotal = 0;
+    this.byCall = new Map();
+    this.reason = null;
+  }
+
+  #fire(reason) { this.reason ??= reason; return this.reason; }
+
+  /** A tool card frame (`agent-tool`), counted once when it has finished. Returns the reason to stop, or null. */
+  card(tool) {
+    if (this.reason || !tool) return this.reason;
+    const done = tool.state === 'done' || tool.state === 'error' || tool.state === 'denied';
+    const id = tool.id ?? tool.callId;
+    if (!done || id === undefined || this.seen.has(id)) return this.reason;
+    this.seen.add(id);
+    if (tool.state === 'denied') return this.reason;
+    if (tool.state !== 'error') { this.failedInARow = 0; return this.reason; }
+    this.failedInARow += 1; this.failedTotal += 1;
+    let key;
+    try { key = `${tool.name}\u0000${JSON.stringify(tool.args ?? null)}`; } catch { key = `${tool.name}\u0000?`; }
+    const same = (this.byCall.get(key) ?? 0) + 1;
+    this.byCall.set(key, same);
+    if (this.failedInARow >= this.limits.goalFailedInARow || same >= this.limits.goalSameFailure) return this.#fire('goal-failures');
+    return this.reason;
+  }
+
+  text() { return this.reason; }
+  silent() { return this.reason; }
 }

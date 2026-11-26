@@ -87,7 +87,23 @@ if [ "$VERIFY" -eq 1 ]; then
       else
         echo "      signature: $auth (verifies; Gatekeeper needs one right-click to open)"
       fi
-      status=0
+      # Verify bundled runtimes inside the signed .app (no empty placeholder folders, no foreign Windows node.exe)
+      res="$app/Contents/Resources"
+      res_ok=1
+      for req in "node/node" "control/strata.py" "control/python/bin/python3" "control/BUNDLE.json" "harness/BUNDLE.json"; do
+        if [ ! -e "$res/$req" ]; then
+          echo "      resources: MISSING $req"
+          res_ok=0
+        fi
+      done
+      if [ -e "$res/node/node.exe" ]; then
+        echo "      resources: ERROR foreign node.exe shipped inside macOS bundle"
+        res_ok=0
+      fi
+      if [ "$res_ok" -eq 1 ]; then
+        echo "      resources: node + control + harness + engine-bundle verified"
+        status=0
+      fi
     else
       echo "      signature: app inside dmg is unsigned or invalid"
     fi
@@ -110,7 +126,13 @@ if [ "$VERIFY" -eq 1 ]; then
       *.sig) echo "      signature: updater signature (verified by the app, not here)" ;;
     esac
   done
-  # A macOS app bundle inside a dmg is what actually gets signed; check it standalone too.
+  # A macOS app bundle inside a dmg is what actually gets signed; check it standalone and run --self-test.
+  if [ -z "$TARGET" ] && [ "$(uname -s)" = "Darwin" ]; then
+    case "$(uname -m)" in
+      arm64)  TARGET="aarch64-apple-darwin" ;;
+      x86_64) TARGET="x86_64-apple-darwin" ;;
+    esac
+  fi
   app="$DESKTOP/src-tauri/target/$TARGET/release/bundle/macos/$PRODUCT.app"
   if [ -d "$app" ]; then
     echo "→ $PRODUCT.app"
@@ -119,8 +141,22 @@ if [ "$VERIFY" -eq 1 ]; then
       echo "      signature: valid — $auth"
     else
       echo "      signature: invalid or absent"
+      fail=1
     fi
     echo "      identifier: $(codesign -dv "$app" 2>&1 | sed -n 's/^Identifier=//p' | head -1)"
+    bin="$app/Contents/MacOS/stratat-desktop"
+    if [ -x "$bin" ]; then
+      report="$(mktemp -t stratat-self-test).json"
+      echo "→ running packaged --self-test"
+      if "$bin" --self-test="$report" >/dev/null; then
+        echo "      self-test: PASSED ($(node -e "const r=require('$report'); console.log(r.steps.length + '/' + r.steps.length + ' steps ok')"))"
+      else
+        echo "      self-test: FAILED"
+        cat "$report" >&2 || true
+        fail=1
+      fi
+      rm -f "$report"
+    fi
   fi
   [ "$fail" -eq 0 ] || { echo "✗ verification failed" >&2; exit 1; }
   echo "✓ verification passed"
@@ -140,19 +176,9 @@ fi
 
 echo "→ $PRODUCT $VERSION for $TARGET"
 
-# The bundle ships a private Node runtime; it is not committed.
-NODE_TARGET=""
-case "$TARGET" in
-  *windows*) NODE_TARGET="win-x64" ;;
-  aarch64-apple-darwin) NODE_TARGET="darwin-arm64" ;;
-  x86_64-apple-darwin)  NODE_TARGET="darwin-x64" ;;
-  *linux*) NODE_TARGET="linux-x64" ;;
-esac
-( cd "$DESKTOP" && bash scripts/fetch-node.sh --target "$NODE_TARGET" )
-for d in harness control engine-bundle; do
-  mkdir -p "$DESKTOP/src-tauri/resources/$d"
-  [ -f "$DESKTOP/src-tauri/resources/$d/.gitignore" ] || printf '*\n!.gitignore\n' > "$DESKTOP/src-tauri/resources/$d/.gitignore"
-done
+# Stage ALL verified bundled runtimes (private Node, Control 0.1.69, DeepSeek Harness + Playwright MCP,
+# and Apple Metal engines on arm64) and prune foreign-OS binaries.
+node "$HERE/stage-desktop-resources.mjs" --target "$TARGET"
 
 # The host UI is what the shell renders; build it before the shell.
 ( cd "$DESKTOP" && npm run build:ui )

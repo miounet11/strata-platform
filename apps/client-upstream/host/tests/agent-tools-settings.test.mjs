@@ -79,7 +79,7 @@ test('Tools: the person\'s own tools are checked in plain words and saved with t
     assert.throws(() => tools.addCustom({ name: 'release notes', about: 'a', kind: 'instructions', instructions: 'y' }), /already have a tool/);
     const p = tools.profileView();
     assert.equal(p.hasInstructionTools && p.hasCommandTools, true);
-    assert.deepEqual(p.servers, { 'custom-issue-tracker': { url: 'https://issues.example/mcp' } });
+    assert.deepEqual(p.servers, { 'custom-issue-tracker': { url: 'https://issues.example/mcp', timeoutSec: 120 } });
     const file = JSON.parse(readFileSync(tools.filePath, 'utf8'));
     assert.deepEqual(Object.keys(file.instructions), ['release_notes']); assert.deepEqual(Object.keys(file.commands), ['check_site']);
     v = tools.update({ custom: { check_site: false } });
@@ -143,6 +143,19 @@ test('profile: the person\'s instruction and command tools are the app\'s own to
     assert.deepEqual(rows.map(r => r.config.serverName).sort(), ['custom-remote', 'strata-commands', 'strata-instructions']);
     const own = rows.find(r => r.config.serverName === 'strata-commands').config;
     assert.deepEqual([own.command, own.args[0], own.args[1]], [process.execPath, CUSTOM_TOOLS_SCRIPT, 'commands']);
+    const remote = rows.find(r => r.config.serverName === 'custom-remote').config;
+    assert.equal(remote.toolCallTimeoutMs, 120000);
+  } finally { cleanup(dir); }
+});
+
+test('profile: MCP servers forward custom timeoutSec as toolCallTimeoutMs', () => {
+  const dir = tmp();
+  try {
+    const { tools } = make(dir);
+    tools.addCustom({ name: 'Long Job', about: 'a', kind: 'server', address: 'https://r.example/mcp', timeoutSec: 600 });
+    const e = entriesOf(buildProfile({ local: [], connections: [], tools: tools.profileView() }));
+    const row = e.flatMap(x => x.insert ?? []).find(r => r.name === '@deepseek-ai/dsh-mcp-client' && r.config.serverName === 'custom-long-job');
+    assert.equal(row.config.toolCallTimeoutMs, 600000);
   } finally { cleanup(dir); }
 });
 
@@ -202,9 +215,9 @@ test('search: polite by design: one request at a time, spaced out, a minute limi
     now: () => clock, sleep: async ms => { waits.push(ms); clock += ms; },
     fetch: async (url, init) => { calls++; assert.equal(init.method, 'POST'); assert.match(init.headers['user-agent'], /Mozilla/); assert.match(String(url), /duckduckgo\.com/); return new Response(HTML, { status: 200 }); },
   });
-  const a = await provider.search({ query: 'Stratat engine', maxResults: 1 });
+  const a = await provider.search({ query: 'Strata engine', maxResults: 1 });
   assert.equal(a.sources.length, 1);
-  await provider.search({ query: 'STRATAT ENGINE' });         // same words, other case: from the cache
+  await provider.search({ query: 'strata ENGINE' });          // same words: from the cache
   assert.equal(calls, 1);
   await provider.search({ query: 'another one' });
   assert.equal(calls, 2); assert.ok(waits.some(ms => ms >= 1400), 'the second request waited for the gap');

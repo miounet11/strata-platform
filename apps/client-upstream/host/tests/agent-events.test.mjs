@@ -1,9 +1,9 @@
 /** Pure parts of the agent bridge: profile generation, environment scrubbing, event projection. No Harness needed. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildProfile, outputBudget, routeFor, ASSUMED_API_CONTEXT } from '../server/agent/profile.mjs';
+import { buildProfile, outputBudget, compactionHeadroom, routeFor, ASSUMED_API_CONTEXT } from '../server/agent/profile.mjs';
 import { agentEnvironment, redact } from '../server/agent/harness-runtime.mjs';
-import { TurnProjector, presentTool, toolScope, toolVerb, friendlyFailure } from '../server/agent/events.mjs';
+import { TurnProjector, presentTool, toolScope, toolVerb, friendlyFailure, baselineItems } from '../server/agent/events.mjs';
 import { withEarlierConversation } from '../server/agent/agent-bridge.mjs';
 
 const local = [{ id: 'inst-1', label: 'Qwen', baseUrl: 'http://127.0.0.1:8095/v1', modelId: 'qwen', context: 32768, key: 'local-secret-key-1' }];
@@ -56,11 +56,13 @@ test('routeFor picks the chat\'s own choice', () => {
   assert.equal(outputBudget(200_000, 64_000), 64_000, 'the connection own maximum is used when known');
   assert.equal(outputBudget(8192, 64_000), 8192 - 2048, 'a known maximum is still bounded by the window');
   assert.equal(outputBudget(200_000, 4096), 4096, 'a small known maximum is respected');
+  assert.equal(outputBudget(200_000, 512), 512, 'a provider maximum below 1K is still respected');
+  assert.equal(outputBudget(512), 384, 'an advertised tiny window still reserves prompt room');
 });
 
 test('the agent environment keeps what a shell needs and drops ambient credentials', () => {
   const env = agentEnvironment({ PATH: '/bin', HOME: '/h', OPENAI_API_KEY: 'x', GITHUB_TOKEN: 'y', AWS_SECRET_ACCESS_KEY: 'z', SSH_AUTH_SOCK: 's', SystemRoot: 'C:\\Windows' }, { STRATA_API_KEY_X: 'k' });
-  assert.deepEqual(Object.keys(env).sort(), ['DSH_PERMISSION_MODE', 'DSH_TELEMETRY_DISABLED', 'HOME', 'PATH', 'STRATA_API_KEY_X', 'SystemRoot']);
+  assert.deepEqual(Object.keys(env).sort(), ['DSH_PERMISSION_MODE', 'DSH_TELEMETRY_DISABLED', 'HOME', 'NODE_USE_SYSTEM_CA', 'PATH', 'STRATA_API_KEY_X', 'SystemRoot']);
 });
 
 test('redact removes secret values and launch tokens from log text', () => {
@@ -122,6 +124,52 @@ test('a text the live frames missed is completed from the committed message, onc
   assert.deepEqual(p.consume(ev('assistant/message', { message: { content: [{ type: 'text', text: 'Hello there' }] } })), []);
 });
 
+test('a turn followed after it began shows a committed reply no live frame carried, once; an ordinary turn does not', () => {
+  const said = { message: { content: [{ type: 'text', text: 'The job finished and printed 42.' }] } };
+  const late = new TurnProjector({ catchUp: true });
+  assert.deepEqual(late.consume(ev('assistant/message', said)), [{ type: 'delta', text: 'The job finished and printed 42.' }]);
+  assert.equal(late.emittedAny, true, 'it counts as written, so the turn guard does not call the turn silent');
+  // The next step is heard live: its committed message adds nothing (the bridge itself drops an event it has seen, by seq).
+  assert.deepEqual(late.consume({ type: 'assistant-stream', frame: { type: 'chunk', attemptId: 'a:2', chunk: { type: 'text-delta', index: 0, text: ' Done.' } } }), [{ type: 'delta', text: ' Done.' }]);
+  assert.deepEqual(late.consume(ev('assistant/message', { message: { content: [{ type: 'text', text: ' Done.' }] } }, 2)), [], 'and nothing twice');
+  // An ordinary turn hears its reply live from the start: a committed message with no live text is not repeated as new.
+  assert.deepEqual(new TurnProjector().consume(ev('assistant/message', said)), []);
+});
+
+test('the snapshot baseline of a reply in progress becomes the live pieces, and the committed reply adds only the rest', () => {
+  const baseline = { revision: 4, activeAttempt: { attemptId: 'att-9', startedAfterSeq: 12, turn: 2, step: 1, nextIndex: 6, stream: [
+    { type: 'reasoning-chunks', time0: 1, index: 0, dt: [1], texts: ['Reading ', 'the log.'] },
+    { type: 'text-chunks', time0: 3, index: 1, dt: [1], texts: ['The job ', 'finished'] },
+    { type: 'tool-call-chunks', time0: 5, index: 2, dt: [1], id: 'call-1', name: 'write', args: ['{"file_path":', '"out.txt"}'] },
+    { type: 'chunk', time: 7, chunk: { type: 'usage', usage: { inputTokens: 10, outputTokens: 4 } } },
+  ] } };
+  const items = baselineItems(baseline);
+  assert.ok(items.every(i => i.type === 'assistant-stream' && i.frame.type === 'chunk' && i.frame.attemptId === 'att-9'));
+  assert.deepEqual(items.map(i => i.frame.chunk), [
+    { type: 'reasoning-delta', index: 0, text: 'Reading ' },
+    { type: 'reasoning-delta', index: 0, text: 'the log.' },
+    { type: 'text-delta', index: 1, text: 'The job ' },
+    { type: 'text-delta', index: 1, text: 'finished' },
+    { type: 'tool-call-delta', index: 2, id: 'call-1', name: 'write', argumentsDelta: '{"file_path":' },
+    { type: 'tool-call-delta', index: 2, id: 'call-1', argumentsDelta: '"out.txt"}' },
+    { type: 'usage', usage: { inputTokens: 10, outputTokens: 4 } },
+  ]);
+
+  const p = new TurnProjector({ catchUp: true });
+  const out = items.flatMap(i => p.consume(i));
+  assert.equal(out.filter(f => f.type === 'delta').map(f => f.text).join(''), 'The job finished');
+  assert.equal(out.filter(f => f.type === 'reasoning').map(f => f.text).join(''), 'Reading the log.');
+  // The rest arrives live under the same attempt, then the committed reply: nothing is shown twice.
+  p.consume({ type: 'assistant-stream', frame: { type: 'chunk', attemptId: 'att-9', chunk: { type: 'text-delta', index: 1, text: ' and printed 42.' } } });
+  assert.deepEqual(p.consume(ev('assistant/message', { message: { content: [{ type: 'text', text: 'The job finished and printed 42.' }] } })), []);
+});
+
+test('a snapshot with no reply in progress, or none at all, gives nothing', () => {
+  assert.deepEqual(baselineItems(undefined), []);
+  assert.deepEqual(baselineItems({ revision: 3 }), []);
+  assert.deepEqual(baselineItems({ revision: 3, activeAttempt: { attemptId: 'a', stream: [] } }), []);
+});
+
 test('tool scopes and previews', () => {
   assert.equal(toolScope('write'), 'write'); assert.equal(toolScope('grep'), 'read'); assert.equal(toolScope('web_fetch'), 'connected');
   assert.equal(presentTool({ callId: 'x', name: 'write', args: { file_path: 'a.txt' } }).preview, 'a.txt');
@@ -138,7 +186,7 @@ test('a chat that existed before the agent carries a bounded summary into its fi
 
 test('the browser and the person\'s own tools have plain sentences, translated in every language', async () => {
   const { readFileSync } = await import('node:fs');
-  const catalog = Object.fromEntries(['en', 'de', 'es', 'ja', 'ko', 'pt', 'ru', 'zh'].map(l => [l, JSON.parse(readFileSync(new URL(`../src/locales/${l}.json`, import.meta.url), 'utf8'))]));
+  const catalog = Object.fromEntries(['en', 'de', 'es', 'fr', 'ja', 'ko', 'pt', 'ru', 'zh'].map(l => [l, JSON.parse(readFileSync(new URL(`../src/locales/${l}.json`, import.meta.url), 'utf8'))]));
   const idOf = text => Object.entries(catalog.en).find(([, v]) => v === text)?.[0];
   const cases = [
     ['mcp__browser__browser_navigate', 'Opening a page in the browser', 'Opened a page in the browser', "Couldn't open the page"],
@@ -157,7 +205,7 @@ test('the browser and the person\'s own tools have plain sentences, translated i
   ];
   for (const [name, running, done, failed] of cases) {
     assert.equal(toolVerb(name, 'running'), running, name); assert.equal(toolVerb(name, 'done'), done, name); assert.equal(toolVerb(name, 'error'), failed, name);
-    for (const text of [running, done, failed]) { const id = idOf(text); assert.ok(id, `${text} is in the catalog`); for (const l of ['de', 'es', 'ja', 'ko', 'pt', 'ru', 'zh']) assert.ok(catalog[l][id]?.trim(), `${l}: ${text}`); }
+    for (const text of [running, done, failed]) { const id = idOf(text); assert.ok(id, `${text} is in the catalog`); for (const l of ['de', 'es', 'fr', 'ja', 'ko', 'pt', 'ru', 'zh']) assert.ok(catalog[l][id]?.trim(), `${l}: ${text}`); }
   }
   const nav = presentTool({ callId: 'c1', name: 'mcp__browser__browser_navigate', args: { url: 'https://example.com' } });
   assert.equal(nav.target, 'https://example.com'); assert.equal(nav.verb, 'Opening a page in the browser');
@@ -175,4 +223,15 @@ test('an API model\'s route gets a generous answer room, or the connection\'s ow
   const models = Object.values(providers)[0].models;
   const by = Object.fromEntries(models.map(m => [m.id, m.maxTokens]));
   assert.equal(by.unknown, 32768); assert.equal(by.big, 64_000); assert.equal(by.small, 16_384 - 4096);
+});
+
+// #5011: a cloud model whose provider says it may write as much as its window (128K window, 128K maximum output) reserved almost the whole
+// window for every reply, so the conversation was compacted after about 4K tokens of prompt. The reply keeps the larger of 32K and half the window.
+test('a provider maximum as large as the window does not leave the prompt a few thousand tokens before compaction (#5011)', () => {
+  assert.equal(outputBudget(131_072, 131_072), 65_536);
+  const promptRoom = 131_072 - outputBudget(131_072, 131_072) - compactionHeadroom(131_072, outputBudget(131_072, 131_072));
+  assert.ok(promptRoom > 50_000, `prompt room before compaction: ${promptRoom}`);
+  assert.equal(outputBudget(1_000_000, 128_000), 128_000, 'a very large window keeps a large known maximum');
+  assert.equal(outputBudget(200_000, 64_000), 64_000);
+  assert.equal(outputBudget(null, 100_000), 100_000, 'an unknown window: the known maximum as before');
 });

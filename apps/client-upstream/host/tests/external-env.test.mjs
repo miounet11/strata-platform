@@ -10,7 +10,7 @@ import { externalEnvironment, recordedOriginal, withoutAppImage } from '../serve
 import { chooseFolder, chooserUnavailable, portalFolder } from '../server/folder-dialog.mjs';
 import { agentEnvironment } from '../server/agent/harness-runtime.mjs';
 
-const APPDIR = '/tmp/.mount_StratatAbc';
+const APPDIR = '/tmp/.mount_StrataAbc';
 const leaky = {
   APPDIR, APPIMAGE: '/home/u/Stratat.AppImage', ARGV0: 'Stratat',
   LD_LIBRARY_PATH: `${APPDIR}/usr/lib:${APPDIR}/usr/lib/x86_64-linux-gnu:/opt/cuda/lib64`,

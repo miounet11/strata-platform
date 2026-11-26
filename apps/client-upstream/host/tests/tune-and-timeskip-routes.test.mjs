@@ -1,3 +1,4 @@
+import { terminalRoot } from './helpers/terminal-root.mjs';
 import { fileURLToPath } from 'node:url';
 /**
  * The tuning and Time-skip client routes.
@@ -20,14 +21,9 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { existsSync } from 'node:fs';
 
 const HOST = fileURLToPath(new URL('../server/index.mjs',import.meta.url));
-const HOST_DIR = fileURLToPath(new URL('..',import.meta.url));
-// The tuning plan is computed by the engine's own `strata.py`. A client-only fork ships without the
-// engine, so this contract test has nothing to drive and says so instead of failing.
-const ENGINE = process.env.STRATA_ENGINE_DIR || resolve(HOST_DIR, '..', '..', '..');
-const noEngine = existsSync(join(ENGINE, 'strata.py')) ? false : 'the engine checkout (strata.py) is not part of this client-only fork';
+const REPO = terminalRoot();
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -45,11 +41,14 @@ async function startHost({ python } = {}) {
   const home = await mkdtemp(join(tmpdir(), 'strata-tune-routes-'));
   await mkdir(join(home, 'data'), { recursive: true });
   const port = await listenFree();
-  const child = spawn(process.execPath, [HOST, '--dist', join(HOST_DIR, 'dist')], {
-    cwd: HOST_DIR,
+  const child = spawn(process.execPath, [HOST, '--dist', resolve(fileURLToPath(new URL('.', import.meta.url)), '..', 'dist')], {
+    cwd: resolve(fileURLToPath(new URL('.', import.meta.url)), '..'),
     env: {
       ...process.env,
       STRATA_HOME: home,
+      STRATA_CONTROL_DIR: REPO,
+      STRATA_COMPONENTS_DIR: join(home, 'components'),
+      STRATA_NO_BUNDLED_ENGINE: '1',
       // the Time-skip runs of whoever uses this PC live in their own state folder; a test must not read (or write) them
       STRATA_TIMESKIP_DIR: join(home, 'time-skip'),
       STRATA_PORT: String(port),
@@ -86,13 +85,24 @@ test('an unconfigured engine is reported as unavailable rather than guessed at',
   }
 });
 
-test('the tuning plan comes from the engine binary and excludes what it cannot accept', { timeout: 60000, skip: noEngine }, async () => {
+test('the tuning plan comes from the engine binary and excludes what it cannot accept', { timeout: 60000 }, async () => {
   // A stub engine that accepts exactly two of the flags the static table knows about. The plan must
   // offer only those two, and must name each exclusion.
   const dir = await mkdtemp(join(tmpdir(), 'strata-tune-stub-'));
   // A Python stub, run by Stratat Control as [python, stub.py] on every OS (a #! script is WinError 193 on Windows).
   const engine = join(dir, 'strata-stub.py');
-  await writeFile(engine, 'import sys\nfor line in ("usage:", "  --kv KV", "  --ple-io MODE"):\n    print(line, file=sys.stderr)\n');
+  // Like the engine's parser, it names an argument it does not know ("unknown argument: --x"): the tuner asks the binary about
+  // every flag its --help does not list (#4652), and a stub that answered every call with its usage "accepted" them all.
+  await writeFile(engine, [
+    'import sys',
+    'for a in sys.argv[1:]:',
+    '    if a not in ("--help", "--kv", "--ple-io"):',
+    '        print("unknown argument: " + a, file=sys.stderr)',
+    '        sys.exit(1)',
+    'for line in ("usage:", "  --kv KV", "  --ple-io MODE"):',
+    '    print(line, file=sys.stderr)',
+    '',
+  ].join('\n'));
 
   const { child, base } = await startHost();
   try {

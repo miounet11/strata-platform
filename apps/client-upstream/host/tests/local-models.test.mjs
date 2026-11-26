@@ -22,7 +22,7 @@ test('bounded reader gets real metadata and rejects fake extensions, partial ten
  ggufFixture(file,{extra:[['general.name',8,'duplicate']]});assert.throws(()=>readGGUF(file),/duplicate/);
  ggufFixture(file,{arch:'clip'});assert.throws(()=>inspectLocalModel(file),/architecture.*not supported/);
  ggufFixture(file,{tensorCount:0});assert.throws(()=>inspectLocalModel(file),/missing tensors/);
- ggufFixture(file,{context:1024});assert.throws(()=>inspectLocalModel(file),/context_length/);
+ ggufFixture(file,{context:512});assert.throws(()=>inspectLocalModel(file),/context_length/);
  const oversized=Buffer.alloc(24);oversized.write('GGUF');oversized.writeUInt32LE(3,4);oversized.writeBigUInt64LE(2n**63n,8);writeFileSync(file,oversized);assert.throws(()=>readGGUF(file),/unsupported integer/);
 });
 
@@ -79,4 +79,10 @@ test('HTTP import leaves the running model intact, loads through normal controls
  assert.equal((await call(`/api/models/${id}`,undefined,'DELETE')).status,200);assert.ok(readFileSync(file).length>0);assert.equal((await call('/api/models')).body.variants.some(v=>v.id===id),false);
  assert.equal((await call('/api/runtime')).body.instances.length,0);
  } finally {host.kill('SIGTERM');await new Promise(r=>host.once('exit',r));}
+});
+test('the Flash-Next family\'s own architecture (qwen4exp) is accepted by the importer, not sent to llama-server (#4726)',t=>{
+ const root=fixture(t),file=join(root,'flash-next.gguf');
+ ggufFixture(file,{arch:'qwen4exp'});
+ const info=inspectLocalModel(file);
+ assert.equal(info.variant.local.architecture,'qwen4exp');
 });

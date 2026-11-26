@@ -6,7 +6,7 @@
  * per saved API connection, so that each chat can pick its own model. This module writes the same two
  * Cordis entries (`agent-default-model`, `llm-pi-ai`) for the current set.
  *
- * Rules carried over from the integration notes (docs/work/IMPLEMENTATION_STATUS.md section 1.8):
+ * Rules carried over from the integration notes (history/docs/work/IMPLEMENTATION_STATUS.md section 1.8):
  *   - `llm-pi-ai` config is `{ providers: { "<route>": {...} } }`; a route key at the top level is
  *     silently ignored.
  *   - the output budget must fit the whole request, so `maxTokens` is derived from the real context.
@@ -20,6 +20,7 @@
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { standardPreset } from './preset.mjs';
+import { validMcpName } from '../mcp-names.mjs';
 import { BUDGETS, isPrivateHost } from './llm-shape.mjs';
 import { DDG_PROVIDER_ID } from '../web-search-ddg.mjs';
 
@@ -55,37 +56,82 @@ export const modeOf = value => (Object.hasOwn(MODE_PRESETS, value) ? value : DEF
 /** The approval gate plugin (plain ESM, loaded by absolute path). */
 export const GATE_PLUGIN = fileURLToPath(new URL('./plugins/strata-gate.mjs', import.meta.url));
 /** The app's web search (DuckDuckGo, or the person's own Exa / Perplexity key), registered with the Harness's web seam. */
+/** Compaction that measures the real prompt and summarises in pieces that fit the window (plugins/strata-context.mjs). */
+export const CONTEXT_PLUGIN = fileURLToPath(new URL('./plugins/strata-context.mjs', import.meta.url));
+const WORKING_MEMORY_PLUGIN = fileURLToPath(new URL('./plugins/strata-working-memory.mjs', import.meta.url));
+const EDIT_RECOVERY_PLUGIN = fileURLToPath(new URL('./plugins/strata-edit-recovery.mjs', import.meta.url));
 export const MODELS_PLUGIN = fileURLToPath(new URL('./plugins/strata-models.mjs', import.meta.url));
+const QUESTIONS_PLUGIN = fileURLToPath(new URL('./plugins/strata-questions.mjs', import.meta.url));
 export const SEARCH_PLUGIN = fileURLToPath(new URL('./plugins/strata-search.mjs', import.meta.url));
 /** The app's own tool server for the tools a person writes (instructions, commands). */
 export const CUSTOM_TOOLS_SCRIPT = fileURLToPath(new URL('./custom-tools-mcp.mjs', import.meta.url));
+/** Run as administrator (#5968): the app's one-tool server that asks Windows for the rights, one command at a time. */
+export const ADMIN_TOOL_SCRIPT = fileURLToPath(new URL('./admin-tool-mcp.mjs', import.meta.url));
+
+/** The search service as the person knows it, for the question that comes before the first web search in a chat. */
+const SEARCH_NAMES = Object.freeze({ builtin: 'DuckDuckGo, or Bing when DuckDuckGo is busy', exa: 'Exa', perplexity: 'Perplexity', deepseek: 'DeepSeek' });
 
 /** What Settings -> Tools says when nothing was chosen. */
-const NO_TOOLS_SETTINGS = Object.freeze({ off: new Set(), search: { provider: 'builtin', key: '' }, browserEnabled: false, browserPath: null, browserCli: null, servers: {}, hasInstructionTools: false, hasCommandTools: false, toolFile: null });
+const NO_TOOLS_SETTINGS = Object.freeze({ off: new Set(), search: { provider: 'builtin', key: '' }, webWithoutAsking: false, browserEnabled: false, browserPath: null, browserCli: null, servers: {}, hasInstructionTools: false, hasCommandTools: false, runAsAdminEnabled: false, blockedFolders: [], toolFile: null });
 
 /**
  * The tool servers (MCP) set up for the model in Settings, as Harness client rows. Their tools appear to the agent as
  * `mcp__<server>__<tool>`. A command or URL goes into the patch as text; a secret (an env value or a header) never does: the row
  * carries `!!js process.env.<NAME>` and the value travels in the agent process's environment (returned in `env`).
  */
-export function mcpRows(servers, env) {
+export function mcpRows(servers, env, skipped = []) {
   const rows = [];
+  const ids = new Set();
   let index = 0;
   for (const [name, server] of Object.entries(servers ?? {})) {
-    if (!server || server.disabled === true || !/^[A-Za-z0-9_-]{1,32}$/.test(name)) continue;
+    if (!server || server.disabled === true) continue;       // switched off on purpose: not an error
+    // A server that cannot be wired is REPORTED (T6): the model never sees its tools, and a silent drop looked like "the tool does not work".
+    if (!validMcpName(name)) { skipped.push({ name, why: 'name' }); continue; }
+    if (!server.command && !server.url) { skipped.push({ name, why: 'address' }); continue; }
+    if (ids.has(`mcp-${slug(name)}`)) { skipped.push({ name, why: 'duplicate' }); continue; }
+    ids.add(`mcp-${slug(name)}`);
     const token = (kind, key, value) => {
       const variable = `STRATA_MCP_${index}_${kind}_${slug(key).replace(/-/g, '_').toUpperCase()}`;
       env[variable] = String(value);
       return `@@JS:process.env.${variable}@@`;
     };
-    const config = { serverName: name, ...(server.command
-      ? { transport: 'stdio', command: String(server.command), args: Array.isArray(server.args) ? server.args.map(String) : [], ...(server.cwd ? { cwd: String(server.cwd) } : {}),
-        ...(server.env && Object.keys(server.env).length ? { env: Object.fromEntries(Object.entries(server.env).map(([k, v]) => [k, token('E', k, v)])) } : {}) }
-      : { transport: 'streamable-http', url: String(server.url), ...(server.headers && Object.keys(server.headers).length ? { headers: Object.fromEntries(Object.entries(server.headers).map(([k, v]) => [k, token('H', k, v)])) } : {}) }) };
+    const rawTimeoutSec = server.timeoutSec ?? server.timeout_s ?? server.timeout;
+    const envTimeoutMs = process.env.STRATA_MCP_TIMEOUT_MS && Number(process.env.STRATA_MCP_TIMEOUT_MS) > 0
+      ? Math.round(Number(process.env.STRATA_MCP_TIMEOUT_MS))
+      : undefined;
+    const timeoutMs = Number(rawTimeoutSec) > 0
+      ? Math.round(Number(rawTimeoutSec) * 1000)
+      : (Number(server.toolCallTimeoutMs) > 0 ? Math.round(Number(server.toolCallTimeoutMs)) : envTimeoutMs);
+    const config = {
+      serverName: name,
+      ...(timeoutMs ? { toolCallTimeoutMs: timeoutMs } : {}),
+      ...(server.command
+        ? { transport: 'stdio', command: String(server.command), args: Array.isArray(server.args) ? server.args.map(String) : [], ...(server.cwd ? { cwd: String(server.cwd) } : {}),
+          ...(server.env && Object.keys(server.env).length ? { env: Object.fromEntries(Object.entries(server.env).map(([k, v]) => [k, token('E', k, v)])) } : {}) }
+        : { transport: 'streamable-http', url: String(server.url), ...(server.headers && Object.keys(server.headers).length ? { headers: Object.fromEntries(Object.entries(server.headers).map(([k, v]) => [k, token('H', k, v)])) } : {}) }),
+    };
     rows.push({ id: `mcp-${slug(name)}`, name: '@deepseek-ai/dsh-mcp-client', config });
     index += 1;
   }
   return rows;
+}
+
+/**
+ * What the chat says when a tool server was left out (one notice per reason). The sentences are interface copy: they are in every language's
+ * catalog (src/locales/tools-<lang>.json), and the {0} is the list of names exactly as the person wrote them.
+ */
+const SKIPPED_TEXT = {
+  name: 'These tool servers were left out because their names are not allowed: {0}. A name can have up to 32 letters, numbers, hyphens or underscores.',
+  address: 'These tool servers were left out because they have no program or web address: {0}.',
+  duplicate: 'These tool servers were left out because another one has almost the same name: {0}.',
+};
+export function mcpSkippedNotices(skipped) {
+  const out = [];
+  for (const why of Object.keys(SKIPPED_TEXT)) {
+    const names = (skipped ?? []).filter(s => s.why === why).map(s => String(s.name).slice(0, 40));
+    if (names.length) out.push({ code: `mcp-skipped-${why}-${names.join(',')}`.slice(0, 160), message: SKIPPED_TEXT[why].replace('{0}', names.join(', ')) });
+  }
+  return out;
 }
 
 const slug = value => String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 24) || 'x';
@@ -118,9 +164,64 @@ export function localOutputBudget(context) {
  * which on a local window of 32K to 128K leaves no room at all (it then reports a configuration error once and never compacts). An eighth
  * of what the window has left after the reply's room works from 16K up to the largest windows. Compaction then starts at about 60 percent.
  */
-export function compactionHeadroom(context, outputBudget) {
+export function compactionHeadroom(context, outputBudget, env = process.env) {
   const room = Math.max(0, (Number.isFinite(context) && context > 0 ? context : 32768) - outputBudget);
-  return Math.max(512, Math.min(65536, Math.floor(room * 0.125)));
+  return Math.max(512, Math.min(65536, Math.floor(room * headroomFraction(env))));
+}
+
+/**
+ * The pressure fraction at which compaction starts, the Harness's own default (compaction-basic `thresholdRatio`, 0.8).
+ * `STRATA_COMPACTION_THRESHOLD_RATIO` (0.1..0.99) moves it: on a large window the fraction, not the headroom, is what
+ * decides, so 0.8 makes a 256K chat summarise its history at 204K tokens. A value outside the range is ignored.
+ */
+export const DEFAULT_THRESHOLD_RATIO = 0.8;
+
+/**
+ * The person's own choice in the app (Settings -> "Summarize older messages"), set by the host from its saved settings.
+ * It sets the whole choice: a name left null means "not chosen", so the environment and then the default still apply for
+ * it, and an operator's `STRATA_COMPACTION_*` keep working until the person touches the control.
+ */
+let chosen = { thresholdRatio: null, headroomFraction: null };
+/**
+ * A saved or sent value as a number, or null. Only a real number counts: `Number(null)` is 0, and 0 is a legal
+ * headroom, so an unset setting would otherwise quietly become "keep no room at all".
+ */
+export function compactionNumber(value, min, max) {
+  if (value === null || value === undefined || value === '' || typeof value === 'boolean') return null;
+  const n = typeof value === 'number' ? value : Number.parseFloat(String(value));
+  return Number.isFinite(n) && n >= min && n <= max ? n : null;
+}
+export function setCompactionChoice(next = {}) {
+  chosen = {
+    thresholdRatio: compactionNumber(next?.thresholdRatio, 0.1, 0.99),
+    headroomFraction: compactionNumber(next?.headroomFraction, 0, 0.5),
+  };
+  return { ...chosen };
+}
+export const compactionChoice = () => ({ ...chosen });
+
+export function thresholdRatio(env = process.env) {
+  if (chosen.thresholdRatio !== null) return chosen.thresholdRatio;
+  const v = Number.parseFloat(env?.STRATA_COMPACTION_THRESHOLD_RATIO);
+  return Number.isFinite(v) && v >= 0.1 && v <= 0.99 ? v : DEFAULT_THRESHOLD_RATIO;
+}
+
+/** The fraction of the room left after the reply that compaction keeps free; `STRATA_COMPACTION_HEADROOM_FRACTION` (0..0.5) moves it from the default 0.125. */
+export const DEFAULT_HEADROOM_FRACTION = 0.125;
+export function headroomFraction(env = process.env) {
+  if (chosen.headroomFraction !== null) return chosen.headroomFraction;
+  const v = Number.parseFloat(env?.STRATA_COMPACTION_HEADROOM_FRACTION);
+  return Number.isFinite(v) && v >= 0 && v <= 0.5 ? v : DEFAULT_HEADROOM_FRACTION;
+}
+
+/**
+ * Where compaction starts on one window, in real tokens: the smaller of the pressure fraction and the room the window has
+ * after the reply and the headroom. The same arithmetic the Harness applies (compaction-basic resolveCompactSpec), so the
+ * app's pre-send check and the Harness's own step-boundary check agree.
+ */
+export function compactionThreshold(context, outputBudget, env = process.env) {
+  const w = Number.isFinite(context) && context > 0 ? context : 32768;
+  return Math.floor(Math.min(w * thresholdRatio(env), w - outputBudget - compactionHeadroom(w, outputBudget, env)));
 }
 
 /**
@@ -128,16 +229,46 @@ export function compactionHeadroom(context, outputBudget) {
  * chat_template_kwargs.enable_thinking false; the rest send it true plus reasoning_effort (the server maps high and max to its top level).
  */
 export const LOCAL_EFFORTS = Object.freeze({ off: null, low: 'low', medium: 'medium', high: 'high', max: 'high' });
+/** Thinking levels for Tencent Hy4-Flash: Off, High (default), Max (passes max through to strata-hy4's max reasoning budget). */
+export const HY4_LOCAL_EFFORTS = Object.freeze({ off: null, low: 'high', medium: 'high', high: 'high', max: 'max' });
+/** Inkling-2-Mini thinks (0.2.21). The server's levels: none/off 0, minimal 0.1, low 0.2, medium 0.7, high 0.9, xhigh and max 0.99. The menu's words go through as they are (Off sends enable_thinking false and no effort), Max as "max" (the other local models' server maps Max to high). */
+export const INKLING_LOCAL_EFFORTS = Object.freeze({ off: null, low: 'low', medium: 'medium', high: 'high', max: 'max' });
 /** The menu's words to the Harness's level names. */
-export const EFFORT_LEVEL = Object.freeze({ off: 'off', low: 'low', medium: 'medium', high: 'high', max: 'max' });
+export const EFFORT_LEVEL = Object.freeze({ off: 'off', minimal: 'minimal', low: 'low', medium: 'medium', high: 'high', max: 'max' });
 /**
  * The thinking levels for a model on OpenRouter: its `reasoning.effort` words (none, low, medium, high, xhigh). A model takes them when its entry in
  * OpenRouter's model list names `reasoning` among its supported parameters; the Harness (pi-ai) writes `reasoning: { effort }` into the request.
  */
 export const OPENROUTER_EFFORTS = Object.freeze({ off: 'none', low: 'low', medium: 'medium', high: 'high', max: 'xhigh' });
+export const DEEPSEEK_EFFORTS = Object.freeze({ off: 'none', low: 'low', medium: 'high', high: 'high', max: 'max' });
+const EFFORT_API_LEVELS = Object.freeze({ ...LOCAL_EFFORTS, off: 'none' });
+export const REASONING_FORMATS = Object.freeze(['auto', 'default', 'strata', 'deepseek', 'effort']);
 /** Whether a connection is OpenRouter (the catalog entry, or its address), whatever address it is reached at. */
-export const isOpenRouter = conn => conn?.provider === 'openrouter' || (() => { try { return /(^|.)openrouter.ai$/i.test(new URL(conn.baseUrl).hostname); } catch { return false; } })();
-export const effortOf = value => EFFORT_LEVEL[String(value ?? '').toLowerCase()] ?? null;
+export const isOpenRouter = conn => conn?.provider === 'openrouter' || (() => { try { return /(^|\.)openrouter\.ai$/i.test(new URL(conn.baseUrl).hostname); } catch { return false; } })();
+export function connectionReasoningFormat(conn) {
+  if (conn.protocol !== 'openai-chat') return 'default';
+  if (conn.reasoningFormat && conn.reasoningFormat !== 'auto') return conn.reasoningFormat;
+  if (isOpenRouter(conn)) return 'openrouter';
+  if (conn.provider === 'deepseek') return 'deepseek';
+  return 'effort';
+}
+
+export function connectionReasoningEfforts(conn, model) {
+  const format = connectionReasoningFormat(conn);
+  if (model.reasoning === false || (model.reasoning !== true && conn.reasoningFormat !== format)) return null;
+  if (/^hy4-flash/i.test(String(model?.id ?? '')) && (format === 'strata' || format === 'effort')) return HY4_LOCAL_EFFORTS;
+  switch (format) {
+    case 'strata': return LOCAL_EFFORTS;
+    case 'openrouter': return OPENROUTER_EFFORTS;
+    case 'deepseek': return DEEPSEEK_EFFORTS;
+    case 'effort': return EFFORT_API_LEVELS;
+    default: return null;
+  }
+}
+export const effortOf = value => {
+  const key = String(value ?? '').toLowerCase();
+  return key === 'xhigh' ? 'max' : (EFFORT_LEVEL[key] ?? null);
+};
 
 /**
  * Output budget for an API model. The connection's own maximum output is used when it is known (`maxOutput`, read from the provider's model
@@ -148,9 +279,12 @@ export const effortOf = value => EFFORT_LEVEL[String(value ?? '').toLowerCase()]
 export const DEFAULT_API_OUTPUT = 32768;
 export function outputBudget(context, maxOutput = null) {
   const c = Number.isFinite(context) && context > 0 ? context : null;
-  const window = c === null ? Infinity : Math.max(1024, c - Math.min(4096, Math.floor(c / 4)));
-  if (Number.isFinite(maxOutput) && maxOutput > 0) return Math.max(1024, Math.min(Math.floor(maxOutput), window));
-  return Math.max(1024, Math.min(DEFAULT_API_OUTPUT, window));
+  const window = c === null ? Infinity : Math.max(1, Math.floor(c) - Math.min(4096, Math.floor(c / 4)));
+  // A provider's maximum is what the model can write, not what every reply should reserve (#5011): a 128K model that may write 128K left the
+  // prompt about 4K before compaction. The reply keeps the larger of 32K and half the window; a smaller maximum is still respected.
+  const cap = c === null ? Infinity : Math.max(DEFAULT_API_OUTPUT, Math.floor(c / 2));
+  if (Number.isFinite(maxOutput) && maxOutput > 0) return Math.max(1, Math.min(Math.floor(maxOutput), window, cap));
+  return Math.min(DEFAULT_API_OUTPUT, window);
 }
 
 /**
@@ -161,9 +295,22 @@ export function outputBudget(context, maxOutput = null) {
  * @returns {{patch:string, env:Record<string,string>, routes:Array, defaultRoute:object|null, signature:string}}
  */
 /** What a local model, or an OpenAI-style server on this network, takes for the thinking level (see the comment where a local route is built). */
+/**
+ * "store" is OpenAI's own field (keep the request out of its stored completions). pi-ai sends store: false to every OpenAI-style server it
+ * does not know as non-standard, and some refuse an unknown field: Google's Gemini endpoint answers 400 "Unknown name \"store\"" (#5903). Only
+ * OpenAI's own address gets it; for every other address it is left out.
+ */
+function storeCompat(baseURL) {
+  let host = '';
+  try { host = new URL(baseURL).hostname.toLowerCase(); } catch { /* not an address: leave it out */ }
+  return host === 'api.openai.com' ? {} : { supportsStore: false };
+}
 const THINKING_COMPAT = { supportsStore: false, thinkingFormat: 'chat-template', chatTemplateKwargs: { enable_thinking: { $var: 'thinking.enabled' }, reasoning_effort: { $var: 'thinking.effort', omitWhenOff: true } } };
+// Keep the Harness's transient failures and backoff. Repeating an empty completion with
+// the same request hides the missing answer and can take six model calls to report it.
+const AGENT_RETRY_POLICY = { mode: 'normal', retryableCodes: ['RATE_LIMIT', 'SERVER', 'TIMEOUT', 'TRANSPORT'], backoff: {} };
 
-export function buildProfile({ local = [], connections = [], gate = true, tools = NO_TOOLS_SETTINGS, skillsDir = null, proxyBase = null, searchMock = null }) {
+export function buildProfile({ local = [], connections = [], gate = true, tools = NO_TOOLS_SETTINGS, skillsDir = null, proxyBase = null, searchMock = null, defaultLocalId = null, workingMemory = false, contextOptimizer = null }) {
   const providers = {};
   const env = {};
   const routes = [];
@@ -181,7 +328,7 @@ export function buildProfile({ local = [], connections = [], gate = true, tools 
       const key = `${route}~s${budget}`;
       providers[key] = { ...def, displayName: `${def.displayName} (with your response settings)`, baseURL: `${proxyBase}/${key}/v1`, ...(budget ? { headers: { ...(def.headers ?? {}), 'x-strata-budget': String(budget) } } : {}) };
       shapeTargets[key] = realBase;
-      for (const m of def.models) { const w = m.contextWindow, out = m.maxTokens; compaction.push({ provider: key, model: m.id, headroomTokens: compactionHeadroom(w, out) }); }
+      for (const m of def.models) { const w = m.contextWindow, out = m.maxTokens; compaction.push({ provider: key, model: m.id, headroomTokens: compactionHeadroom(w, out), thresholdRatio: thresholdRatio() }); }
       keys[budget] = key;
     }
     return keys;
@@ -194,24 +341,32 @@ export function buildProfile({ local = [], connections = [], gate = true, tools 
     // does not authenticate gets a fixed placeholder; one that does gets its real key, by reference.
     env[keyEnv] = inst.key || 'strata-local';
     const context = inst.context ?? 32768;
+    const isInklingModel = inst.arch === 'inkling2_loop' || /^inkling-2-mini/i.test(String(inst.modelId ?? ''));
+    const isHy4Model = inst.arch === 'hy4flash' || /^hy4-flash/i.test(String(inst.modelId ?? ''));
     providers[route] = {
       displayName: inst.label ? `Stratat (local) ${inst.label}` : 'Stratat (local)',
       api: 'openai-completions',
       baseURL: inst.baseUrl,
       apiKeyEnv: keyEnv,
+      retryPolicy: AGENT_RETRY_POLICY,
+      // A long prompt read sends only SSE comments, which pi-ai's OpenAI client drops, so its 300 s stream-idle timer would cut the
+      // request five minutes in (#3623). 60 minutes is a backstop: serve ends a hung engine and the bridge's watchdog ends a lost turn.
+      streamIdleTimeoutMs: 60 * 60_000,
       // The Stratat server reads the thinking level from `chat_template_kwargs` (enable_thinking, reasoning_effort) or from a top-level
       // reasoning_effort; a top-level `enable_thinking` (pi-ai's `qwen` format) is ignored, so the model went on thinking with the menu on Off.
+      // Inkling-2-Mini thinks like the others (0.2.21): its thinking comes back as reasoning_content, and Off sends none.
       compat: THINKING_COMPAT,
       models: [{
         id: inst.modelId, name: inst.label || inst.modelId, contextWindow: context, maxTokens: localOutputBudget(context),
         input: inst.vision ? ['text', 'image'] : ['text'],
-        reasoning: true, reasoningEfforts: LOCAL_EFFORTS,
+        reasoning: true,
+        reasoningEfforts: isHy4Model ? HY4_LOCAL_EFFORTS : isInklingModel ? INKLING_LOCAL_EFFORTS : LOCAL_EFFORTS,
       }],
     };
-    compaction.push({ provider: route, model: inst.modelId, headroomTokens: compactionHeadroom(context, localOutputBudget(context)) });
+    compaction.push({ provider: route, model: inst.modelId, headroomTokens: compactionHeadroom(context, localOutputBudget(context)), thresholdRatio: thresholdRatio() });
     slots = Math.max(slots, Number.isFinite(inst.slots) && inst.slots >= 1 ? Math.floor(inst.slots) : 1);
     const shaped = addShaped(route, providers[route], inst.baseUrl);
-    routes.push({ route, fp: fingerprint(providers[route], env[keyEnv]), kind: 'local', connectionName: 'this computer', instanceId: inst.id, modelId: inst.modelId, name: inst.label || inst.modelId, contextWindow: context, ...(shaped ? { shaped } : {}) });
+    routes.push({ route, fp: fingerprint(providers[route], env[keyEnv]), kind: 'local', connectionName: 'this computer', instanceId: inst.id, modelId: inst.modelId, arch: inst.arch ?? null, name: inst.label || inst.modelId, contextWindow: context, vision: !!inst.vision, ...(shaped ? { shaped } : {}) });
   });
 
   connections.forEach(conn => {
@@ -226,10 +381,9 @@ export function buildProfile({ local = [], connections = [], gate = true, tools 
     else if (keyless) env[keyEnv] = 'not-needed';
     let baseURL = conn.baseUrl;
     if (protocol === 'anthropic-messages') baseURL = baseURL.replace(/\/v1\/?$/, '');
-    // A model server on this computer or network (another Stratat PC, llama.cpp, LM Studio) takes the same thinking vocabulary as a local model:
-    // without it the Reasoning menu did nothing for a connection to another Stratat machine.
-    const openRouter = protocol === 'openai-completions' && isOpenRouter(conn);
-    const ownServer = protocol === 'openai-completions' && !openRouter && isPrivateHost(baseURL);
+    const format = connectionReasoningFormat(conn);
+    // A private address may opt into local forwarding, but says nothing about its wire format.
+    const ownServer = protocol === 'openai-completions' && format !== 'openrouter' && isPrivateHost(baseURL);
     // A model server on this computer or network has a window of its own size like a local model: the reply keeps half of it, so the Harness can compact the conversation
     // before the window is full (with nearly all of it reserved for the reply a long task ended with "the prompt leaves no room to answer").
     const reply = m => (ownServer && Number.isFinite(m.contextMax) && m.contextMax > 0 && !m.maxOutput ? localOutputBudget(m.contextMax) : outputBudget(m.contextMax ?? ASSUMED_API_CONTEXT, m.maxOutput));
@@ -237,33 +391,52 @@ export function buildProfile({ local = [], connections = [], gate = true, tools 
       displayName: conn.name,
       api: protocol,
       baseURL,
+      retryPolicy: AGENT_RETRY_POLICY,
       ...(conn.apiKey || keyless ? { apiKeyEnv: keyEnv } : {}),
-      ...(ownServer ? { compat: THINKING_COMPAT } : openRouter ? { compat: { thinkingFormat: 'openrouter' } } : {}),
-      models: conn.models.map(m => ({
-        id: m.id, name: m.name || m.id,
-        contextWindow: m.contextMax ?? ASSUMED_API_CONTEXT, maxTokens: reply(m),
-        // Pictures are on by default (owner rule): only an explicit no (the person's switch, or the server's own model list or /props) leaves them out.
-        // (any OpenAI-style API: a cloud model the person marked, or whose model list says it reads pictures, takes image_url the same way)
-        input: protocol === 'openai-completions' && m.vision !== false ? ['text', 'image'] : ['text'],
-        ...(ownServer ? { reasoning: true, reasoningEfforts: LOCAL_EFFORTS } : openRouter && m.reasoning === true ? { reasoning: true, reasoningEfforts: OPENROUTER_EFFORTS } : {}),
-      })),
+      ...(protocol === 'openai-completions' ? { compat: format === 'strata' ? THINKING_COMPAT : {
+        ...storeCompat(baseURL),
+        ...(format === 'openrouter' ? { thinkingFormat: 'openrouter' } : {}),
+        ...(format === 'deepseek' ? { thinkingFormat: 'deepseek', supportsReasoningEffort: true, requiresReasoningContentOnAssistantMessages: true } : {}),
+        ...(format === 'effort' ? { supportsReasoningEffort: true } : {}),
+      } } : {}),
+      models: conn.models.map(m => {
+        const reasoningEfforts = connectionReasoningEfforts(conn, m);
+        return {
+          id: m.id, name: m.name || m.id,
+          contextWindow: m.contextMax ?? ASSUMED_API_CONTEXT, maxTokens: reply(m),
+          // Pictures are on unless the model or user explicitly switches them off.
+          input: protocol === 'openai-completions' && m.vision !== false ? ['text', 'image'] : ['text'],
+          ...(reasoningEfforts ? { reasoning: true, reasoningEfforts } : {}),
+        };
+      }),
     };
     const fp = fingerprint(providers[route], conn.apiKey ?? '');
     const shaped = ownServer ? addShaped(route, providers[route], baseURL) : null;
-    for (const m of conn.models) { const ctx = m.contextMax ?? ASSUMED_API_CONTEXT; compaction.push({ provider: route, model: m.id, headroomTokens: compactionHeadroom(ctx, reply(m)) }); }
+    for (const m of conn.models) { const ctx = m.contextMax ?? ASSUMED_API_CONTEXT; compaction.push({ provider: route, model: m.id, headroomTokens: compactionHeadroom(ctx, reply(m)), thresholdRatio: thresholdRatio() }); }
     for (const m of conn.models) routes.push({ route, fp, kind: 'api', connectionId: conn.id, connectionName: conn.name, modelId: m.id, name: m.name || m.id, contextWindow: m.contextMax ?? ASSUMED_API_CONTEXT, ...(shaped ? { shaped } : {}) });
   });
 
-  const defaultRoute = routes.find(r => r.kind === 'local') ?? null;
+  // The model the chat really runs on is the default instance, not whichever one was loaded first (T5: with two models loaded, the tool servers of the
+  // first one were wired to a chat on the second).
+  const defaultInstance = local.find(i => i.id === defaultLocalId) ?? local[0] ?? null;
+  const defaultRoute = routes.find(r => r.kind === 'local' && r.instanceId === defaultInstance?.id) ?? routes.find(r => r.kind === 'local') ?? null;
   // One Harness, one set of tool servers: the default local model's.
-  const mcp = mcpRows({ ...(local[0]?.mcpServers ?? {}), ...(tools.servers ?? {}) }, mcpEnv);
+  const mcpSkipped = [];
+  // The model's own servers wait as long as its "Tool timeout (seconds)" says (mcp_timeout_s), unless a server names its own (#5788);
+  // without either the client keeps its default (60 s).
+  const modelTimeoutS = Number(defaultInstance?.mcpTimeoutS) > 0 ? Number(defaultInstance.mcpTimeoutS) : undefined;
+  const modelServers = Object.fromEntries(Object.entries(defaultInstance?.mcpServers ?? {}).map(([name, s]) => [name,
+    modelTimeoutS && s && typeof s === 'object' && s.timeoutSec == null && s.timeout_s == null && s.timeout == null && s.toolCallTimeoutMs == null ? { ...s, timeout_s: modelTimeoutS } : s]));
+  const mcp = mcpRows({ ...modelServers, ...(tools.servers ?? {}) }, mcpEnv, mcpSkipped);
   Object.assign(env, mcpEnv);
   // The person's own instruction and command tools come from the app's tool server; a command tool asks in Manual like any connected tool.
   const own = (kind, on) => on && tools.toolFile ? [{ id: `mcp-strata-${kind}`, name: '@deepseek-ai/dsh-mcp-client', config: { serverName: `strata-${kind}`, transport: 'stdio', command: process.execPath, args: [CUSTOM_TOOLS_SCRIPT, kind, tools.toolFile] } }] : [];
   // The browser: Playwright's tool server on the person's own Chrome or Edge, in a separate empty profile (what the Harness's own browser provider does). Every action asks in Manual.
   const browserRows = tools.browserEnabled && tools.browserPath && tools.browserCli
     ? [{ id: 'mcp-browser', name: '@deepseek-ai/dsh-mcp-client', config: { serverName: 'browser', transport: 'stdio', command: process.execPath, args: [tools.browserCli, '--browser', 'chromium', '--isolated', ...(process.env.STRATA_BROWSER_HEADLESS === '1' ? ['--headless'] : []), '--executable-path', tools.browserPath] } }] : [];
-  const ownRows = [...own('instructions', tools.hasInstructionTools), ...own('commands', tools.hasCommandTools), ...browserRows];
+  // Run as administrator (#5968): only when the person turned it on, on Windows. Manual asks first; Windows asks for every call.
+  const adminRows = tools.runAsAdminEnabled ? [{ id: 'mcp-strata-admin', name: '@deepseek-ai/dsh-mcp-client', config: { serverName: 'strata-admin', transport: 'stdio', command: process.execPath, args: [ADMIN_TOOL_SCRIPT] } }] : [];
+  const ownRows = [...own('instructions', tools.hasInstructionTools), ...own('commands', tools.hasCommandTools), ...browserRows, ...adminRows];
   // Web search: DuckDuckGo with no key unless the person chose a keyed service AND saved its key (then that one; never a half-set-up one).
   const searchOn = !tools.off.has('search');
   const keyed = ['exa', 'perplexity', 'deepseek'].includes(tools.search.provider) && tools.search.key ? tools.search.provider : null;
@@ -281,14 +454,22 @@ export function buildProfile({ local = [], connections = [], gate = true, tools 
     { id: 'permission', config: { presets: Object.fromEntries(Object.values(MODE_PRESETS).map(({ key, sandbox, approval, name, description }) => [key, { sandbox, approval, name, description }])), defaultPreset: MODE_PRESETS[DEFAULT_MODE].key } },
     { id: 'subagent', config: { maxActiveSubagents: slots > 0 ? Math.max(slots, MIN_LOCAL_HELPERS) : DEFAULT_API_HELPERS } },
     // Manual asks before a change runs, so the person sees one Approve/Deny card and nothing has happened yet.
-    ...(gate ? [{ insert: [{ id: 'strata-gate', name: GATE_PLUGIN }] }] : []),
+    // Its web question names the search service the person chose (a keyed one only when its key is saved), and the person's switch skips the question.
+    ...(gate ? [{ insert: [{ id: 'strata-gate', name: GATE_PLUGIN, config: { web: { provider: SEARCH_NAMES[keyed ?? 'builtin'], skipAsk: tools.webWithoutAsking === true }, blocked: tools.blockedFolders ?? [] } }] }] : []),
+    // Compaction decides from what the model server measured, and its summary requests always fit the window (plugins/strata-context.mjs).
+    { insert: [{ id: 'strata-context', name: CONTEXT_PLUGIN, config: contextOptimizer?.enabled ? { contextOptimizer } : {} }] },
+    ...(workingMemory ? [{ insert: [
+      { id: 'strata-working-memory', name: WORKING_MEMORY_PLUGIN, config: {} },
+      { id: 'strata-edit-recovery', name: EDIT_RECOVERY_PLUGIN, config: {} },
+    ] }] : []),
+    ...(!tools.off.has('questions') ? [{ insert: [{ id: 'strata-questions', name: QUESTIONS_PLUGIN, config: {} }] }] : []),
     // Helper agents on a model the person names: every model the app can reach is allowed, and the plugin makes the choice forgiving (plugins/strata-models.mjs).
     ...(subagentRoutes.length ? [{ id: 'subagent-model-selection-settings', config: { enabled: true, allowedModels: subagentRoutes.map(r => ({ provider: r.provider, model: r.model })) } }] : []),
     ...(subagentRoutes.length ? [{ insert: [{ id: 'strata-models', name: MODELS_PLUGIN, config: { routes: subagentRoutes } }] }] : []),
     ...(mcp.length || ownRows.length ? [{ insert: [...mcp, ...ownRows] }] : []),
     ...webRows,
     // The reminder tools would be a second scheduler beside the app's Tasks. The tool groups the person switched off in Settings -> Tools are left out.
-    { id: 'preset-standard', name: '@deepseek-ai/dsh-agent-preset', config: standardPreset({ off: tools.off, search: searchOn, skillsDir, compaction }) },
+    { id: 'preset-standard', name: '@deepseek-ai/dsh-agent-preset', config: standardPreset({ off: tools.off, search: searchOn, skillsDir, compaction, modelNames: subagentRoutes.length > 0 }) },
     // Stratat names its chats itself; the Harness's own title request would be an extra model call on
     // every first prompt (and, for an API route, an unrequested one).
     { id: 'session-title-llm', disabled: true },
@@ -304,8 +485,11 @@ export function buildProfile({ local = [], connections = [], gate = true, tools 
   const signature = createHash('sha256').update(patch).update(JSON.stringify(Object.entries(env).sort())).digest('hex').slice(0, 16);
   // What the agent is offered (tool groups, web search, tool servers, the person's own tools) decides whether a running agent must be
   // restarted for the next message; the routes are compared separately (a changed context size alone does not restart it).
-  const toolsSignature = createHash('sha256').update(JSON.stringify([mcp, ownRows, webRows, entries.find(e => e.id === 'preset-standard'), env.STRATA_SEARCH_KEY ?? '', mcpEnv])).digest('hex').slice(0, 16);
-  return { patch, env, routes, defaultRoute, signature, toolsSignature, shapeTargets };
+  // The approval gate's own settings are in it too (the blocked folders, the search service it names, whether web needs no question): the gate reads them once, when the
+  // Harness starts, so a change in Settings -> Tools reaches the next message only if it restarts the Harness (SAFETY: a blocked folder was not enforced until the host restarted).
+  const gateEntry = entries.find(e => e.insert?.some(x => x.id === 'strata-gate')) ?? null;
+  const toolsSignature = createHash('sha256').update(JSON.stringify([mcp, ownRows, webRows, entries.find(e => e.id === 'preset-standard'), gateEntry, env.STRATA_SEARCH_KEY ?? '', mcpEnv, ...(contextOptimizer?.enabled ? [contextOptimizer] : [])])).digest('hex').slice(0, 16);
+  return { patch, env, routes, defaultRoute, signature, toolsSignature, shapeTargets, mcpSkipped };
 }
 
 /** Find the route for a chat's model choice. */
