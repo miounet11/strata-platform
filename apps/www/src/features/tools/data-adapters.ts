@@ -10,11 +10,12 @@ import type {
   ToolDownloadSummary,
   ToolGpuRecord,
   ToolRigRecord,
+  ToolSlug,
   ToolVariantRecord,
   ToolsBundle,
 } from "@/features/tools/types";
 
-const MAX_GPUS = 250;
+const MAX_GPUS = 80;
 const DEV_VENDORS = new Set<string>(["nvidia", "amd", "apple", "intel"]);
 
 function evidenceRank(gpu: Gpu): number {
@@ -158,6 +159,22 @@ export function getToolsBundle(locale: string): ToolsBundle {
     gpus: selectGpus().map(toGpuRecord),
     rigs: getRigs().map(toRigRecord),
     builds: allBuilds().map((build) => toBuildRecord(build, locale)),
+    variants: toVariantRecords(),
+    downloads: toDownloadSummary(),
+  };
+}
+
+const GPU_SLUGS = new Set<ToolSlug>(["vram-visualizer", "gpu-compare", "quant-explorer", "multi-gpu-planner"]);
+const RIG_SLUGS = new Set<ToolSlug>(["benchmark-scatter", "roi-calculator", "vram-visualizer", "quant-explorer"]);
+const BUILD_SLUGS = new Set<ToolSlug>(["pc-builder", "roi-calculator"]);
+
+/** Per-tool compact payload so every static HTML page stays well under the 180 KB budget. */
+export function getToolsBundleForSlug(locale: string, slug: ToolSlug): ToolsBundle {
+  return {
+    locale,
+    gpus: GPU_SLUGS.has(slug) ? selectGpus().map(toGpuRecord) : [],
+    rigs: RIG_SLUGS.has(slug) ? getRigs().map(toRigRecord) : [],
+    builds: BUILD_SLUGS.has(slug) ? allBuilds().map((build) => toBuildRecord(build, locale)) : [],
     variants: toVariantRecords(),
     downloads: toDownloadSummary(),
   };

@@ -12,7 +12,7 @@ import { QuantExplorerTool } from "@/features/tools/quant-explorer/QuantExplorer
 import { RoiCalculatorTool } from "@/features/tools/roi-calculator/RoiCalculatorTool";
 import { TroubleshooterTool } from "@/features/tools/troubleshooter/TroubleshooterTool";
 import { VramVisualizerTool } from "@/features/tools/vram-visualizer/VramVisualizerTool";
-import { getToolsBundle } from "@/features/tools/data-adapters";
+import { getToolsBundleForSlug } from "@/features/tools/data-adapters";
 import { ALL_TOOLS, getTool } from "@/features/tools/registry";
 import type { ToolSlug } from "@/features/tools/types";
 import type { ToolsBundle } from "@/features/tools/types";
@@ -75,8 +75,8 @@ export default async function ToolDetailPage({
   const t = await getTranslations("tools");
   const tn = await getTranslations("nav");
 
-  // Bundle is assembled strictly on the server; never shipped as static HTML payload.
-  const bundle = await getToolsBundle(locale);
+  // Bundle is sliced per tool strictly on the server to keep every static page under 180 KB.
+  const bundle = getToolsBundleForSlug(locale, tool.slug);
   const labels: Record<string, string> = {
     title: t(`items.${tool.slug}.title`),
     tagline: t(`items.${tool.slug}.tagline`),

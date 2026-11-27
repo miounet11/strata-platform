@@ -45,10 +45,10 @@ export function ToolShell({
     <section className="tool-shell" aria-label={title}>
       <header className="tool-shell-header">
         <div>
-          <h1>
+          <h2>
             {title}
             {badge ? <span className="badge">{badge}</span> : null}
-          </h1>
+          </h2>
           <p>{subtitle}</p>
         </div>
         <div className="tool-shell-actions" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
