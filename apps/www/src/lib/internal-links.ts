@@ -37,6 +37,11 @@ export function buildPath(slug: string): string {
   return `/builds/${encodeURIComponent(slug)}`;
 }
 
+/** Detail path for one interactive tool, e.g. `/tools/vram-visualizer`. */
+export function toolPath(slug: string): string {
+  return `/tools/${encodeURIComponent(slug)}`;
+}
+
 /** Browsable index of one chip vendor, e.g. `/gpus/vendor/nvidia`. */
 export function gpuVendorPath(vendor: string): string {
   return `/gpus/vendor/${encodeURIComponent(vendor)}`;

@@ -9,6 +9,7 @@ import { getReleases } from "@/lib/releases";
 import { getLiveTopics, getTopic } from "@/lib/topics";
 import { getLiveArticles, getLiveArticlesByKind, liveGuideKinds, localesForSlug } from "@/lib/articles";
 import { allBuilds } from "@/lib/builds";
+import { ALL_TOOLS } from "@/features/tools/registry";
 import { allGpus, allSeries, vendorSlug, vendorSummaries } from "@/lib/gpus";
 import { SCENARIOS } from "@/lib/scenarios";
 import { getVpsDeals } from "@/lib/vps";
@@ -22,6 +23,7 @@ import {
   gpuVendorPath,
   releasePath,
   rigPath,
+  toolPath,
   STATIC_PATHS,
 } from "@/lib/routes";
 
@@ -103,6 +105,7 @@ export function buildEntries(part: SitemapPart): Entry[] {
     ...creator.posts.map((post) => `/creator/updates/${post.id}`),
     ...getRigs().map((rig) => rigPath(rig.id)),
     ...allBuilds().map((build) => buildPath(build.slug)),
+    ...ALL_TOOLS.map((tool) => toolPath(tool.slug)),
     ...SCENARIOS.map((scenario) => `/best/${scenario.slug}`),
     ...releases.releases.map((release) => releasePath(release.tag)),
   ];
@@ -156,7 +159,8 @@ export function buildEntries(part: SitemapPart): Entry[] {
         path === "/vps" ||
         path === "/can-i-run" ||
         path === "/guides" ||
-        path === "/builds";
+        path === "/builds" ||
+        path === "/tools";
       let modified = releaseAt;
       if (path === "/pulse") modified = pulseAt ?? releaseAt;
       else if (path === "/vps") modified = vpsAt ?? releaseAt;
@@ -176,6 +180,8 @@ export function buildEntries(part: SitemapPart): Entry[] {
 
       const isRelease = Boolean(releaseTag);
       const isBuildDetail = path.startsWith("/builds/");
+      const isToolDetail = path.startsWith("/tools/");
+      const isToolHub = path === "/tools";
       const isHighIntentHub =
         path === "/can-i-run" || path === "/best" || path.startsWith("/best/") || Boolean(guideCategory);
       const isDetail = Boolean(
@@ -194,17 +200,21 @@ export function buildEntries(part: SitemapPart): Entry[] {
         priority:
           path === ""
             ? 1
-            : freshHub
-              ? 0.9
-              : isBuildDetail
-                ? 0.8
-                : isHighIntentHub
-                ? 0.85
-                : releaseTag?.[1] === latestReleaseTag
-                  ? 0.85
-                  : isDetail
-                    ? 0.55
-                    : 0.75,
+            : isToolHub
+              ? 0.85
+              : freshHub
+                ? 0.9
+                : isBuildDetail
+                  ? 0.8
+                  : isToolDetail
+                    ? 0.8
+                    : isHighIntentHub
+                      ? 0.85
+                      : releaseTag?.[1] === latestReleaseTag
+                        ? 0.85
+                        : isDetail
+                          ? 0.55
+                          : 0.75,
         ...(languages ? { languages } : {}),
       });
     }

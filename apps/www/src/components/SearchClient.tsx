@@ -18,6 +18,7 @@ type Labels = {
   guides: string;
   gpus: string;
   builds: string;
+  tools: string;
   benchmarks: string;
   topics: string;
   releases: string;
@@ -123,6 +124,7 @@ export function SearchClient({
           <option value="guide">{labels.guides}</option>
           <option value="gpu">{labels.gpus}</option>
           <option value="build">{labels.builds}</option>
+          <option value="tool">{labels.tools}</option>
           <option value="benchmark">{labels.benchmarks}</option>
           <option value="topic">{labels.topics}</option>
           <option value="release">{labels.releases}</option>

@@ -31,7 +31,8 @@
     "vps": "Ofertas VPS",
     "canIRun": "Calculadora VRAM",
     "search": "Buscar",
-    "builds": "PCs montados"
+    "builds": "PCs montados",
+    "tools": "Ferramentas"
   },
   "topics": {
     "title": "Usos",
@@ -59,7 +60,10 @@
     "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
     "buildsTitle": "PCs em destaque para IA local",
     "buildsIntro": "Quatro máquinas completas com lista de peças, preço de rua, VRAM e velocidade de escrita.",
-    "buildsCta": "Ver todos os PCs"
+    "buildsCta": "Ver todos os PCs",
+    "toolsTitle": "Top 10 das ferramentas visuais",
+    "toolsIntro": "Planeje sua IA local com ferramentas interativas para VRAM, escolha de GPU, quantização e custo.",
+    "toolsCta": "Explorar as ferramentas"
   },
   "releases": {
     "title": "Notas de versão",
@@ -409,6 +413,10 @@
     "builds": {
       "title": "PCs completos para IA local",
       "description": "Vinte e quatro estações com preço para IA local: lista de peças, VRAM, consumo, ruído e tokens por segundo estimados."
+    },
+    "tools": {
+      "title": "Top 10 das ferramentas visuais para IA local",
+      "description": "Dez ferramentas interativas para calcular a VRAM, comparar GPUs e PCs, explorar a quantização, estimar custos e resolver problemas de IA local."
     }
   },
   "gpus": {
@@ -816,7 +824,8 @@
     "popularHeading": "Buscas populares",
     "resultCount": "{count} resultado(s)",
     "browseHeading": "Navegar por seção",
-    "filterBuild": "PCs montados"
+    "filterBuild": "PCs montados",
+    "filterTool": "Ferramentas visuais"
   },
   "builds": {
     "title": "PCs montados",
@@ -911,5 +920,83 @@
     "seeRig": "Benchmark medido",
     "seeCanIRun": "Conferir o seu PC",
     "backToBuilds": "Todos os PCs montados"
+  },
+  "tools": {
+    "eyebrow": "Caixa de ferramentas",
+    "title": "Top 10 das ferramentas visuais para IA local",
+    "intro": "Dez ferramentas práticas para calcular a VRAM, comparar GPUs e máquinas, explorar o KV-Cache e a quantização, e planejar um PC de IA local.",
+    "searchPlaceholder": "Buscar ferramentas",
+    "allCategories": "Todas as categorias",
+    "openTool": "Abrir ferramenta",
+    "relatedTitle": "Ferramentas relacionadas",
+    "reset": "Redefinir",
+    "copyShare": "Copiar link de compartilhamento",
+    "copied": "Copiado",
+    "ctaDefault": "Abrir ferramenta",
+    "categories": {
+      "memory": "Memória e VRAM",
+      "hardware": "Hardware",
+      "models": "Modelos",
+      "setup": "Configuração",
+      "economics": "Custo e ROI",
+      "diagnostics": "Diagnóstico"
+    },
+    "priority": {
+      "P0": "P0 · Essencial",
+      "P1": "P1 · Útil",
+      "P2": "P2 · Avançado"
+    },
+    "items": {
+      "vram-visualizer": {
+        "title": "Visualizador de VRAM",
+        "tagline": "Veja como os pesos, o KV-Cache e o contexto cabem na VRAM da GPU.",
+        "cta": "Ver a VRAM"
+      },
+      "gpu-compare": {
+        "title": "Comparador de GPUs",
+        "tagline": "Compare GPUs NVIDIA, AMD e Apple por VRAM, largura de banda e tok/s.",
+        "cta": "Comparar GPUs"
+      },
+      "quant-explorer": {
+        "title": "Explorador de quantização",
+        "tagline": "Compare Q2_0, IQ2_XS e UD-IQ4_XS por tamanho e qualidade.",
+        "cta": "Explorar quantização"
+      },
+      "install-wizard": {
+        "title": "Assistente de instalação",
+        "tagline": "Escolha o sistema e a GPU e siga as etapas corretas do Strata.",
+        "cta": "Iniciar assistente"
+      },
+      "benchmark-scatter": {
+        "title": "Gráfico de dispersão de benchmarks",
+        "tagline": "Plote tok/s contra VRAM e consumo das GPUs medidas.",
+        "cta": "Plotar benchmarks"
+      },
+      "multi-gpu-planner": {
+        "title": "Planejador multi-GPU",
+        "tagline": "Planeje faixas PCIe, --layer-split e folga da PSU para duas ou mais GPUs.",
+        "cta": "Planejar multi-GPU"
+      },
+      "pc-builder": {
+        "title": "Montador de PC",
+        "tagline": "Monte um PC de IA local com peças equilibradas e orçamento realista.",
+        "cta": "Montar um PC"
+      },
+      "troubleshooter": {
+        "title": "Solucionador de problemas",
+        "tagline": "Resolva passo a passo problemas de detecção de CUDA, ROCm e Metal.",
+        "cta": "Diagnosticar"
+      },
+      "roi-calculator": {
+        "title": "Calculadora de ROI",
+        "tagline": "Estime o TCO, o custo de energia e o retorno frente à inferência em nuvem.",
+        "cta": "Calcular ROI"
+      },
+      "agent-studio": {
+        "title": "Agent Studio",
+        "tagline": "Conecte modelos locais a ferramentas MCP e fluxos de HF-Mirror e ModelScope.",
+        "cta": "Abrir o estúdio"
+      }
+    }
   }
 }

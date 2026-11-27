@@ -57,6 +57,19 @@ const hubs = [
   "/topics",
 ];
 
+const TOOL_SLUGS = [
+  "vram-visualizer",
+  "gpu-compare",
+  "quant-explorer",
+  "install-wizard",
+  "benchmark-scatter",
+  "multi-gpu-planner",
+  "pc-builder",
+  "troubleshooter",
+  "roi-calculator",
+  "agent-studio",
+];
+
 function pcBuildPaths() {
   const data = loadJson("apps/www/src/data/pc-builds.json");
   if (!Array.isArray(data)) return [];
@@ -154,6 +167,8 @@ function collectFull() {
 
   for (const path of hubs) addLocales(urls, path);
   for (const path of pcBuildPaths()) addLocales(urls, path);
+  addLocales(urls, "/tools");
+  for (const slug of TOOL_SLUGS) addLocales(urls, `/tools/${slug}`);
 
   const releases = loadJson("apps/www/src/data/releases.json");
   for (const release of releases?.releases ?? []) {

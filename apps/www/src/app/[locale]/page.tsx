@@ -4,7 +4,7 @@ import { EnrichedAudio, EnrichedImage } from "@/components/EnrichedBlock";
 import { FreshSignals } from "@/components/FreshSignals";
 import { getLiveArticles } from "@/lib/articles";
 import { getBuild, buildText, type PcBuild } from "@/lib/builds";
-import { buildPath, guidePath, releasePath } from "@/lib/routes";
+import { buildPath, guidePath, releasePath, toolPath } from "@/lib/routes";
 import { getReleases } from "@/lib/releases";
 import { latestPosts, postHeadline } from "@/lib/creator";
 import { comparisonSignals, latestXSignals, upgradeSignals, worthReading } from "@/lib/intelligence";
@@ -36,6 +36,7 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("home");
+  const tt = await getTranslations("tools");
   const tc = await getTranslations("creator");
   const tn = await getTranslations("nav");
   const tp = await getTranslations("pulse");
@@ -116,6 +117,22 @@ export default async function HomePage({
           </div>
         </section>
       ) : null}
+
+      <section className="tool-hub-grid" aria-label={t("toolsTitle")}>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <h2>{t("toolsTitle")}</h2>
+          <p className="section-lead">{t("toolsIntro")}</p>
+        </div>
+        {(["vram-visualizer", "gpu-compare", "quant-explorer", "install-wizard"] as const).map((slug) => (
+          <Link key={slug} href={toolPath(slug)} className="tool-card">
+            <strong>{tt(`items.${slug}.title`)}</strong>
+            <span>{tt(`items.${slug}.tagline`)}</span>
+          </Link>
+        ))}
+        <div style={{ gridColumn: "1 / -1" }}>
+          <Link href="/tools" className="tool-cta">{t("toolsCta")}</Link>
+        </div>
+      </section>
 
       <div className="grid-3">
         <Link href="/install" className="card">

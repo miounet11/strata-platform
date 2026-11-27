@@ -108,6 +108,10 @@
     "builds": {
       "title": "Complete local-AI PC builds",
       "description": "Twenty-four priced local-AI workstations with a full parts list, VRAM, power draw, noise, and estimated tokens per second."
+    },
+    "tools": {
+      "title": "Top 10 visual tools for local AI",
+      "description": "Ten interactive tools to plan VRAM, compare GPUs and PCs, explore quantization, estimate ROI, and troubleshoot a local AI setup."
     }
   },
   "nav": {
@@ -138,7 +142,8 @@
     "vps": "VPS deals",
     "canIRun": "Can I Run It?",
     "search": "Search",
-    "builds": "PC builds"
+    "builds": "PC builds",
+    "tools": "Tools"
   },
   "topics": {
     "title": "Guides",
@@ -166,7 +171,10 @@
     "ctaBenchmarks": "See benchmarks",
     "buildsTitle": "Featured local-AI PC builds",
     "buildsIntro": "Four complete machines with a parts list, street price, VRAM, and write speed.",
-    "buildsCta": "See all PC builds"
+    "buildsCta": "See all PC builds",
+    "toolsTitle": "Top 10 visual tools",
+    "toolsIntro": "Plan your local AI setup with interactive tools for VRAM, GPU choice, quantization, and cost.",
+    "toolsCta": "Explore the tools"
   },
   "releases": {
     "title": "Release notes",
@@ -816,7 +824,8 @@
     "popularHeading": "Popular searches",
     "resultCount": "{count} matching result(s)",
     "browseHeading": "Browse by section",
-    "filterBuild": "PC builds"
+    "filterBuild": "PC builds",
+    "filterTool": "Visual tools"
   },
   "builds": {
     "title": "PC builds",
@@ -911,5 +920,83 @@
     "seeRig": "Measured benchmark",
     "seeCanIRun": "Check your own PC",
     "backToBuilds": "All PC builds"
+  },
+  "tools": {
+    "eyebrow": "Toolkit",
+    "title": "Top 10 visual tools for local AI",
+    "intro": "Ten hands-on tools to size VRAM, compare GPUs and builds, explore KV-Cache and quantization, and plan a local AI machine.",
+    "searchPlaceholder": "Search tools",
+    "allCategories": "All categories",
+    "openTool": "Open tool",
+    "relatedTitle": "Related tools",
+    "reset": "Reset",
+    "copyShare": "Copy share link",
+    "copied": "Copied",
+    "ctaDefault": "Open tool",
+    "categories": {
+      "memory": "Memory and VRAM",
+      "hardware": "Hardware",
+      "models": "Models",
+      "setup": "Setup",
+      "economics": "Cost and ROI",
+      "diagnostics": "Diagnostics"
+    },
+    "priority": {
+      "P0": "P0 · Core",
+      "P1": "P1 · Useful",
+      "P2": "P2 · Advanced"
+    },
+    "items": {
+      "vram-visualizer": {
+        "title": "VRAM Visualizer",
+        "tagline": "See how weights, KV-Cache, and context fit into your GPU VRAM.",
+        "cta": "Visualize VRAM"
+      },
+      "gpu-compare": {
+        "title": "GPU Compare",
+        "tagline": "Compare NVIDIA, AMD, and Apple GPUs by VRAM, bandwidth, and tok/s.",
+        "cta": "Compare GPUs"
+      },
+      "quant-explorer": {
+        "title": "Quant Explorer",
+        "tagline": "Compare Q2_0, IQ2_XS, and UD-IQ4_XS sizes and quality trade-offs.",
+        "cta": "Explore quantizations"
+      },
+      "install-wizard": {
+        "title": "Install Wizard",
+        "tagline": "Pick your OS and GPU, then follow the right Strata install steps.",
+        "cta": "Start the wizard"
+      },
+      "benchmark-scatter": {
+        "title": "Benchmark Scatter",
+        "tagline": "Plot tok/s against VRAM and power across measured GPUs.",
+        "cta": "Plot benchmarks"
+      },
+      "multi-gpu-planner": {
+        "title": "Multi-GPU Planner",
+        "tagline": "Plan PCIe lanes, --layer-split, and PSU headroom for two or more GPUs.",
+        "cta": "Plan multi-GPU"
+      },
+      "pc-builder": {
+        "title": "PC Builder",
+        "tagline": "Build a local AI PC with a balanced parts list and a realistic budget.",
+        "cta": "Build a PC"
+      },
+      "troubleshooter": {
+        "title": "Troubleshooter",
+        "tagline": "Fix CUDA, ROCm, and Metal detection issues step by step.",
+        "cta": "Diagnose issues"
+      },
+      "roi-calculator": {
+        "title": "ROI Calculator",
+        "tagline": "Estimate TCO, electricity cost, and payback versus cloud inference.",
+        "cta": "Calculate ROI"
+      },
+      "agent-studio": {
+        "title": "Agent Studio",
+        "tagline": "Wire local models into MCP tools and HF-Mirror and ModelScope workflows.",
+        "cta": "Open Agent Studio"
+      }
+    }
   }
 }

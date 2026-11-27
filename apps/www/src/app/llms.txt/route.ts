@@ -1,6 +1,7 @@
 import { routing } from "@/i18n/routing";
+import { ALL_TOOLS } from "@/features/tools/registry";
 import { getLiveArticles } from "@/lib/articles";
-import { PRIMARY_NAV, SECONDARY_NAV, buildPath } from "@/lib/routes";
+import { PRIMARY_NAV, SECONDARY_NAV, buildPath, toolPath } from "@/lib/routes";
 import { getReleases } from "@/lib/releases";
 import { getBenchmarks } from "@/lib/benchmarks";
 import { allBuilds, buildText, getBuild } from "@/lib/builds";
@@ -82,6 +83,16 @@ export function GET() {
     if (!build) continue;
     sections.push(
       `- [${buildText(build.title, "en")}](${absolute(buildPath(build.slug), "en")}): ${build.totalVramGb} GB VRAM, $${build.totalPriceUsd.toLocaleString("en-US")}, ${build.writingToks} tok/s write`,
+    );
+  }
+
+  sections.push(`\n## Interactive Graphical Tools\n`);
+  sections.push(
+    `- [Interactive Graphical Tools](${absolute("/tools", "en")}): ${ALL_TOOLS.length} interactive visual tools for VRAM fit, GPU comparison, quantization, setup and cost planning`,
+  );
+  for (const tool of ALL_TOOLS) {
+    sections.push(
+      `- [${tool.slug}](${absolute(toolPath(tool.slug), "en")}): ${tool.badgeMetric}`,
     );
   }
 

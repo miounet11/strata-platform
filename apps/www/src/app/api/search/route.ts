@@ -3,6 +3,7 @@ import { routing, type Locale } from "@/i18n/routing";
 import { getLiveArticles } from "@/lib/articles";
 import { getRigs } from "@/lib/benchmarks";
 import { allBuilds, buildText } from "@/lib/builds";
+import { ALL_TOOLS } from "@/features/tools/registry";
 import { allGpus, vramLabel } from "@/lib/gpus";
 import { getReleases } from "@/lib/releases";
 import { SCENARIOS } from "@/lib/scenarios";
@@ -12,7 +13,7 @@ import { buildPath, gpuPath, guidePath, releasePath, rigPath } from "@/lib/route
 export const dynamic = "force-dynamic";
 
 export type SearchHit = {
-  type: "guide" | "gpu" | "build" | "benchmark" | "topic" | "scenario" | "release";
+  type: "guide" | "gpu" | "build" | "tool" | "benchmark" | "topic" | "scenario" | "release";
   title: string;
   subtitle: string;
   href: string;
@@ -158,6 +159,27 @@ export async function GET(request: Request) {
           href: buildPath(build.slug),
           badge: build.tier,
           score: s + 11,
+        });
+      }
+    }
+  }
+
+  if (typeFilter === "all" || typeFilter === "tool") {
+    for (const tool of ALL_TOOLS) {
+      const s = scoreText(
+        needle,
+        effectiveTokens,
+        tool.slug.replace(/-/g, " "),
+        tool.category + " " + tool.badgeMetric + " " + tool.keywords.join(" "),
+      );
+      if (s > 0) {
+        hits.push({
+          type: "tool",
+          title: tool.slug.replace(/-/g, " "),
+          subtitle: `${tool.category} · ${tool.badgeMetric}`,
+          href: `/tools/${encodeURIComponent(tool.slug)}`,
+          badge: tool.priority,
+          score: s + 12,
         });
       }
     }

@@ -31,7 +31,8 @@
     "vps": "Offres VPS",
     "canIRun": "Calculateur VRAM",
     "search": "Recherche",
-    "builds": "Configurations PC"
+    "builds": "Configurations PC",
+    "tools": "Outils"
   },
   "topics": {
     "title": "Usages",
@@ -59,7 +60,10 @@
     "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
     "buildsTitle": "PC mis en avant pour l'IA locale",
     "buildsIntro": "Quatre machines complètes : nomenclature, prix constaté, VRAM et débit d'écriture.",
-    "buildsCta": "Voir toutes les configurations"
+    "buildsCta": "Voir toutes les configurations",
+    "toolsTitle": "Top 10 des outils visuels",
+    "toolsIntro": "Planifiez votre IA locale avec des outils interactifs pour la VRAM, le choix du GPU, la quantification et le coût.",
+    "toolsCta": "Découvrir les outils"
   },
   "releases": {
     "title": "Notes de version",
@@ -409,6 +413,10 @@
     "builds": {
       "title": "PC complets pour l'IA locale",
       "description": "Vingt-quatre postes chiffrés pour l'IA locale, avec nomenclature, VRAM, consommation, bruit et tokens par seconde estimés."
+    },
+    "tools": {
+      "title": "Top 10 des outils visuels pour l'IA locale",
+      "description": "Dix outils interactifs pour estimer la VRAM, comparer les GPU et les PC, explorer la quantification, évaluer les coûts et dépanner une installation d'IA locale."
     }
   },
   "gpus": {
@@ -816,7 +824,8 @@
     "popularHeading": "Recherches populaires",
     "resultCount": "{count} résultat(s)",
     "browseHeading": "Parcourir par rubrique",
-    "filterBuild": "Configurations"
+    "filterBuild": "Configurations",
+    "filterTool": "Outils visuels"
   },
   "builds": {
     "title": "Configurations PC",
@@ -911,5 +920,83 @@
     "seeRig": "Benchmark mesuré",
     "seeCanIRun": "Vérifier votre PC",
     "backToBuilds": "Toutes les configurations PC"
+  },
+  "tools": {
+    "eyebrow": "Boîte à outils",
+    "title": "Top 10 des outils visuels pour l'IA locale",
+    "intro": "Dix outils pratiques pour calculer la VRAM, comparer GPU et configurations, explorer le KV-Cache et la quantification, et planifier une machine d'IA locale.",
+    "searchPlaceholder": "Rechercher un outil",
+    "allCategories": "Toutes les catégories",
+    "openTool": "Ouvrir l'outil",
+    "relatedTitle": "Outils associés",
+    "reset": "Réinitialiser",
+    "copyShare": "Copier le lien de partage",
+    "copied": "Copié",
+    "ctaDefault": "Ouvrir l'outil",
+    "categories": {
+      "memory": "Mémoire et VRAM",
+      "hardware": "Matériel",
+      "models": "Modèles",
+      "setup": "Installation",
+      "economics": "Coûts et ROI",
+      "diagnostics": "Diagnostic"
+    },
+    "priority": {
+      "P0": "P0 · Essentiel",
+      "P1": "P1 · Utile",
+      "P2": "P2 · Avancé"
+    },
+    "items": {
+      "vram-visualizer": {
+        "title": "Visualiseur VRAM",
+        "tagline": "Voyez comment les poids, le KV-Cache et le contexte occupent la VRAM du GPU.",
+        "cta": "Voir la VRAM"
+      },
+      "gpu-compare": {
+        "title": "Comparateur de GPU",
+        "tagline": "Comparez les GPU NVIDIA, AMD et Apple selon la VRAM, la bande passante et les tok/s.",
+        "cta": "Comparer les GPU"
+      },
+      "quant-explorer": {
+        "title": "Explorateur de quantification",
+        "tagline": "Comparez Q2_0, IQ2_XS et UD-IQ4_XS en taille et en qualité.",
+        "cta": "Explorer la quantification"
+      },
+      "install-wizard": {
+        "title": "Assistant d'installation",
+        "tagline": "Choisissez votre système et votre GPU, puis suivez les étapes Strata adaptées.",
+        "cta": "Démarrer l'assistant"
+      },
+      "benchmark-scatter": {
+        "title": "Nuage de points des benchmarks",
+        "tagline": "Tracez les tok/s selon la VRAM et la puissance des GPU mesurés.",
+        "cta": "Tracer les benchmarks"
+      },
+      "multi-gpu-planner": {
+        "title": "Planificateur multi-GPU",
+        "tagline": "Planifiez les voies PCIe, --layer-split et la marge du PSU pour deux GPU ou plus.",
+        "cta": "Planifier le multi-GPU"
+      },
+      "pc-builder": {
+        "title": "Constructeur de PC",
+        "tagline": "Assemblez un PC d'IA locale avec une liste de pièces équilibrée et un budget réaliste.",
+        "cta": "Construire un PC"
+      },
+      "troubleshooter": {
+        "title": "Dépannage",
+        "tagline": "Résolvez pas à pas les problèmes de détection CUDA, ROCm et Metal.",
+        "cta": "Diagnostiquer"
+      },
+      "roi-calculator": {
+        "title": "Calculateur de ROI",
+        "tagline": "Estimez le TCO, le coût électrique et le retour sur investissement face à l'inférence cloud.",
+        "cta": "Calculer le ROI"
+      },
+      "agent-studio": {
+        "title": "Agent Studio",
+        "tagline": "Connectez les modèles locaux aux outils MCP et aux flux HF-Mirror et ModelScope.",
+        "cta": "Ouvrir le studio"
+      }
+    }
   }
 }

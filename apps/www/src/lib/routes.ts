@@ -27,6 +27,7 @@ export type NavGroup = {
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/download", key: "download" },
   { href: "/can-i-run", key: "canIRun" },
+  { href: "/tools", key: "tools" },
   { href: "/gpus", key: "gpus" },
   { href: "/builds", key: "builds" },
   { href: "/benchmarks", key: "benchmarks" },
@@ -45,6 +46,7 @@ export const SECONDARY_NAV: NavGroup[] = [
       { href: "/install", key: "install" },
       { href: "/models", key: "models" },
       { href: "/can-i-run", key: "canIRun" },
+      { href: "/tools", key: "tools" },
       { href: "/topics", key: "topics" },
       { href: "/gpus", key: "gpus" },
       { href: "/builds", key: "builds" },
@@ -88,6 +90,7 @@ export const STATIC_PATHS = [
   "/install",
   "/models",
   "/can-i-run",
+  "/tools",
   "/search",
   "/gpus",
   "/builds",
@@ -133,6 +136,7 @@ export function guideKindOrder(kind: string): number {
 /** Paths whose first segment is a hub worth naming in the trail. */
 const HUB_LABELS: Record<string, string> = {
   "can-i-run": "canIRun",
+  tools: "tools",
   search: "search",
   gpus: "gpus",
   builds: "builds",
@@ -163,6 +167,7 @@ export function hubKeyFor(pathname: string): string | undefined {
 export {
   guidePath,
   guideCategoryPath,
+  toolPath,
   gpuPath,
   buildPath,
   gpuSeriesPath,

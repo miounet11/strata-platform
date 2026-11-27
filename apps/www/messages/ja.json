@@ -31,7 +31,8 @@
     "vps": "VPS 特価",
     "canIRun": "動作判定",
     "search": "検索",
-    "builds": "完成PC"
+    "builds": "完成PC",
+    "tools": "ツール"
   },
   "topics": {
     "title": "使い方",
@@ -59,7 +60,10 @@
     "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
     "buildsTitle": "注目のローカルAI向けPC",
     "buildsIntro": "部品表、実売価格、VRAM、生成速度が分かる完成機を4台。",
-    "buildsCta": "すべてのPC構成を見る"
+    "buildsCta": "すべてのPC構成を見る",
+    "toolsTitle": "トップ10ビジュアルツール",
+    "toolsIntro": "VRAM、GPU選び、量子化、コストを対話的に確認して、ローカルAI環境を設計しましょう。",
+    "toolsCta": "ツールを見る"
   },
   "releases": {
     "title": "リリースノート",
@@ -409,6 +413,10 @@
     "builds": {
       "title": "ローカルAI向け完成PC",
       "description": "価格付きのローカルAI向けワークステーション24構成。部品表、VRAM、消費電力、騒音、推定トークン/秒を掲載。"
+    },
+    "tools": {
+      "title": "ローカルAI向けトップ10ビジュアルツール",
+      "description": "VRAM容量、GPU比較、量子化、コスト試算、セットアップの不具合チェックができる10個のインタラクティブツール。"
     }
   },
   "gpus": {
@@ -518,7 +526,7 @@
       "no": "いいえ",
       "unifiedSystem": "本体の電源を使用",
       "coolingLabels": {
-        "unified-silent": "静音の一体型筐体",
+        "unified-silent": "低騒音の一体型筐体",
         "compact-air": "コンパクト空冷",
         "high-airflow-tower": "高エアフローのタワー",
         "workstation-blower-or-aio": "ワークステーション用ブロワーまたは簡易水冷"
@@ -583,7 +591,7 @@
     "limitsTitle": "これらの数値が対象としない範囲",
     "limit1": "コンシューマー GPU のみ。サーバー向け製品とマルチ GPU 構成は含みません。",
     "limit2": "単一のワークロード（逐次単一ストリーム）です。バッチ・並列配信は全体スループットが上がる一方、ストリームあたりは遅くなります。",
-    "limit3": "価格は時点の実売価格であり、測定結果とは独立に変動します。",
+    "limit3": "価格は時点の実売価格であり、測定結果とは別に変動します。",
     "limit4": "回収日数は見積もりであり、提示した稼働時間で常時稼働する前提です。",
     "freshnessTitle": "データの鮮度",
     "freshnessBody": "表の最終同期日は {date} です。指標は同一 URL で再公開されるため、古いコピーから引用した数値も日付と照合できます。",
@@ -603,7 +611,7 @@
     "guidesLink": "セットアップガイド",
     "synced": "{date} に計測",
     "faqWhyCount": "なぜ最も安いカードではなく、この {count} 台なのか？",
-    "faqWhyCountAnswer": "順位は実測の100万トークンあたりコストで決まり、消費電力とハードウェア寿命が織り込まれています。安いカードでも遅い、あるいは電力を食うなら、5年では1トークンあたり高くつきます。リストはベンチマーク表から直接生成され、データが変われば順序も変わります。",
+    "faqWhyCountAnswer": "順位は実測の100万トークンあたりコストで決まり、消費電力とハードウェア耐用年数が織り込まれています。安いカードでも遅い、あるいは電力を食うなら、5年では1トークンあたり高くつきます。リストはベンチマーク表から直接生成され、データが変われば順序も変わります。",
     "faqWhereData": "この数字はどこから来ていますか？",
     "faqWhereDataAnswer": "{source}による{date}の実測値です。このページのすべてのリストは同じ日付の表から導かれ、コストの前提はベンチマークページに明記されています。",
     "faqTopPickQ": "「{title}」で1位の構成はどれですか？",
@@ -616,7 +624,7 @@
         "seoTitle": "ローカル LLM を最も安く動かせるハードウェア（実測コスト）",
         "seoDescription": "125B クラスのローカルモデルを動かしたとき、100万トークンあたりの実測コストが最も低い 6 台。電力と 5 年分の減価を含みます。",
         "summary": "100万トークンあたりの実測コスト順。電力費と 5 年分のハードウェア費用を含みます。最も安く動かせるマシンが、最も安く買えるマシンとは限りません。",
-        "rule": "100万トークンあたりのコスト順（電力 + ハードウェア寿命）",
+        "rule": "100万トークンあたりのコスト順（電力 + ハードウェア耐用年数）",
         "about": "ローカル LLM 推論の100万トークンあたりコスト",
         "limit": "「トークンあたり最安」はほぼ終日稼働を前提にしています。1日数時間の利用なら、スループットが低く安いマシンのほうが総額で有利な場合があります。"
       },
@@ -645,7 +653,7 @@
         "summary": "Apple 機を別に並べるのは、ユニファイドメモリが問い自体を変えるからです。収めるべき VRAM 上限はなく、価格と帯域だけが制約になります。",
         "rule": "Apple Silicon のみ、100万トークンあたりのコスト順",
         "about": "Apple Silicon のユニファイドメモリによるローカル推論",
-        "limit": "ユニファイドメモリは OS とすべてのアプリで共有されるため、実際に使える上限は公称より小さくなります。制約は容量より帯域であることが多いです。"
+        "limit": "ユニファイドメモリは OS とすべてのアプリで共有されるため、実際に使える上限は表記より小さくなります。制約は容量より帯域であることが多いです。"
       },
       "fastest": {
         "title": "ローカルLLM生成速度が最速のGPU",
@@ -690,7 +698,7 @@
         "summary": "48 GB以上のメモリにより高ビット量子化や128Kコンテキストをオフロード最小限で実行できます。",
         "rule": "メモリ48 GB以上の実測機（容量順）",
         "about": "大容量メモリ ローカルLLMワークステーション",
-        "limit": "ユニファイドメモリは容量と静音性に優れますが、生成速度はRTX PRO 6000等の単体GPUが上回ります。"
+        "limit": "ユニファイドメモリは容量と低騒音性に優れますが、生成速度はRTX PRO 6000等の単体GPUが上回ります。"
       }
     }
   },
@@ -802,7 +810,7 @@
     "faq3Q": "128Kコンテキストでは追加メモリがどれくらい必要ですか？",
     "faq3A": "128KコンテキストではKVキャッシュに約14 GB必要です（8K時は約1.5 GB）。長文用途には64–96 GB RAMまたは128 GBユニファイドメモリが推奨されます。",
     "faq4Q": "Apple SiliconとRTX 4090はどちらを選ぶべきですか？",
-    "faq4A": "大容量メモリと静音性ならApple Silicon（64–512 GB）、生成速度を重視するならRTX 4090（109.3 tok/s）やRTX 5090（168.4 tok/s）が2〜5倍高速です。"
+    "faq4A": "大容量メモリと低騒音性ならApple Silicon（64–512 GB）、生成速度を重視するならRTX 4090（109.3 tok/s）やRTX 5090（168.4 tok/s）が2〜5倍高速です。"
   },
   "search": {
     "title": "サイト内検索",
@@ -816,15 +824,16 @@
     "popularHeading": "人気の検索",
     "resultCount": "{count} 件の結果",
     "browseHeading": "カテゴリから探す",
-    "filterBuild": "PC構成"
+    "filterBuild": "PC構成",
+    "filterTool": "ビジュアルツール"
   },
   "builds": {
     "title": "完成PC",
     "intro": "ローカルAI向けの完成ワークステーション。部品、実売価格、VRAM、消費電力、騒音、トークン/秒。予算で絞るか、最大3台を比較できます。",
     "directoryTitle": "すべての構成",
     "search": "構成を検索",
-    "searchPlaceholder": "GPU、区分、構成名",
-    "tier": "区分",
+    "searchPlaceholder": "GPU、カテゴリ、構成名",
+    "tier": "カテゴリ",
     "vendor": "ベンダー",
     "minVram": "最低VRAM",
     "maxBudget": "予算の上限",
@@ -911,5 +920,83 @@
     "seeRig": "実測ベンチマーク",
     "seeCanIRun": "手持ちのPCを確認",
     "backToBuilds": "すべての完成PC"
+  },
+  "tools": {
+    "eyebrow": "ツールキット",
+    "title": "ローカルAI向けトップ10ビジュアルツール",
+    "intro": "VRAMの見積もり、GPUや構成の比較、KV-Cacheと量子化の確認など、ローカルAIマシンを設計する10個のツール。",
+    "searchPlaceholder": "ツールを検索",
+    "allCategories": "すべてのカテゴリ",
+    "openTool": "ツールを開く",
+    "relatedTitle": "関連ツール",
+    "reset": "リセット",
+    "copyShare": "共有リンクをコピー",
+    "copied": "コピーしました",
+    "ctaDefault": "ツールを開く",
+    "categories": {
+      "memory": "メモリとVRAM",
+      "hardware": "ハードウェア",
+      "models": "モデル",
+      "setup": "セットアップ",
+      "economics": "コストとROI",
+      "diagnostics": "不具合チェック"
+    },
+    "priority": {
+      "P0": "P0 · 基本",
+      "P1": "P1 · 便利",
+      "P2": "P2 · 応用"
+    },
+    "items": {
+      "vram-visualizer": {
+        "title": "VRAM可視化ツール",
+        "tagline": "重み、KV-Cache、コンテキストがGPUのVRAMにどう収まるかを確認します。",
+        "cta": "VRAMを見る"
+      },
+      "gpu-compare": {
+        "title": "GPU比較",
+        "tagline": "NVIDIA、AMD、AppleのGPUをVRAM、帯域幅、tok/sで比較します。",
+        "cta": "GPUを比較"
+      },
+      "quant-explorer": {
+        "title": "量子化エクスプローラー",
+        "tagline": "Q2_0、IQ2_XS、UD-IQ4_XSのサイズと精度の違いを比べます。",
+        "cta": "量子化を調べる"
+      },
+      "install-wizard": {
+        "title": "インストールウィザード",
+        "tagline": "OSとGPUを選んで、Strataの正しい手順を案内します。",
+        "cta": "ウィザードを始める"
+      },
+      "benchmark-scatter": {
+        "title": "ベンチマーク散布図",
+        "tagline": "実測済みGPUのtok/s、VRAM、消費電力をグラフにします。",
+        "cta": "グラフを描く"
+      },
+      "multi-gpu-planner": {
+        "title": "マルチGPUプランナー",
+        "tagline": "PCIeレーン、--layer-split、PSUの余裕を複数GPU向けに設計します。",
+        "cta": "構成を設計"
+      },
+      "pc-builder": {
+        "title": "PCビルダー",
+        "tagline": "部品のバランスと予算を考慮したローカルAI用PCを組み立てます。",
+        "cta": "PCを組む"
+      },
+      "troubleshooter": {
+        "title": "トラブルシューター",
+        "tagline": "CUDA、ROCm、Metalの認識問題を手順どおりに解決します。",
+        "cta": "チェックする"
+      },
+      "roi-calculator": {
+        "title": "ROI計算ツール",
+        "tagline": "TCO、電力費、クラウド推論に対する回収期間を見積もります。",
+        "cta": "ROIを計算"
+      },
+      "agent-studio": {
+        "title": "エージェントスタジオ",
+        "tagline": "ローカルモデルをMCPツールやHF-Mirror、ModelScopeの作業フローに接続します。",
+        "cta": "スタジオを開く"
+      }
+    }
   }
 }

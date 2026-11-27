@@ -31,7 +31,8 @@
     "vps": "VPS-Angebote",
     "canIRun": "VRAM-Rechner",
     "search": "Suche",
-    "builds": "PC-Bauvorschläge"
+    "builds": "PC-Bauvorschläge",
+    "tools": "Werkzeuge"
   },
   "topics": {
     "title": "Einsatz",
@@ -59,7 +60,10 @@
     "aiPromptCopy": "Set up Strata on this PC for me: https://github.com/Niko1221/Strata - follow docs/AI_SETUP.md in that repository.",
     "buildsTitle": "Ausgewählte PCs für lokale KI",
     "buildsIntro": "Vier fertige Rechner mit Stückliste, Straßenpreis, VRAM und Schreibgeschwindigkeit.",
-    "buildsCta": "Alle PC-Bauvorschläge ansehen"
+    "buildsCta": "Alle PC-Bauvorschläge ansehen",
+    "toolsTitle": "Top 10 visuelle Tools",
+    "toolsIntro": "Plane deine lokale KI mit interaktiven Tools für VRAM, GPU-Wahl, Quantisierung und Kosten.",
+    "toolsCta": "Tools entdecken"
   },
   "releases": {
     "title": "Versionshinweise",
@@ -409,6 +413,10 @@
     "builds": {
       "title": "Fertige PCs für lokale KI",
       "description": "Vierundzwanzig bepreiste Workstations für lokale KI mit Stückliste, VRAM, Leistungsaufnahme, Lautstärke und geschätzten Tokens pro Sekunde."
+    },
+    "tools": {
+      "title": "Top 10 visuelle Tools für lokale KI",
+      "description": "Zehn interaktive Tools für VRAM-Bedarf, GPU-Vergleich, Quantisierung, Kostenabschätzung und Fehlerbehebung bei lokaler KI."
     }
   },
   "gpus": {
@@ -816,7 +824,8 @@
     "popularHeading": "Beliebte Suchanfragen",
     "resultCount": "{count} Treffer",
     "browseHeading": "Nach Bereich stöbern",
-    "filterBuild": "PC-Bau"
+    "filterBuild": "PC-Bau",
+    "filterTool": "Visuelle Tools"
   },
   "builds": {
     "title": "PC-Bauvorschläge",
@@ -911,5 +920,83 @@
     "seeRig": "Gemessener Benchmark",
     "seeCanIRun": "Eigenen PC prüfen",
     "backToBuilds": "Alle PC-Bauvorschläge"
+  },
+  "tools": {
+    "eyebrow": "Tool-Sammlung",
+    "title": "Top 10 visuelle Tools für lokale KI",
+    "intro": "Zehn praktische Tools: VRAM berechnen, GPUs und PCs vergleichen, KV-Cache und Quantisierung erkunden und eine lokale KI-Maschine planen.",
+    "searchPlaceholder": "Tools suchen",
+    "allCategories": "Alle Kategorien",
+    "openTool": "Tool öffnen",
+    "relatedTitle": "Verwandte Tools",
+    "reset": "Zurücksetzen",
+    "copyShare": "Link kopieren",
+    "copied": "Kopiert",
+    "ctaDefault": "Tool öffnen",
+    "categories": {
+      "memory": "Speicher und VRAM",
+      "hardware": "Hardware",
+      "models": "Modelle",
+      "setup": "Einrichtung",
+      "economics": "Kosten und ROI",
+      "diagnostics": "Fehlerdiagnose"
+    },
+    "priority": {
+      "P0": "P0 · Basis",
+      "P1": "P1 · Nützlich",
+      "P2": "P2 · Fortgeschritten"
+    },
+    "items": {
+      "vram-visualizer": {
+        "title": "VRAM-Visualizer",
+        "tagline": "Sieh, wie Gewichte, KV-Cache und Kontext in den GPU-VRAM passen.",
+        "cta": "VRAM ansehen"
+      },
+      "gpu-compare": {
+        "title": "GPU-Vergleich",
+        "tagline": "Vergleiche NVIDIA-, AMD- und Apple-GPUs nach VRAM, Bandbreite und tok/s.",
+        "cta": "GPUs vergleichen"
+      },
+      "quant-explorer": {
+        "title": "Quantisierungs-Explorer",
+        "tagline": "Vergleiche Q2_0, IQ2_XS und UD-IQ4_XS nach Größe und Qualität.",
+        "cta": "Quantisierung erkunden"
+      },
+      "install-wizard": {
+        "title": "Installationsassistent",
+        "tagline": "Wähle Betriebssystem und GPU und folge den passenden Strata-Schritten.",
+        "cta": "Assistent starten"
+      },
+      "benchmark-scatter": {
+        "title": "Benchmark-Streudiagramm",
+        "tagline": "Trage tok/s gegen VRAM und Leistungsaufnahme gemessener GPUs auf.",
+        "cta": "Diagramm zeichnen"
+      },
+      "multi-gpu-planner": {
+        "title": "Multi-GPU-Planer",
+        "tagline": "Plane PCIe-Lanes, --layer-split und PSU-Reserve für zwei oder mehr GPUs.",
+        "cta": "Multi-GPU planen"
+      },
+      "pc-builder": {
+        "title": "PC-Konfigurator",
+        "tagline": "Stelle einen lokalen KI-PC mit ausgewogener Teileliste und realistischem Budget zusammen.",
+        "cta": "PC konfigurieren"
+      },
+      "troubleshooter": {
+        "title": "Fehlerbehebung",
+        "tagline": "Löse CUDA-, ROCm- und Metal-Erkennungsprobleme Schritt für Schritt.",
+        "cta": "Fehler beheben"
+      },
+      "roi-calculator": {
+        "title": "ROI-Rechner",
+        "tagline": "Schätze TCO, Stromkosten und Amortisation im Vergleich zu Cloud-Inferenz.",
+        "cta": "ROI berechnen"
+      },
+      "agent-studio": {
+        "title": "Agent Studio",
+        "tagline": "Verbinde lokale Modelle mit MCP-Tools und HF-Mirror- sowie ModelScope-Workflows.",
+        "cta": "Studio öffnen"
+      }
+    }
   }
 }

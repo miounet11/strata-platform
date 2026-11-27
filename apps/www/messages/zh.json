@@ -31,7 +31,8 @@
     "vps": "VPS 特价",
     "canIRun": "显存计算器",
     "search": "搜索",
-    "builds": "整机方案"
+    "builds": "整机方案",
+    "tools": "工具箱"
   },
   "topics": {
     "title": "场景",
@@ -59,7 +60,10 @@
     "ctaBenchmarks": "看跑分",
     "buildsTitle": "精选本地 AI 整机",
     "buildsIntro": "四套完整机器：配件、街价、显存和生成速度。",
-    "buildsCta": "查看全部整机"
+    "buildsCta": "查看全部整机",
+    "toolsTitle": "十大图形化工具",
+    "toolsIntro": "用交互式工具规划本地 AI：显存、显卡选择、量化和成本一次看清。",
+    "toolsCta": "看看这些工具"
   },
   "releases": {
     "title": "版本更新",
@@ -409,6 +413,10 @@
     "builds": {
       "title": "本地 AI 整机配置",
       "description": "二十四套标价的本地 AI 工作站：完整配件清单、显存、功耗、噪音和预估每秒 token。"
+    },
+    "tools": {
+      "title": "本地 AI 十大图形化工具",
+      "description": "十款交互式工具：算显存、对比显卡和整机、看量化、估成本，还能排查本地 AI 环境。"
     }
   },
   "gpus": {
@@ -816,7 +824,8 @@
     "popularHeading": "热门搜索",
     "resultCount": "找到 {count} 条相关结果",
     "browseHeading": "按栏目浏览",
-    "filterBuild": "整机"
+    "filterBuild": "整机",
+    "filterTool": "图形化工具"
   },
   "builds": {
     "title": "整机方案",
@@ -911,5 +920,83 @@
     "seeRig": "实测跑分",
     "seeCanIRun": "看看你的电脑",
     "backToBuilds": "全部整机方案"
+  },
+  "tools": {
+    "eyebrow": "工具套件",
+    "title": "本地 AI 十大图形化工具",
+    "intro": "十款上手的图形工具：算显存、对比显卡和整机、看 KV-Cache 与量化，规划你的本地 AI 机器。",
+    "searchPlaceholder": "搜索工具",
+    "allCategories": "全部分类",
+    "openTool": "打开工具",
+    "relatedTitle": "相关工具",
+    "reset": "重置",
+    "copyShare": "复制分享链接",
+    "copied": "已复制",
+    "ctaDefault": "打开工具",
+    "categories": {
+      "memory": "显存与内存",
+      "hardware": "硬件",
+      "models": "模型",
+      "setup": "安装配置",
+      "economics": "成本与回本",
+      "diagnostics": "故障排查"
+    },
+    "priority": {
+      "P0": "P0 · 核心",
+      "P1": "P1 · 常用",
+      "P2": "P2 · 进阶"
+    },
+    "items": {
+      "vram-visualizer": {
+        "title": "显存可视化",
+        "tagline": "看清模型权重、KV-Cache 和上下文怎么占满显卡显存。",
+        "cta": "查看显存"
+      },
+      "gpu-compare": {
+        "title": "显卡对比",
+        "tagline": "按显存、带宽和 tok/s 对比 NVIDIA、AMD 与 Apple 显卡。",
+        "cta": "对比显卡"
+      },
+      "quant-explorer": {
+        "title": "量化探索器",
+        "tagline": "对比 Q2_0、IQ2_XS、UD-IQ4_XS 的体积和质量取舍。",
+        "cta": "查看量化"
+      },
+      "install-wizard": {
+        "title": "安装向导",
+        "tagline": "选好系统和显卡，按对应步骤装好 Strata。",
+        "cta": "开始安装"
+      },
+      "benchmark-scatter": {
+        "title": "跑分散点图",
+        "tagline": "把实测显卡的 tok/s、显存和功耗画在一张图上。",
+        "cta": "查看跑分"
+      },
+      "multi-gpu-planner": {
+        "title": "多卡规划器",
+        "tagline": "规划 PCIe 通道、--layer-split 和 PSU 余量，装两张以上显卡。",
+        "cta": "规划多卡"
+      },
+      "pc-builder": {
+        "title": "装机助手",
+        "tagline": "配一台本地 AI 电脑：配件均衡、预算靠谱。",
+        "cta": "开始装机"
+      },
+      "troubleshooter": {
+        "title": "故障排查",
+        "tagline": "一步一步解决 CUDA、ROCm 和 Metal 识别问题。",
+        "cta": "开始排查"
+      },
+      "roi-calculator": {
+        "title": "回本计算器",
+        "tagline": "算清 TCO、电费，以及相比云端推理多久回本。",
+        "cta": "计算回本"
+      },
+      "agent-studio": {
+        "title": "智能体工作台",
+        "tagline": "把本地模型接到 MCP 工具和 HF-Mirror、ModelScope 工作流里。",
+        "cta": "打开工作台"
+      }
+    }
   }
 }
